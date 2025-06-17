@@ -3,7 +3,7 @@ import unittest
 import requests_mock
 
 from canvasapi import Canvas
-from canvasapi.favorite import Favorite
+from canvasapi_get.favorite import Favorite
 from tests import settings
 from tests.util import register_uris
 

@@ -3,9 +3,9 @@ import unittest
 import requests_mock
 
 from canvasapi import Canvas
-from canvasapi.enrollment_term import EnrollmentTerm
-from canvasapi.paginated_list import PaginatedList
-from canvasapi.user import User
+from canvasapi_get.enrollment_term import EnrollmentTerm
+from canvasapi_get.paginated_list import PaginatedList
+from canvasapi_get.user import User
 from tests import settings
 from tests.util import register_uris
 

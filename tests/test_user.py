@@ -4,27 +4,27 @@ import uuid
 import requests_mock
 
 from canvasapi import Canvas
-from canvasapi.assignment import Assignment
-from canvasapi.authentication_event import AuthenticationEvent
-from canvasapi.avatar import Avatar
-from canvasapi.calendar_event import CalendarEvent
-from canvasapi.communication_channel import CommunicationChannel
-from canvasapi.content_export import ContentExport
-from canvasapi.content_migration import ContentMigration, Migrator
-from canvasapi.course import Course
-from canvasapi.enrollment import Enrollment
-from canvasapi.eportfolio import EPortfolio
-from canvasapi.feature import Feature, FeatureFlag
-from canvasapi.file import File
-from canvasapi.folder import Folder
-from canvasapi.grade_change_log import GradeChangeEvent
-from canvasapi.license import License
-from canvasapi.login import Login
-from canvasapi.page_view import PageView
-from canvasapi.paginated_list import PaginatedList
-from canvasapi.pairing_code import PairingCode
-from canvasapi.usage_rights import UsageRights
-from canvasapi.user import User
+from canvasapi_get.assignment import Assignment
+from canvasapi_get.authentication_event import AuthenticationEvent
+from canvasapi_get.avatar import Avatar
+from canvasapi_get.calendar_event import CalendarEvent
+from canvasapi_get.communication_channel import CommunicationChannel
+from canvasapi_get.content_export import ContentExport
+from canvasapi_get.content_migration import ContentMigration, Migrator
+from canvasapi_get.course import Course
+from canvasapi_get.enrollment import Enrollment
+from canvasapi_get.eportfolio import EPortfolio
+from canvasapi_get.feature import Feature, FeatureFlag
+from canvasapi_get.file import File
+from canvasapi_get.folder import Folder
+from canvasapi_get.grade_change_log import GradeChangeEvent
+from canvasapi_get.license import License
+from canvasapi_get.login import Login
+from canvasapi_get.page_view import PageView
+from canvasapi_get.paginated_list import PaginatedList
+from canvasapi_get.pairing_code import PairingCode
+from canvasapi_get.usage_rights import UsageRights
+from canvasapi_get.user import User
 from tests import settings
 from tests.util import cleanup_file, register_uris
 

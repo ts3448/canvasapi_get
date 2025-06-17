@@ -3,8 +3,8 @@ import unittest
 import requests_mock
 
 from canvasapi import Canvas
-from canvasapi.exceptions import RequiredFieldMissing
-from canvasapi.planner import PlannerNote, PlannerOverride
+from canvasapi_get.exceptions import RequiredFieldMissing
+from canvasapi_get.planner import PlannerNote, PlannerOverride
 from tests import settings
 from tests.util import register_uris
 

@@ -3,9 +3,9 @@ import unittest
 import requests_mock
 
 from canvasapi import Canvas
-from canvasapi.exceptions import RequiredFieldMissing
-from canvasapi.paginated_list import PaginatedList
-from canvasapi.quiz import (
+from canvasapi_get.exceptions import RequiredFieldMissing
+from canvasapi_get.paginated_list import PaginatedList
+from canvasapi_get.quiz import (
     Quiz,
     QuizAssignmentOverrideSet,
     QuizExtension,
@@ -16,9 +16,9 @@ from canvasapi.quiz import (
     QuizSubmissionEvent,
     QuizSubmissionQuestion,
 )
-from canvasapi.quiz_group import QuizGroup
-from canvasapi.submission import Submission
-from canvasapi.user import User
+from canvasapi_get.quiz_group import QuizGroup
+from canvasapi_get.submission import Submission
+from canvasapi_get.user import User
 from tests import settings
 from tests.util import register_uris
 

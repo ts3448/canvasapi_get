@@ -3,8 +3,8 @@ import unittest
 import requests_mock
 
 from canvasapi import Canvas
-from canvasapi.exceptions import RequiredFieldMissing
-from canvasapi.poll_session import PollSession
+from canvasapi_get.exceptions import RequiredFieldMissing
+from canvasapi_get.poll_session import PollSession
 from tests import settings
 from tests.util import register_uris
 

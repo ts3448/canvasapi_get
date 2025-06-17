@@ -3,7 +3,7 @@ import unittest
 import requests_mock
 
 from canvasapi import Canvas
-from canvasapi.notification_preference import NotificationPreference
+from canvasapi_get.notification_preference import NotificationPreference
 from tests import settings
 from tests.util import register_uris
 

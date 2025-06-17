@@ -3,8 +3,8 @@ import unittest
 import requests_mock
 
 from canvasapi import Canvas
-from canvasapi.authentication_event import AuthenticationEvent
-from canvasapi.login import Login
+from canvasapi_get.authentication_event import AuthenticationEvent
+from canvasapi_get.login import Login
 from tests import settings
 from tests.util import register_uris
 

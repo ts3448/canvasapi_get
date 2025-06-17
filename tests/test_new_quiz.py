@@ -3,7 +3,7 @@ import unittest
 import requests_mock
 
 from canvasapi import Canvas
-from canvasapi.new_quiz import NewQuiz
+from canvasapi_get.new_quiz import NewQuiz
 from tests import settings
 from tests.util import register_uris
 

@@ -3,7 +3,7 @@ import unittest
 import requests_mock
 
 from canvasapi import Canvas
-from canvasapi.conversation import Conversation
+from canvasapi_get.conversation import Conversation
 from tests import settings
 from tests.util import register_uris
 

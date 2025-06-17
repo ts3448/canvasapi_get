@@ -6,27 +6,27 @@ import pytz
 import requests_mock
 
 from canvasapi import Canvas
-from canvasapi.account import Account
-from canvasapi.account_calendar import AccountCalendar
-from canvasapi.appointment_group import AppointmentGroup
-from canvasapi.calendar_event import CalendarEvent
-from canvasapi.comm_message import CommMessage
-from canvasapi.conversation import Conversation
-from canvasapi.course import Course, CourseNickname
-from canvasapi.course_epub_export import CourseEpubExport
-from canvasapi.discussion_topic import DiscussionTopic
-from canvasapi.eportfolio import EPortfolio
-from canvasapi.exceptions import RequiredFieldMissing, ResourceDoesNotExist
-from canvasapi.file import File
-from canvasapi.group import Group, GroupCategory
-from canvasapi.jwt import JWT
-from canvasapi.outcome import Outcome, OutcomeGroup
-from canvasapi.paginated_list import PaginatedList
-from canvasapi.poll import Poll
-from canvasapi.progress import Progress
-from canvasapi.section import Section
-from canvasapi.todo import Todo
-from canvasapi.user import User
+from canvasapi_get.account import Account
+from canvasapi_get.account_calendar import AccountCalendar
+from canvasapi_get.appointment_group import AppointmentGroup
+from canvasapi_get.calendar_event import CalendarEvent
+from canvasapi_get.comm_message import CommMessage
+from canvasapi_get.conversation import Conversation
+from canvasapi_get.course import Course, CourseNickname
+from canvasapi_get.course_epub_export import CourseEpubExport
+from canvasapi_get.discussion_topic import DiscussionTopic
+from canvasapi_get.eportfolio import EPortfolio
+from canvasapi_get.exceptions import RequiredFieldMissing, ResourceDoesNotExist
+from canvasapi_get.file import File
+from canvasapi_get.group import Group, GroupCategory
+from canvasapi_get.jwt import JWT
+from canvasapi_get.outcome import Outcome, OutcomeGroup
+from canvasapi_get.paginated_list import PaginatedList
+from canvasapi_get.poll import Poll
+from canvasapi_get.progress import Progress
+from canvasapi_get.section import Section
+from canvasapi_get.todo import Todo
+from canvasapi_get.user import User
 from tests import settings
 from tests.util import register_uris
 

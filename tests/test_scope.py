@@ -3,7 +3,7 @@ import unittest
 import requests_mock
 
 from canvasapi import Canvas
-from canvasapi.scope import Scope
+from canvasapi_get.scope import Scope
 from tests import settings
 
 

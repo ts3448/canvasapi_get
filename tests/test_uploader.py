@@ -4,8 +4,8 @@ from pathlib import Path
 
 import requests_mock
 
-from canvasapi.canvas import Canvas
-from canvasapi.upload import Uploader
+from canvasapi_get.canvas import Canvas
+from canvasapi_get.upload import Uploader
 from tests import settings
 from tests.util import cleanup_file, register_uris
 

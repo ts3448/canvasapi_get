@@ -3,7 +3,7 @@ import unittest
 import requests_mock
 
 from canvasapi import Canvas
-from canvasapi.outcome_import import OutcomeImport
+from canvasapi_get.outcome_import import OutcomeImport
 from tests import settings
 
 

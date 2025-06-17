@@ -5,9 +5,9 @@ from itertools import chain
 import requests_mock
 
 from canvasapi import Canvas
-from canvasapi.course import CourseNickname
-from canvasapi.user import User
-from canvasapi.util import (
+from canvasapi_get.course import CourseNickname
+from canvasapi_get.user import User
+from canvasapi_get.util import (
     clean_headers,
     combine_kwargs,
     file_or_path,

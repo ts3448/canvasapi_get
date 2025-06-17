@@ -2,7 +2,7 @@ import unittest
 
 import requests_mock
 
-from canvasapi.canvas import Canvas
+from canvasapi_get.canvas import Canvas
 from tests import settings
 from tests.util import register_uris
 

@@ -6,7 +6,7 @@ import requests
 import requests_mock
 
 from canvasapi import Canvas
-from canvasapi.exceptions import (
+from canvasapi_get.exceptions import (
     BadRequest,
     CanvasException,
     Conflict,

@@ -3,16 +3,16 @@ import unittest
 import requests_mock
 
 from canvasapi import Canvas
-from canvasapi.account import Account
-from canvasapi.content_migration import (
+from canvasapi_get.account import Account
+from canvasapi_get.content_migration import (
     ContentMigration,
     ContentMigrationSelectionNode,
     MigrationIssue,
 )
-from canvasapi.course import Course
-from canvasapi.group import Group
-from canvasapi.progress import Progress
-from canvasapi.user import User
+from canvasapi_get.course import Course
+from canvasapi_get.group import Group
+from canvasapi_get.progress import Progress
+from canvasapi_get.user import User
 from tests import settings
 from tests.util import register_uris
 

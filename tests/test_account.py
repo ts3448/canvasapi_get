@@ -5,7 +5,7 @@ import pytz
 import requests_mock
 
 from canvasapi import Canvas
-from canvasapi.account import (
+from canvasapi_get.account import (
     Account,
     AccountNotification,
     AccountReport,
@@ -13,28 +13,28 @@ from canvasapi.account import (
     Role,
     SSOSettings,
 )
-from canvasapi.account_calendar import AccountCalendar
-from canvasapi.authentication_event import AuthenticationEvent
-from canvasapi.authentication_provider import AuthenticationProvider
-from canvasapi.content_migration import ContentMigration, Migrator
-from canvasapi.course import Course
-from canvasapi.course_event import CourseEvent
-from canvasapi.enrollment import Enrollment
-from canvasapi.enrollment_term import EnrollmentTerm
-from canvasapi.exceptions import CanvasException, RequiredFieldMissing
-from canvasapi.external_tool import ExternalTool
-from canvasapi.feature import Feature, FeatureFlag
-from canvasapi.grading_period import GradingPeriod
-from canvasapi.grading_standard import GradingStandard
-from canvasapi.group import Group, GroupCategory
-from canvasapi.login import Login
-from canvasapi.outcome import OutcomeGroup, OutcomeLink
-from canvasapi.outcome_import import OutcomeImport
-from canvasapi.paginated_list import PaginatedList
-from canvasapi.rubric import Rubric
-from canvasapi.scope import Scope
-from canvasapi.sis_import import SisImport
-from canvasapi.user import User
+from canvasapi_get.account_calendar import AccountCalendar
+from canvasapi_get.authentication_event import AuthenticationEvent
+from canvasapi_get.authentication_provider import AuthenticationProvider
+from canvasapi_get.content_migration import ContentMigration, Migrator
+from canvasapi_get.course import Course
+from canvasapi_get.course_event import CourseEvent
+from canvasapi_get.enrollment import Enrollment
+from canvasapi_get.enrollment_term import EnrollmentTerm
+from canvasapi_get.exceptions import CanvasException, RequiredFieldMissing
+from canvasapi_get.external_tool import ExternalTool
+from canvasapi_get.feature import Feature, FeatureFlag
+from canvasapi_get.grading_period import GradingPeriod
+from canvasapi_get.grading_standard import GradingStandard
+from canvasapi_get.group import Group, GroupCategory
+from canvasapi_get.login import Login
+from canvasapi_get.outcome import OutcomeGroup, OutcomeLink
+from canvasapi_get.outcome_import import OutcomeImport
+from canvasapi_get.paginated_list import PaginatedList
+from canvasapi_get.rubric import Rubric
+from canvasapi_get.scope import Scope
+from canvasapi_get.sis_import import SisImport
+from canvasapi_get.user import User
 from tests import settings
 from tests.util import register_uris
 

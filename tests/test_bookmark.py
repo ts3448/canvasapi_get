@@ -3,7 +3,7 @@ import unittest
 import requests_mock
 
 from canvasapi import Canvas
-from canvasapi.bookmark import Bookmark
+from canvasapi_get.bookmark import Bookmark
 from tests import settings
 from tests.util import register_uris
 

@@ -3,7 +3,7 @@ import unittest
 import requests_mock
 
 from canvasapi import Canvas
-from canvasapi.feature import Feature, FeatureFlag
+from canvasapi_get.feature import Feature, FeatureFlag
 from tests import settings
 from tests.util import register_uris
 

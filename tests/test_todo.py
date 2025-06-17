@@ -3,7 +3,7 @@ import unittest
 import requests_mock
 
 from canvasapi import Canvas
-from canvasapi.todo import Todo
+from canvasapi_get.todo import Todo
 from tests import settings
 
 

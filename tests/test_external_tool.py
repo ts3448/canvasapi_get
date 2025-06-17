@@ -3,10 +3,10 @@ import unittest
 import requests_mock
 
 from canvasapi import Canvas
-from canvasapi.account import Account
-from canvasapi.course import Course
-from canvasapi.exceptions import CanvasException
-from canvasapi.external_tool import ExternalTool
+from canvasapi_get.account import Account
+from canvasapi_get.course import Course
+from canvasapi_get.exceptions import CanvasException
+from canvasapi_get.external_tool import ExternalTool
 from tests import settings
 from tests.util import register_uris
 

@@ -3,7 +3,7 @@ import unittest
 import requests_mock
 
 from canvasapi import Canvas
-from canvasapi.pairing_code import PairingCode
+from canvasapi_get.pairing_code import PairingCode
 from tests import settings
 from tests.util import register_uris
 

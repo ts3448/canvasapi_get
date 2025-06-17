@@ -3,8 +3,8 @@ import unittest
 import requests_mock
 
 from canvasapi import Canvas
-from canvasapi.appointment_group import AppointmentGroup
-from canvasapi.exceptions import RequiredFieldMissing
+from canvasapi_get.appointment_group import AppointmentGroup
+from canvasapi_get.exceptions import RequiredFieldMissing
 from tests import settings
 from tests.util import register_uris
 
