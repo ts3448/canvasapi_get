@@ -15,10 +15,11 @@ class CanvasObject(object):
 
     def __init__(self, requester, attributes):
         """
-        :param requester: The requester to pass HTTP requests through.
-        :type requester: :class:`canvasapi_get.requester.Requester`
-        :param attributes: The JSON object to build this object with.
-        :type attributes: dict
+        Initialize Canvas object with requester and attributes.
+
+        Args:
+            requester: The requester to pass HTTP requests through.
+            attributes: The JSON object to build this object with.
         """
         self._requester = requester
         self.set_attributes(attributes)
