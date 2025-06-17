@@ -69,6 +69,11 @@ class PaginatedList(Iterable[T]):
         while self._has_next():
             self._grow()
 
+    def __len__(self):
+        # Make sure all pages have been fetched
+        # (your constructor already does greedy pagination)
+        return len(self._elements)
+
     def __iter__(self) -> Iterator[T]:
         for element in self._elements:
             yield element
