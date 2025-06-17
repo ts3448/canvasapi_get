@@ -32,36 +32,45 @@ from canvasapi_get.util import combine_kwargs, get_institution_url, obj_or_id
 class HybridRequester:
     """
     Hybrid requester that provides sync interface while exposing async capabilities.
-    
+
     This wrapper allows Canvas methods to continue working synchronously while
     enabling PaginatedList to automatically detect and use async pagination.
     """
-    
+
     def __init__(self, sync_requester, async_requester):
         """
         Initialize hybrid requester with both sync and async requesters.
-        
+
         Args:
             sync_requester: Synchronous requester for individual Canvas API calls
             async_requester: Asynchronous requester for PaginatedList detection and use
         """
         self._sync_requester = sync_requester
         self._async_requester = async_requester
-        
+
         # Expose async requester attributes for PaginatedList detection
         self.rate_limit_state = async_requester.rate_limit_state
         self.coordinator = async_requester.coordinator
-        
+
         # Expose other requester attributes for compatibility
         self.base_url = sync_requester.base_url
         self.new_quizzes_url = sync_requester.new_quizzes_url
         self.original_url = sync_requester.original_url
         self.access_token = sync_requester.access_token
-    
-    def request(self, method, endpoint=None, headers=None, use_auth=True, _url=None, _kwargs=None, **kwargs):
+
+    def request(
+        self,
+        method,
+        endpoint=None,
+        headers=None,
+        use_auth=True,
+        _url=None,
+        _kwargs=None,
+        **kwargs,
+    ):
         """
         Make a request using the sync requester (for Canvas method compatibility).
-        
+
         Args:
             method: HTTP method for the request
             endpoint: API endpoint to call
@@ -70,48 +79,48 @@ class HybridRequester:
             _url: Optional URL override
             _kwargs: Processed keyword arguments
             **kwargs: Additional request parameters
-            
+
         Returns:
             HTTP response object
         """
         return self._sync_requester.request(
             method=method,
-            endpoint=endpoint, 
+            endpoint=endpoint,
             headers=headers,
             use_auth=use_auth,
             _url=_url,
             _kwargs=_kwargs,
-            **kwargs
+            **kwargs,
         )
-    
+
     async def __aenter__(self):
         """
         Async context manager entry - delegate to async requester.
-        
+
         Returns:
             The async requester for use in async context
         """
         await self._async_requester.__aenter__()
         return self._async_requester
-    
+
     async def __aexit__(self, exc_type, exc_val, exc_tb):
         """
         Async context manager exit - delegate to async requester.
-        
+
         Args:
             exc_type: Exception type if an exception occurred
-            exc_val: Exception value if an exception occurred  
+            exc_val: Exception value if an exception occurred
             exc_tb: Exception traceback if an exception occurred
         """
         return await self._async_requester.__aexit__(exc_type, exc_val, exc_tb)
-    
+
     def __getattr__(self, name):
         """
         Delegate any other attribute access to the sync requester for compatibility.
-        
+
         Args:
             name: Attribute name to access
-            
+
         Returns:
             Attribute value from sync requester
         """
@@ -165,7 +174,7 @@ class Canvas(object):
         if use_async_pagination:
             # Create hybrid requester that provides sync interface but enables async pagination
             from canvasapi_get.async_requester import AsyncRequester
-            
+
             sync_requester = Requester(base_url, access_token)
             async_requester = AsyncRequester(base_url, access_token)
             self.__requester = HybridRequester(sync_requester, async_requester)
@@ -366,129 +375,6 @@ class Canvas(object):
 
         return CalendarEvent(self.__requester, response.json())
 
-    def create_conversation(self, recipients, body, **kwargs):
-        """
-        Create a new Conversation.
-
-        :calls: `POST /api/v1/conversations \
-        <https://canvas.instructure.com/doc/api/conversations.html#method.conversations.create>`_
-
-        :param recipients: An array of recipient ids.
-            These may be user ids or course/group ids prefixed
-            with 'course\\_' or 'group\\_' respectively,
-            e.g. recipients=['1', '2', 'course_3']
-        :type recipients: `list` of `str`
-        :param body: The body of the message being added.
-        :type body: `str`
-        :rtype: list of :class:`canvasapi_get.conversation.Conversation`
-        """
-        kwargs["recipients"] = recipients
-        kwargs["body"] = body
-
-        response = self.__requester.request(
-            "POST", "conversations", _kwargs=combine_kwargs(**kwargs)
-        )
-        return [Conversation(self.__requester, convo) for convo in response.json()]
-
-    def create_group(self, **kwargs):
-        """
-        Create a group
-
-        :calls: `POST /api/v1/groups/ \
-        <https://canvas.instructure.com/doc/api/groups.html#method.groups.create>`_
-
-        :rtype: :class:`canvasapi_get.group.Group`
-        """
-        response = self.__requester.request(
-            "POST", "groups", _kwargs=combine_kwargs(**kwargs)
-        )
-        return Group(self.__requester, response.json())
-
-    def create_jwt(self, **kwargs):
-        """
-        Creates a unique JWT to use with other Canvas services.
-
-        :calls: `POST /api/v1/jwts \
-        <https://canvas.instructure.com/doc/api/jw_ts.html#method.jwts.create>`_
-
-        :rtype: list of :class:`canvasapi_get.jwt.JWT`
-        """
-        response = self.__requester.request(
-            "POST", "jwts", _kwargs=combine_kwargs(**kwargs)
-        )
-
-        return JWT(self.__requester, response.json())
-
-    def create_planner_note(self, **kwargs):
-        """
-        Create a planner note for the current user
-
-        :calls: `POST /api/v1/planner_notes \
-        <https://canvas.instructure.com/doc/api/planner.html#method.planner_notes.create>`_
-
-        :rtype: :class:`canvasapi_get.planner.PlannerNote`
-        """
-        response = self.__requester.request(
-            "POST", "planner_notes", _kwargs=combine_kwargs(**kwargs)
-        )
-        return PlannerNote(self.__requester, response.json())
-
-    def create_planner_override(self, plannable_type, plannable_id, **kwargs):
-        """
-        Create a planner override for the current user
-
-        :calls: `POST /api/v1/planner/overrides \
-        <https://canvas.instructure.com/doc/api/planner.html#method.planner_overrides.create>`_
-
-        :param plannable_type: Type of the item that you are overriding in the planner
-        :type plannable_type: str
-
-        :param plannable_id: ID of the item that you are overriding in the planner
-        :type plannable_id: int or :class:`canvasapi_get.planner.PlannerOverride`
-
-        :rtype: :class:`canvasapi_get.planner.PlannerOverride`
-        """
-        if isinstance(plannable_type, str):
-            kwargs["plannable_type"] = plannable_type
-        else:
-            raise RequiredFieldMissing("plannable_type is required as a str.")
-        if isinstance(plannable_id, int):
-            kwargs["plannable_id"] = plannable_id
-        else:
-            raise RequiredFieldMissing("plannable_id is required as an int.")
-
-        response = self.__requester.request(
-            "POST", "planner/overrides", _kwargs=combine_kwargs(**kwargs)
-        )
-        return PlannerOverride(self.__requester, response.json())
-
-    def create_poll(self, polls, **kwargs):
-        """
-        Create a new poll for the current user.
-
-        :calls: `POST /api/v1/polls \
-        <https://canvas.instructure.com/doc/api/polls.html#method.polling/polls.create>`_
-
-        :param polls: List of polls to create. `'question'` key is required.
-        :type polls: list of dict
-        :rtype: :class:`canvasapi_get.poll.Poll`
-        """
-        if (
-            isinstance(polls, list)
-            and isinstance(polls[0], dict)
-            and "question" in polls[0]
-        ):
-            kwargs["polls"] = polls
-        else:
-            raise RequiredFieldMissing(
-                "List of dictionaries each with key 'question' is required."
-            )
-
-        response = self.__requester.request(
-            "POST", "polls", _kwargs=combine_kwargs(**kwargs)
-        )
-        return Poll(self.__requester, response.json()["polls"][0])
-
     def get_account(self, account, use_sis_id=False, **kwargs):
         """
         Retrieve information on an individual account.
@@ -550,7 +436,7 @@ class Canvas(object):
         """
         return PaginatedList(
             Account,
-            self._get_requester_for_pagination(),
+            self.__requester,
             "GET",
             "accounts",
             _kwargs=combine_kwargs(**kwargs),
