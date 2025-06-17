@@ -33,12 +33,14 @@ class Canvas(object):
     The main class to be instantiated to provide access to Canvas's API.
     """
 
-    def __init__(self, base_url, access_token):
+    def __init__(self, base_url, access_token, use_async_pagination=False):
         """
         :param base_url: The base URL of the Canvas instance's API.
         :type base_url: str
         :param access_token: The API key to authenticate requests with.
         :type access_token: str
+        :param use_async_pagination: Whether to use async concurrent pagination.
+        :type use_async_pagination: bool
         """
         if "api/v1" in base_url:
             raise ValueError(
@@ -70,7 +72,11 @@ class Canvas(object):
         access_token = access_token.strip()
         base_url = get_institution_url(base_url)
 
-        self.__requester = Requester(base_url, access_token)
+        if use_async_pagination:
+            from canvasapi_get.async_requester import AsyncRequester
+            self.__requester = AsyncRequester(base_url, access_token)
+        else:
+            self.__requester = Requester(base_url, access_token)
 
     def clear_course_nicknames(self, **kwargs):
         """

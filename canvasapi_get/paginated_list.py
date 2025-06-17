@@ -1,18 +1,16 @@
 from __future__ import annotations
 
 import re
-from typing import Iterable, Iterator, Type, TypeVar
-
-T = TypeVar("T")
+from collections.abc import Iterable, Iterator
 
 
-class PaginatedList(Iterable[T]):
+class PaginatedList(Iterable):
     """
     Abstracts `pagination of Canvas API \
     <https://canvas.instructure.com/doc/api/file.pagination.html>`_.
     """
 
-    def __getitem__(self, index: int | slice) -> T | Iterable[T]:
+    def __getitem__(self, index: int | slice):
         assert isinstance(index, (int, slice))
         if isinstance(index, int):
             if index < 0:
@@ -24,7 +22,7 @@ class PaginatedList(Iterable[T]):
 
     def __init__(
         self,
-        content_class: Type[T],
+        content_class,
         requester,
         request_method,
         first_url,
@@ -37,7 +35,7 @@ class PaginatedList(Iterable[T]):
         :param content_class: The expected type to return in the list.
         :type content_class: class
         :param requester: The requester to pass HTTP requests through.
-        :type requester: :class:`canvasapi_get.requester.Requester`
+        :type requester: :class:`canvasapi_get.requester.Requester` or :class:`canvasapi_get.async_requester.AsyncRequester`
         :param request_method: HTTP request method
         :type request_method: str
         :param first_url: Canvas endpoint for the initial request
@@ -51,8 +49,40 @@ class PaginatedList(Iterable[T]):
         :type _url_override: str
         :rtype: :class:`canvasapi_get.paginated_list.PaginatedList` of type content_class
         """
-        self._elements: list[T] = []
+        self._elements: list = []
 
+        # Check if requester is async-capable and use async pagination
+        if hasattr(requester, "rate_limit_state") and hasattr(requester, "coordinator"):
+            # This is an AsyncRequester - use async pagination internally
+            import asyncio
+            from canvasapi_get.async_paginated_list import AsyncPaginatedList
+
+            async def _fetch_all_async():
+                async_list = AsyncPaginatedList(
+                    content_class,
+                    requester,
+                    request_method,
+                    first_url,
+                    extra_attribs=extra_attribs,
+                    _root=_root,
+                    _url_override=_url_override,
+                    **kwargs,
+                )
+
+                # Use context manager for proper session handling
+                async with requester:
+                    await async_list.fetch_all()
+                    return await async_list.to_list()
+
+            # Fetch all pages concurrently and populate _elements
+            self._elements = asyncio.run(_fetch_all_async())
+
+            # Set attributes for compatibility
+            self._requester = requester
+            self._content_class = content_class
+            return
+
+        # Standard sync pagination behavior
         self._requester = requester
         self._content_class = content_class
         self._first_url = first_url
@@ -74,7 +104,7 @@ class PaginatedList(Iterable[T]):
         # (your constructor already does greedy pagination)
         return len(self._elements)
 
-    def __iter__(self) -> Iterator[T]:
+    def __iter__(self) -> Iterator:
         for element in self._elements:
             yield element
         # In case _has_next() became False after init, this loop is a no-op
@@ -86,7 +116,7 @@ class PaginatedList(Iterable[T]):
     def __repr__(self) -> str:
         return f"<PaginatedList of type {self._content_class.__name__}>"
 
-    def _get_next_page(self) -> list[T]:
+    def _get_next_page(self) -> list:
         response = self._requester.request(
             self._request_method,
             self._next_url,
@@ -119,7 +149,7 @@ class PaginatedList(Iterable[T]):
                     f"The key <{self._root}> does not exist in the response."
                 ) from exc
 
-        content: list[T] = []
+        content: list = []
         for element in data:
             if element is not None:
                 element.update(self._extra_attribs)
@@ -131,7 +161,7 @@ class PaginatedList(Iterable[T]):
         while len(self._elements) <= index and self._has_next():
             self._grow()
 
-    def _grow(self) -> list[T]:
+    def _grow(self) -> list:
         new_elements = self._get_next_page()
         self._elements.extend(new_elements)
         return new_elements
@@ -142,8 +172,8 @@ class PaginatedList(Iterable[T]):
     def _is_larger_than(self, index: int) -> bool:
         return len(self._elements) > index or self._has_next()
 
-    class _Slice(Iterable[T]):
-        def __init__(self, the_list: PaginatedList[T], the_slice: slice):
+    class _Slice(Iterable):
+        def __init__(self, the_list: PaginatedList, the_slice: slice):
             self._list = the_list
             self._start = the_slice.start or 0
             self._stop = the_slice.stop
@@ -152,7 +182,7 @@ class PaginatedList(Iterable[T]):
             if self._start < 0 or (self._stop is not None and self._stop < 0):
                 raise IndexError("Cannot negative index a PaginatedList slice")
 
-        def __iter__(self) -> Iterator[T]:
+        def __iter__(self) -> Iterator:
             index = self._start
             while not self._finished(index):
                 if self._list._is_larger_than(index):

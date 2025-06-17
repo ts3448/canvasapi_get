@@ -34,9 +34,13 @@ class AsyncResponse:
         self.links = getattr(original_response, "links", {})
         self._content = content
 
-    async def json(self):
+    def json(self) -> dict:
+        """Parse response content as JSON.
+        
+        Returns:
+            Parsed JSON data.
+        """
         import json
-
         return json.loads(self._content.decode("utf-8"))
 
     @property
