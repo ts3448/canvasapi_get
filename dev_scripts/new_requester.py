@@ -13,7 +13,6 @@ logging.getLogger("canvasapi").setLevel(logging.DEBUG)
 CANVAS_API_URL = os.environ.get("CANVAS_API_URL")
 CANVAS_API_KEY = os.environ.get("CANVAS_API_KEY")
 
-print(CANVAS_API_URL)
 
 canvas = Canvas(CANVAS_API_URL, CANVAS_API_KEY)
 

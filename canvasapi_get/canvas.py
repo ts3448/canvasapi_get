@@ -74,9 +74,14 @@ class Canvas(object):
 
         if use_async_pagination:
             from canvasapi_get.async_requester import AsyncRequester
+
             self.__requester = AsyncRequester(base_url, access_token)
         else:
             self.__requester = Requester(base_url, access_token)
+
+    @property
+    def requester(self):
+        return self.__requester
 
     def clear_course_nicknames(self, **kwargs):
         """

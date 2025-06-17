@@ -3,10 +3,12 @@
 import asyncio
 import logging
 import random
+import ssl
 from datetime import datetime
 from pprint import pformat
 
 import aiohttp
+import certifi
 
 from canvasapi_get.async_rate_limit_state import AsyncRateLimitState
 from canvasapi_get.rate_limit_coordinator import RateLimitCoordinator
@@ -36,11 +38,12 @@ class AsyncResponse:
 
     def json(self) -> dict:
         """Parse response content as JSON.
-        
+
         Returns:
             Parsed JSON data.
         """
         import json
+
         return json.loads(self._content.decode("utf-8"))
 
     @property
@@ -128,7 +131,12 @@ class AsyncRequester:
         """Ensure aiohttp session is available."""
         async with self._session_lock:
             if self._session is None or self._session.closed:
-                connector = aiohttp.TCPConnector(limit=100, limit_per_host=30)
+                ssl_context = ssl.create_default_context(cafile=certifi.where())
+                connector = aiohttp.TCPConnector(
+                    ssl=ssl_context,
+                    limit=100,
+                    limit_per_host=30,
+                )
                 timeout = aiohttp.ClientTimeout(total=300, connect=30)
                 self._session = aiohttp.ClientSession(
                     connector=connector,
@@ -263,7 +271,7 @@ class AsyncRequester:
         _url: str | None = None,
         _kwargs: list | None = None,
         **kwargs,
-    ) -> aiohttp.ClientResponse | AsyncResponse:
+    ) -> AsyncResponse:
         """
         Make an async request to the Canvas API with intelligent rate limiting.
 
