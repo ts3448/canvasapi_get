@@ -40,8 +40,8 @@ class Module(CanvasObject):
         :calls: `GET /api/v1/courses/:course_id/modules/:module_id/items \
         <https://canvas.instructure.com/doc/api/modules.html#method.context_module_items_api.index>`_
 
-        :rtype: :class:`canvasapi-get.paginated_list.PaginatedList` of
-            :class:`canvasapi-get.module.ModuleItem`
+        :rtype: :class:`canvasapi_get.paginated_list.PaginatedList` of
+            :class:`canvasapi_get.module.ModuleItem`
         """
         return PaginatedList(
             ModuleItem,

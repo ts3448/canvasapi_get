@@ -61,10 +61,10 @@ class DiscussionTopic(CanvasObject):
             <https://canvas.instructure.com/doc/api/discussion_topics.html#method.discussion_topics_api.entry_list>`_
 
         :param ids: A list of entry objects or IDs to retrieve.
-        :type ids: :class:`canvasapi-get.discussion_topic.DiscussionEntry`, or list or tuple of int
+        :type ids: :class:`canvasapi_get.discussion_topic.DiscussionEntry`, or list or tuple of int
 
-        :rtype: :class:`canvasapi-get.paginated_list.PaginatedList` of
-            :class:`canvasapi-get.discussion_topic.DiscussionEntry`
+        :rtype: :class:`canvasapi_get.paginated_list.PaginatedList` of
+            :class:`canvasapi_get.discussion_topic.DiscussionEntry`
         """
 
         entry_ids = [obj_or_id(item, "ids", (DiscussionEntry,)) for item in ids]
@@ -115,8 +115,8 @@ class DiscussionTopic(CanvasObject):
             or `GET /api/v1/groups/:group_id/discussion_topics/:topic_id/entries \
             <https://canvas.instructure.com/doc/api/discussion_topics.html#method.discussion_topics_api.entries>`_
 
-        :rtype: :class:`canvasapi-get.paginated_list.PaginatedList` of
-            :class:`canvasapi-get.discussion_topic.DiscussionEntry`
+        :rtype: :class:`canvasapi_get.paginated_list.PaginatedList` of
+            :class:`canvasapi_get.discussion_topic.DiscussionEntry`
         """
         return PaginatedList(
             DiscussionEntry,
@@ -201,8 +201,8 @@ class DiscussionEntry(CanvasObject):
             /api/v1/groups/:group_id/discussion_topics/:topic_id/entries/:entry_id/replies \
             <https://canvas.instructure.com/doc/api/discussion_topics.html#method.discussion_topics_api.replies>`_
 
-        :rtype: :class:`canvasapi-get.paginated_list.PaginatedList` of
-            :class:`canvasapi-get.discussion_topic.DiscussionEntry`
+        :rtype: :class:`canvasapi_get.paginated_list.PaginatedList` of
+            :class:`canvasapi_get.discussion_topic.DiscussionEntry`
         """
         return PaginatedList(
             DiscussionEntry,

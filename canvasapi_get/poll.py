@@ -34,8 +34,8 @@ class Poll(CanvasObject):
         :calls: `GET /api/v1/polls/:poll_id/poll_choices \
         <https://canvas.instructure.com/doc/api/poll_choices.html#method.polling/poll_choices.index>`_
 
-        :rtype: :class:`canvasapi-get.paginated_list.PaginatedList` of
-            :class:`canvasapi-get.poll_choice.PollChoice`
+        :rtype: :class:`canvasapi_get.paginated_list.PaginatedList` of
+            :class:`canvasapi_get.poll_choice.PollChoice`
         """
         return PaginatedList(
             PollChoice,
@@ -74,8 +74,8 @@ class Poll(CanvasObject):
         :calls: `GET /api/v1/polls/:poll_id/poll_sessions \
         <https://canvas.instructure.com/doc/api/poll_sessions.html#method.polling/poll_sessions.index>`_
 
-        :rtype: :class:`canvasapi-get.paginated_lsit.Paginated List` of
-            :class:`canvasapi-get.poll_session.PollSession`
+        :rtype: :class:`canvasapi_get.paginated_lsit.Paginated List` of
+            :class:`canvasapi_get.poll_session.PollSession`
         """
         return PaginatedList(
             PollSession,

@@ -49,7 +49,7 @@ class PaginatedList(Iterable[T]):
         :param _url_override: "new_quizzes" or "graphql" for specific Canvas endpoints.
                                 Other URLs may be specified for third-party requests.
         :type _url_override: str
-        :rtype: :class:`canvasapi-get.paginated_list.PaginatedList` of type content_class
+        :rtype: :class:`canvasapi_get.paginated_list.PaginatedList` of type content_class
         """
         self._elements: list[T] = []
 

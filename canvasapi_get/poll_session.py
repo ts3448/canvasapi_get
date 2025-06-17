@@ -14,7 +14,7 @@ class PollSession(CanvasObject):
         :calls: `GET /api/v1/polls/:poll_id/poll_sessions/:id/close \
         <https://canvas.instructure.com/doc/api/poll_sessions.html#method.polling/poll_sessions.close>`_
 
-        :returns: :class:`canvasapi-get.poll_session.PollSession`
+        :returns: :class:`canvasapi_get.poll_session.PollSession`
         """
         response = self._requester.request(
             "GET",
@@ -55,7 +55,7 @@ class PollSession(CanvasObject):
         :calls: `GET /api/v1/polls/:poll_id/poll_sessions/:id/open \
         <https://canvas.instructure.com/doc/api/poll_sessions.html#method.polling/poll_sessions.open>`_
 
-        :returns: :class:`canvasapi-get.poll_session.PollSession`
+        :returns: :class:`canvasapi_get.poll_session.PollSession`
         """
         response = self._requester.request(
             "GET",

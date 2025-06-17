@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# canvasapi-get documentation build configuration file, created by
+# canvasapi_get documentation build configuration file, created by
 # sphinx-quickstart on Wed Apr 27 15:40:16 2016.
 #
 # This file is execfile()d with the current directory set to its
@@ -53,7 +53,7 @@ source_suffix = ".rst"
 master_doc = "index"
 
 # General information about the project.
-project = "canvasapi-get"
+project = "canvasapi_get"
 copyright = "2017, University of Central Florida (Center for Distributed Learning)"
 author = "University of Central Florida (Center for Distributed Learning)"
 
@@ -65,7 +65,7 @@ release = __version__
 
 # sphinx-version-warning configuration
 versionwarning_messages = {
-    "develop": 'You are viewing a development build of the canvasapi-get docs. <a href="/en/stable">Visit the stable release docs here.</a>',
+    "develop": 'You are viewing a development build of the canvasapi_get docs. <a href="/en/stable">Visit the stable release docs here.</a>',
 }
 versionwarning_body_selector = "ul.wy-breadcrumbs"
 
@@ -131,7 +131,7 @@ html_theme = "sphinx_rtd_theme"
 
 # The name for this set of Sphinx documents.
 # "<project> v<release> documentation" by default.
-# html_title = u'canvasapi-get v1.0'
+# html_title = u'canvasapi_get v1.0'
 
 # A shorter title for the navigation bar.  Default is the same as html_title.
 # html_short_title = None
@@ -234,8 +234,8 @@ latex_elements = {
 latex_documents = [
     (
         master_doc,
-        "canvasapi-get.tex",
-        "canvasapi-get Documentation",
+        "canvasapi_get.tex",
+        "canvasapi_get Documentation",
         "University of Central Florida (Center for Distributed Learning)",
         "manual",
     ),
@@ -266,7 +266,7 @@ latex_documents = [
 
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
-man_pages = [(master_doc, "canvasapi-get", "canvasapi-get Documentation", [author], 1)]
+man_pages = [(master_doc, "canvasapi_get", "canvasapi_get Documentation", [author], 1)]
 
 # If true, show URL addresses after external links.
 # man_show_urls = False
@@ -280,10 +280,10 @@ man_pages = [(master_doc, "canvasapi-get", "canvasapi-get Documentation", [autho
 texinfo_documents = [
     (
         master_doc,
-        "canvasapi-get",
-        "canvasapi-get Documentation",
+        "canvasapi_get",
+        "canvasapi_get Documentation",
         author,
-        "canvasapi-get",
+        "canvasapi_get",
         "One line description of project.",
         "Miscellaneous",
     ),

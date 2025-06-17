@@ -27,8 +27,8 @@ class Assignment(CanvasObject):
         :calls: `/api/v1/audit/grade_change/assignments/:assignment_id \
         <https://canvas.instructure.com/doc/api/grade_change_log.html#method.grade_change_audit_api.for_assignment>`_
 
-        :rtype: :class:`canvasapi-get.paginated_list.PaginatedList` of
-            :class:`canvasapi-get.grade_change_log.GradeChangeEvent`
+        :rtype: :class:`canvasapi_get.paginated_list.PaginatedList` of
+            :class:`canvasapi_get.grade_change_log.GradeChangeEvent`
         """
 
         return PaginatedList(
@@ -47,8 +47,8 @@ class Assignment(CanvasObject):
         :calls: `GET /api/v1/courses/:course_id/assignments/:assignment_id/gradeable_students  \
         <https://canvas.instructure.com/doc/api/submissions.html#method.submissions_api.gradeable_students>`_
 
-        :rtype: :class:`canvasapi-get.paginated_list.PaginatedList` of
-            :class:`canvasapi-get.user.UserDisplay`
+        :rtype: :class:`canvasapi_get.paginated_list.PaginatedList` of
+            :class:`canvasapi_get.user.UserDisplay`
         """
         return PaginatedList(
             UserDisplay,
@@ -94,8 +94,8 @@ class Assignment(CanvasObject):
         :calls: `GET /api/v1/courses/:course_id/assignments/:assignment_id/overrides \
         <https://canvas.instructure.com/doc/api/assignments.html#method.assignment_overrides.index>`_
 
-        :rtype: :class:`canvasapi-get.paginated_list.PaginatedList` of
-            :class:`canvasapi-get.assignment.AssignmentOverride`
+        :rtype: :class:`canvasapi_get.paginated_list.PaginatedList` of
+            :class:`canvasapi_get.assignment.AssignmentOverride`
         """
         return PaginatedList(
             AssignmentOverride,
@@ -113,8 +113,8 @@ class Assignment(CanvasObject):
         :calls: `GET /api/v1/courses/:course_id/assignments/:assignment_id/peer_reviews \
         <https://canvas.instructure.com/doc/api/peer_reviews.html#method.peer_reviews_api.index>`_
 
-        :rtype: :class:`canvasapi-get.paginated_list.PaginatedList` of
-            :class:`canvasapi-get.peer_review.PeerReview`
+        :rtype: :class:`canvasapi_get.paginated_list.PaginatedList` of
+            :class:`canvasapi_get.peer_review.PeerReview`
         """
         return PaginatedList(
             PeerReview,
@@ -157,8 +157,8 @@ class Assignment(CanvasObject):
         :calls: `GET /api/v1/courses/:course_id/assignments/:assignment_id/moderated_students \
         <https://canvas.instructure.com/doc/api/moderated_grading.html#method.moderation_set.index>`_
 
-        :rtype: :class:`canvasapi-get.paginated_list.PaginatedList` of
-            :class:`canvasapi-get.user.User`
+        :rtype: :class:`canvasapi_get.paginated_list.PaginatedList` of
+            :class:`canvasapi_get.user.User`
         """
         return PaginatedList(
             User,
@@ -203,8 +203,8 @@ class Assignment(CanvasObject):
         :calls: `GET /api/v1/courses/:course_id/assignments/:assignment_id/submissions  \
         <https://canvas.instructure.com/doc/api/submissions.html#method.submissions_api.index>`_
 
-        :rtype: :class:`canvasapi-get.paginated_list.PaginatedList` of
-            :class:`canvasapi-get.submission.Submission`
+        :rtype: :class:`canvasapi_get.paginated_list.PaginatedList` of
+            :class:`canvasapi_get.submission.Submission`
         """
         return PaginatedList(
             Submission,
@@ -223,8 +223,8 @@ class Assignment(CanvasObject):
         <https://canvas.instructure.com/doc/api/moderated_grading.html#method.moderation_set.create>`_
 
         :returns: The list of users that were selected
-        :rtype: :class:`canvasapi-get.paginated_list.PaginatedList` of
-            :class:`canvasapi-get.user.User`
+        :rtype: :class:`canvasapi_get.paginated_list.PaginatedList` of
+            :class:`canvasapi_get.user.User`
         """
         return PaginatedList(
             User,

@@ -14,8 +14,8 @@ class Login(CanvasObject):
         :calls: `GET /api/v1/audit/authentication/logins/:login_id \
         <https://canvas.instructure.com/doc/api/authentications_log.html#method.authentication_audit_api.for_login>`_
 
-        :rtype: :class:`canvasapi-get.paginated_list.PaginatedList` of
-                :class:`canvasapi-get.authentication_event.AuthenticationEvent`
+        :rtype: :class:`canvasapi_get.paginated_list.PaginatedList` of
+                :class:`canvasapi_get.authentication_event.AuthenticationEvent`
         """
         from canvasapi.authentication_event import AuthenticationEvent
 

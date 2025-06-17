@@ -392,7 +392,7 @@ class Canvas(object):
         <https://canvas.instructure.com/doc/api/accounts.html#method.accounts.show>`_
 
         :param account: The object or ID of the account to retrieve.
-        :type account: int, str or :class:`canvasapi-get.account.Account`
+        :type account: int, str or :class:`canvasapi_get.account.Account`
         :param use_sis_id: Whether or not account_id is an sis ID.
             Defaults to `False`.
         :type use_sis_id: bool
@@ -418,8 +418,8 @@ class Canvas(object):
         :calls: `GET /api/v1/account_calendars \
         <https://canvas.instructure.com/doc/api/account_calendars.html#method.account_calendars_api.index>`_
 
-        :rtype: :class:`canvasapi-get.paginated_list.PaginatedList` of
-            :class:`canvasapi-get.account_calendar.AccountCalendar`
+        :rtype: :class:`canvasapi_get.paginated_list.PaginatedList` of
+            :class:`canvasapi_get.account_calendar.AccountCalendar`
         """
         return PaginatedList(
             AccountCalendar,
@@ -440,8 +440,8 @@ class Canvas(object):
         :calls: `GET /api/v1/accounts \
         <https://canvas.instructure.com/doc/api/accounts.html#method.accounts.index>`_
 
-        :rtype: :class:`canvasapi-get.paginated_list.PaginatedList` of
-            :class:`canvasapi-get.account.Account`
+        :rtype: :class:`canvasapi_get.paginated_list.PaginatedList` of
+            :class:`canvasapi_get.account.Account`
         """
         return PaginatedList(
             Account,
@@ -477,8 +477,8 @@ class Canvas(object):
         :param context_codes: Course ID(s) or <Course> objects to request announcements from.
         :type context_codes: list
 
-        :rtype: :class:`canvasapi-get.paginated_list.PaginatedList` of
-                :class:`canvasapi-get.discussion_topic.DiscussionTopic`
+        :rtype: :class:`canvasapi_get.paginated_list.PaginatedList` of
+                :class:`canvasapi_get.discussion_topic.DiscussionTopic`
         """
         if type(context_codes) is not list or len(context_codes) == 0:
             raise RequiredFieldMissing("context_codes need to be passed as a list")
@@ -537,8 +537,8 @@ class Canvas(object):
         :calls: `GET /api/v1/appointment_groups \
         <https://canvas.instructure.com/doc/api/appointment_groups.html#method.appointment_groups.index>`_
 
-        :rtype: :class:`canvasapi-get.paginated_list.PaginatedList` of
-            :class:`canvasapi-get.appointment_group.AppointmentGroup`
+        :rtype: :class:`canvasapi_get.paginated_list.PaginatedList` of
+            :class:`canvasapi_get.appointment_group.AppointmentGroup`
         """
         return PaginatedList(
             AppointmentGroup,
@@ -593,8 +593,8 @@ class Canvas(object):
         :calls: `GET /api/v1/calendar_events \
         <https://canvas.instructure.com/doc/api/calendar_events.html#method.calendar_events_api.index>`_
 
-        :rtype: :class:`canvasapi-get.paginated_list.PaginatedList` of
-            :class:`canvasapi-get.calendar_event.CalendarEvent`
+        :rtype: :class:`canvasapi_get.paginated_list.PaginatedList` of
+            :class:`canvasapi_get.calendar_event.CalendarEvent`
         """
         return PaginatedList(
             CalendarEvent,
@@ -615,8 +615,8 @@ class Canvas(object):
         :type user: :class:`canvasapi.user.User` or int
 
         :returns: Paginated list containing messages sent to user
-        :rtype: :class:`canvasapi-get.paginated_list.PaginatedList` of
-            :class:`canvasapi-get.comm_message.CommMessage`
+        :rtype: :class:`canvasapi_get.paginated_list.PaginatedList` of
+            :class:`canvasapi_get.comm_message.CommMessage`
 
         """
 
@@ -658,8 +658,8 @@ class Canvas(object):
         :calls: `GET /api/v1/conversations \
         <https://canvas.instructure.com/doc/api/conversations.html#method.conversations.index>`_
 
-        :rtype: :class:`canvasapi-get.paginated_list.PaginatedList` of \
-        :class:`canvasapi-get.conversation.Conversation`
+        :rtype: :class:`canvasapi_get.paginated_list.PaginatedList` of \
+        :class:`canvasapi_get.conversation.Conversation`
         """
         return PaginatedList(
             Conversation,
@@ -677,7 +677,7 @@ class Canvas(object):
         <https://canvas.instructure.com/doc/api/courses.html#method.courses.show>`_
 
         :param course: The object or ID of the course to retrieve.
-        :type course: int, str or :class:`canvasapi-get.course.Course`
+        :type course: int, str or :class:`canvasapi_get.course.Course`
         :param use_sis_id: Whether or not course_id is an sis ID.
             Defaults to `False`.
         :type use_sis_id: bool
@@ -707,8 +707,8 @@ class Canvas(object):
         :calls: `GET /api/v1/course_accounts \
         <https://canvas.instructure.com/doc/api/accounts.html#method.accounts.course_accounts>`_
 
-        :rtype: :class:`canvasapi-get.paginated_list.PaginatedList` of
-            :class:`canvasapi-get.account.Account`
+        :rtype: :class:`canvasapi_get.paginated_list.PaginatedList` of
+            :class:`canvasapi_get.account.Account`
         """
         return PaginatedList(
             Account,
@@ -746,8 +746,8 @@ class Canvas(object):
         :calls: `GET /api/v1/users/self/course_nicknames \
         <https://canvas.instructure.com/doc/api/users.html#method.course_nicknames.index>`_
 
-        :rtype: :class:`canvasapi-get.paginated_list.PaginatedList` of
-            :class:`canvasapi-get.course.CourseNickname`
+        :rtype: :class:`canvasapi_get.paginated_list.PaginatedList` of
+            :class:`canvasapi_get.course.CourseNickname`
         """
         return PaginatedList(
             CourseNickname,
@@ -764,8 +764,8 @@ class Canvas(object):
         :calls: `GET /api/v1/courses \
         <https://canvas.instructure.com/doc/api/courses.html#method.courses.index>`_
 
-        :rtype: :class:`canvasapi-get.paginated_list.PaginatedList` of
-            :class:`canvasapi-get.course.Course`
+        :rtype: :class:`canvasapi_get.paginated_list.PaginatedList` of
+            :class:`canvasapi_get.course.Course`
         """
         return PaginatedList(
             Course, self.__requester, "GET", "courses", _kwargs=combine_kwargs(**kwargs)
@@ -787,7 +787,7 @@ class Canvas(object):
         Get an eportfolio by ID.
 
         :param eportfolio: The object or ID of the eportfolio to retrieve.
-        :type eportfolio: :class: `canvasapi-get.eportfolio.EPortfolio` or int
+        :type eportfolio: :class: `canvasapi_get.eportfolio.EPortfolio` or int
 
         :calls: `GET /api/v1/eportfolios/:id` \
             `<https://canvas.instructure.com/doc/api/e_portfolios.html#method.eportfolios_api.show>`_
@@ -810,8 +810,8 @@ class Canvas(object):
         :calls: `GET /api/v1/epub_exports\
         <https://canvas.instructure.com/doc/api/e_pub_exports.html#method.epub_exports.index>`_
 
-        :rtype: :class:`canvasapi-get.paginated_list.PaginatedList` of
-            :class:`canvasapi-get.course_epub_export.CourseEpubExport`
+        :rtype: :class:`canvasapi_get.paginated_list.PaginatedList` of
+            :class:`canvasapi_get.course_epub_export.CourseEpubExport`
         """
 
         return PaginatedList(
@@ -1012,8 +1012,8 @@ class Canvas(object):
         :calls: `GET /api/v1/planner_notes \
         <https://canvas.instructure.com/doc/api/planner.html#method.planner_notes.index>`_
 
-        :rtype: :class:`canvasapi-get.paginated_list.PaginatedList` of
-            :class:`canvasapi-get.planner.PlannerNote`
+        :rtype: :class:`canvasapi_get.paginated_list.PaginatedList` of
+            :class:`canvasapi_get.planner.PlannerNote`
         """
         return PaginatedList(
             PlannerNote,
@@ -1061,8 +1061,8 @@ class Canvas(object):
         :calls: `GET /api/v1/planner/overrides \
         <https://canvas.instructure.com/doc/api/planner.html#method.planner_overrides.index>`_
 
-        :rtype: :class:`canvasapi-get.paginated_list.PaginatedList` of
-            :class:`canvasapi-get.planner.PlannerOverride`
+        :rtype: :class:`canvasapi_get.paginated_list.PaginatedList` of
+            :class:`canvasapi_get.planner.PlannerOverride`
         """
         return PaginatedList(
             PlannerOverride,
@@ -1097,8 +1097,8 @@ class Canvas(object):
         :calls: `GET /api/1/polls \
         <https://canvas.instructure.com/doc/api/polls.html#method.polling/polls.index>`_
 
-        :rtype: :class:`canvasapi-get.paginated_list.PaginatedList` of
-            :class:`canvasapi-get.poll.Poll`
+        :rtype: :class:`canvasapi_get.paginated_list.PaginatedList` of
+            :class:`canvasapi_get.poll.Poll`
         """
         return PaginatedList(
             Poll,
@@ -1117,7 +1117,7 @@ class Canvas(object):
             <https://canvas.instructure.com/doc/api/progress.html#method.progress.show>`_
 
         :param progress: The object or ID of the progress to retrieve.
-        :type progress: int, str or :class:`canvasapi-get.progress.Progress`
+        :type progress: int, str or :class:`canvasapi_get.progress.Progress`
 
         :rtype: :class:`canvasapi.progress.Progress`
         """

@@ -42,10 +42,10 @@ class Page(CanvasObject):
         <https://canvas.instructure.com/doc/api/pages.html#method.wiki_pages_api.show_revision>`_
 
         :param revision: The object or ID of a specified revision.
-        :type revision: :class:`canvasapi-get.pagerevision.PageRevision` or int
+        :type revision: :class:`canvasapi_get.pagerevision.PageRevision` or int
 
         :returns: Contents of the page revision.
-        :rtype: :class:`canvasapi-get.pagerevision.PageRevision`
+        :rtype: :class:`canvasapi_get.pagerevision.PageRevision`
         """
         revision_id = obj_or_id(revision, "revision", (PageRevision,))
 
@@ -71,8 +71,8 @@ class Page(CanvasObject):
         :calls: `GET /api/v1/courses/:course_id/pages/:url/revisions \
         <https://canvas.instructure.com/doc/api/pages.html#method.wiki_pages_api.revisions>`_
 
-        :rtype: :class:`canvasapi-get.paginated_list.PaginatedList` of
-            :class:`canvasapi-get.pagerevision.PageRevision`
+        :rtype: :class:`canvasapi_get.paginated_list.PaginatedList` of
+            :class:`canvasapi_get.pagerevision.PageRevision`
         """
         return PaginatedList(
             PageRevision,
@@ -119,7 +119,7 @@ class Page(CanvasObject):
         :calls: `GET /api/v1/courses/:course_id/pages/:url/revisions/latest \
         <https://canvas.instructure.com/doc/api/pages.html#method.wiki_pages_api.show_revision>`_
 
-        :rtype: :class:`canvasapi-get.pagerevision.PageRevision`
+        :rtype: :class:`canvasapi_get.pagerevision.PageRevision`
         """
         response = self._requester.request(
             "GET",

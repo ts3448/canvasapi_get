@@ -227,13 +227,13 @@ Alternatively, each step can be run manually one-by-one, or all at once executin
 We use `flake8` for linting:
 
 ```sh
-flake8 canvasapi-get tests
+flake8 canvasapi_get tests
 ```
 
 We use `black` for auto-formatting. When you run the command below, `black` will automatically convert your code to our desired style.
 
 ```sh
-black canvasapi-get tests
+black canvasapi_get tests
 ```
 
 We require methods to be in alphabetical order for ease of reading. Run this script to confirm order:

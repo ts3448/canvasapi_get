@@ -14,8 +14,8 @@ class Folder(CanvasObject):
         :calls: `GET /api/v1/folders/:id/files \
         <https://canvas.instructure.com/doc/api/files.html#method.files.api_index>`_
 
-        :rtype: :class:`canvasapi-get.paginated_list.PaginatedList` of
-            :class:`canvasapi-get.file.File`
+        :rtype: :class:`canvasapi_get.paginated_list.PaginatedList` of
+            :class:`canvasapi_get.file.File`
         """
         from canvasapi.file import File
 
@@ -36,8 +36,8 @@ class Folder(CanvasObject):
         :calls: `GET /api/v1/folders/:id/folders \
         <https://canvas.instructure.com/doc/api/files.html#method.folders.api_index>`_
 
-        :rtype: :class:`canvasapi-get.paginated_list.PaginatedList` of
-            :class:`canvasapi-get.folder.Folder`
+        :rtype: :class:`canvasapi_get.paginated_list.PaginatedList` of
+            :class:`canvasapi_get.folder.Folder`
         """
         return PaginatedList(
             Folder, self._requester, "GET", "folders/{}/folders".format(self.id)

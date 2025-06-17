@@ -4,6 +4,7 @@ version = "0.1.0"
 description = ""
 authors = ["ts3448"]
 readme = "README.md"
+packages = [{include = "canvasapi-get"}]
 
 [tool.poetry.dependencies]
 python = "^3.12"

@@ -69,7 +69,7 @@ class ContentMigration(CanvasObject):
             <https://canvas.instructure.com/doc/api/content_migrations.html#method.migration_issues.show>`_
 
         :param migration_issue: The object or ID of the issue to retrieve.
-        :type migration_issue: int, str or :class:`canvasapi-get.content_migration.ContentMigration`
+        :type migration_issue: int, str or :class:`canvasapi_get.content_migration.ContentMigration`
 
         :rtype: :class:`canvasapi.content_migration.MigrationIssue`
         """
@@ -142,10 +142,10 @@ class ContentMigration(CanvasObject):
         """
         Return the object that spawned this content migration.
 
-        :rtype: :class:`canvasapi-get.group.Account`,
-            or :class:`canvasapi-get.course.Course`,
-            or :class:`canvasapi-get.course.Group`,
-            or :class:`canvasapi-get.course.User`
+        :rtype: :class:`canvasapi_get.group.Account`,
+            or :class:`canvasapi_get.course.Course`,
+            or :class:`canvasapi_get.course.Group`,
+            or :class:`canvasapi_get.course.User`
         """
         from canvasapi.account import Account
         from canvasapi.course import Course

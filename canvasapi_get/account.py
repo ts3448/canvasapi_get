@@ -71,8 +71,8 @@ class Account(CanvasObject):
         <https://canvas.instructure.com/doc/api/account_calendars.html#method.account_calendars_api.all_calendars>`_
 
         :returns: Paginated list of all account calendars for the provided account.
-        :rtype: :class:`canvasapi-get.paginated_list.PaginatedList` of
-            :class:`canvasapi-get.account_calendar.AccountCalendar`
+        :rtype: :class:`canvasapi_get.paginated_list.PaginatedList` of
+            :class:`canvasapi_get.account_calendar.AccountCalendar`
         """
         return PaginatedList(
             AccountCalendar,
@@ -90,8 +90,8 @@ class Account(CanvasObject):
         <https://canvas.instructure.com/doc/api/outcome_groups.html#method.outcome_groups_api.link_index>`_
 
         :returns: Paginated List of OutcomesLinks in the context.
-        :rtype: :class:`canvasapi-get.paginated_list.PaginatedList` of
-            :class:`canvasapi-get.outcome.OutcomeLink`
+        :rtype: :class:`canvasapi_get.paginated_list.PaginatedList` of
+            :class:`canvasapi_get.outcome.OutcomeLink`
         """
         return PaginatedList(
             OutcomeLink,
@@ -108,8 +108,8 @@ class Account(CanvasObject):
         :calls: `GET /api/v1/audit/authentication/accounts/:account_id \
         <https://canvas.instructure.com/doc/api/authentications_log.html#method.authentication_audit_api.for_account>`_
 
-        :rtype: :class:`canvasapi-get.paginated_list.PaginatedList` of
-                :class:`canvasapi-get.authentication_event.AuthenticationEvent`
+        :rtype: :class:`canvasapi_get.paginated_list.PaginatedList` of
+                :class:`canvasapi_get.authentication_event.AuthenticationEvent`
         """
         return PaginatedList(
             AuthenticationEvent,
@@ -128,7 +128,7 @@ class Account(CanvasObject):
 
         :param authentication_provider: The object or ID of the authentication provider
         :type authentication_provider:
-            :class:`canvasapi-get.authentication_provider.AuthenticationProvider` or int
+            :class:`canvasapi_get.authentication_provider.AuthenticationProvider` or int
 
         :rtype: :class:`canvasapi.authentication_provider.AuthenticationProvider`
         """
@@ -155,8 +155,8 @@ class Account(CanvasObject):
         :calls: `GET /api/v1/accounts/:account_id/authentication_providers \
         <https://canvas.instructure.com/doc/api/authentication_providers.html#method.account_authorization_configs.index>`_
 
-        :rtype: :class:`canvasapi-get.paginated_list.PaginatedList` of
-            :class:`canvasapi-get.authentication_provider.AuthenticationProvider`
+        :rtype: :class:`canvasapi_get.paginated_list.PaginatedList` of
+            :class:`canvasapi_get.authentication_provider.AuthenticationProvider`
         """
         return PaginatedList(
             AuthenticationProvider,
@@ -175,7 +175,7 @@ class Account(CanvasObject):
         <https://canvas.instructure.com/doc/api/content_migrations.html#method.content_migrations.show>`_
 
         :param content_migration: The object or ID of the content migration to retrieve.
-        :type contnet_migration: int, str or :class:`canvasapi-get.content_migration.ContentMigration`
+        :type contnet_migration: int, str or :class:`canvasapi_get.content_migration.ContentMigration`
 
         :rtype: :class:`canvasapi.content_migration.ContentMigration`
         """
@@ -201,8 +201,8 @@ class Account(CanvasObject):
         :calls: `GET /api/v1/accounts/:account_id/content_migrations/ \
         <https://canvas.instructure.com/doc/api/content_migrations.html#method.content_migrations.index>`_
 
-        :rtype: :class:`canvasapi-get.paginated_list.PaginatedList` of
-            :class:`canvasapi-get.content_migration.ContentMigration`
+        :rtype: :class:`canvasapi_get.paginated_list.PaginatedList` of
+            :class:`canvasapi_get.content_migration.ContentMigration`
         """
         return PaginatedList(
             ContentMigration,
@@ -220,8 +220,8 @@ class Account(CanvasObject):
         :calls: `GET /api/v1/accounts/:account_id/courses \
         <https://canvas.instructure.com/doc/api/accounts.html#method.accounts.courses_api>`_
 
-        :rtype: :class:`canvasapi-get.paginated_list.PaginatedList` of
-            :class:`canvasapi-get.course.Course`
+        :rtype: :class:`canvasapi_get.paginated_list.PaginatedList` of
+            :class:`canvasapi_get.course.Course`
         """
         return PaginatedList(
             Course,
@@ -450,8 +450,8 @@ class Account(CanvasObject):
         :calls: `GET /api/v1/accounts/:account_id/terms \
         <https://canvas.instructure.com/doc/api/enrollment_terms.html#method.terms_api.index>`_
 
-        :rtype: :class:`canvasapi-get.paginated_list.PaginatedList` of
-            :class:`canvasapi-get.enrollment_term.EnrollmentTerm`
+        :rtype: :class:`canvasapi_get.paginated_list.PaginatedList` of
+            :class:`canvasapi_get.enrollment_term.EnrollmentTerm`
         """
         return PaginatedList(
             EnrollmentTerm,
@@ -490,8 +490,8 @@ class Account(CanvasObject):
         :calls: `GET /api/v1/accounts/:account_id/external_tools \
         <https://canvas.instructure.com/doc/api/external_tools.html#method.external_tools.index>`_
 
-        :rtype: :class:`canvasapi-get.paginated_list.PaginatedList` of
-            :class:`canvasapi-get.external_tool.ExternalTool`
+        :rtype: :class:`canvasapi_get.paginated_list.PaginatedList` of
+            :class:`canvasapi_get.external_tool.ExternalTool`
         """
         return PaginatedList(
             ExternalTool,
@@ -530,8 +530,8 @@ class Account(CanvasObject):
         :calls: `GET /api/v1/accounts/:account_id/features \
         <https://canvas.instructure.com/doc/api/feature_flags.html#method.feature_flags.index>`_
 
-        :rtype: :class:`canvasapi-get.paginated_list.PaginatedList` of
-            :class:`canvasapi-get.feature.Feature`
+        :rtype: :class:`canvasapi_get.paginated_list.PaginatedList` of
+            :class:`canvasapi_get.feature.Feature`
         """
         return PaginatedList(
             Feature,
@@ -572,8 +572,8 @@ class Account(CanvasObject):
         :calls: `GET /api/v1/accounts/:account_id/grading_periods \
         <https://canvas.instructure.com/doc/api/grading_periods.html#method.grading_periods.index>`_
 
-        :rtype: :class:`canvasapi-get.paginated_list.PaginatedList` of
-            :class:`canvasapi-get.grading_period.GradingPeriod`
+        :rtype: :class:`canvasapi_get.paginated_list.PaginatedList` of
+            :class:`canvasapi_get.grading_period.GradingPeriod`
         """
         return PaginatedList(
             GradingPeriod,
@@ -592,8 +592,8 @@ class Account(CanvasObject):
         :calls: `GET /api/v1/accounts/:account_id/grading_standards \
         <https://canvas.instructure.com/doc/api/grading_standards.html#method.grading_standards_api.context_index>`_
 
-        :rtype: :class:`canvasapi-get.paginated_list.PaginatedList` of
-            :class:`canvasapi-get.grading_standards.GradingStandard`
+        :rtype: :class:`canvasapi_get.paginated_list.PaginatedList` of
+            :class:`canvasapi_get.grading_standards.GradingStandard`
         """
         return PaginatedList(
             GradingStandard,
@@ -610,8 +610,8 @@ class Account(CanvasObject):
         :calls: `GET /api/v1/accounts/:account_id/group_categories \
         <https://canvas.instructure.com/doc/api/group_categories.html#method.group_categories.index>`_
 
-        :rtype: :class:`canvasapi-get.paginated_list.PaginatedList` of
-            :class:`canvasapi-get.group.GroupCategory`
+        :rtype: :class:`canvasapi_get.paginated_list.PaginatedList` of
+            :class:`canvasapi_get.group.GroupCategory`
         """
         return PaginatedList(
             GroupCategory,
@@ -647,8 +647,8 @@ class Account(CanvasObject):
 
         :param report_type: The type of report.
         :type report_type: str
-        :rtype: :class:`canvasapi-get.paginated_list.PaginatedList` of
-            :class:`canvasapi-get.account.AccountReport`
+        :rtype: :class:`canvasapi_get.paginated_list.PaginatedList` of
+            :class:`canvasapi_get.account.AccountReport`
         """
         return PaginatedList(
             AccountReport,
@@ -666,8 +666,8 @@ class Account(CanvasObject):
         :calls: `GET /api/v1/accounts/:account_id/content_migrations/migrators \
         <https://canvas.instructure.com/doc/api/content_migrations.html#method.content_migrations.available_migrators>`_
 
-        :rtype: :class:`canvasapi-get.paginated_list.PaginatedList` of
-            :class:`canvasapi-get.content_migration.Migrator`
+        :rtype: :class:`canvasapi_get.paginated_list.PaginatedList` of
+            :class:`canvasapi_get.content_migration.Migrator`
         """
         return PaginatedList(
             Migrator,
@@ -708,8 +708,8 @@ class Account(CanvasObject):
         <https://canvas.instructure.com/doc/api/outcome_groups.html#method.outcome_groups_api.index>`_
 
         :returns: Paginated List of OutcomesGroups in the context.
-        :rtype: :class:`canvasapi-get.paginated_list.PaginatedList` of
-            :class:`canvasapi-get.outcome.OutcomeGroups`
+        :rtype: :class:`canvasapi_get.paginated_list.PaginatedList` of
+            :class:`canvasapi_get.outcome.OutcomeGroups`
         """
         return PaginatedList(
             OutcomeGroup,
@@ -728,7 +728,7 @@ class Account(CanvasObject):
         <https://canvas.instructure.com/doc/api/outcome_imports.html#method.outcome_imports_api.show>`_
 
         :param outcome_import: The outcome import object or ID to get the status of.
-        :type outcome_import: :class:`canvasapi-get.outcome_import.OutcomeImport`,
+        :type outcome_import: :class:`canvasapi_get.outcome_import.OutcomeImport`,
             int, or string: "latest"
 
         :rtype: :class:`canvasapi.outcome_import.OutcomeImport`
@@ -784,8 +784,8 @@ class Account(CanvasObject):
         :calls: `GET /api/v1/accounts/:account_id/reports \
         <https://canvas.instructure.com/doc/api/account_reports.html#method.account_reports.available_reports>`_
 
-        :rtype: :class:`canvasapi-get.paginated_list.PaginatedList` of
-            :class:`canvasapi-get.account.AccountReport`
+        :rtype: :class:`canvasapi_get.paginated_list.PaginatedList` of
+            :class:`canvasapi_get.account.AccountReport`
         """
         return PaginatedList(
             AccountReport,
@@ -824,8 +824,8 @@ class Account(CanvasObject):
         :calls: `GET /api/v1/accounts/:account_id/roles \
         <https://canvas.instructure.com/doc/api/roles.html#method.role_overrides.api_index>`_
 
-        :rtype: :class:`canvasapi-get.paginated_list.PaginatedList` of
-            :class:`canvasapi-get.account.Role`
+        :rtype: :class:`canvasapi_get.paginated_list.PaginatedList` of
+            :class:`canvasapi_get.account.Role`
         """
         return PaginatedList(
             Role,
@@ -878,8 +878,8 @@ class Account(CanvasObject):
         :calls: `GET /api/v1/accounts/:account_id/rubrics \
         <https://canvas.instructure.com/doc/api/rubrics.html#method.rubrics_api.index>`_
 
-        :rtype: :class:`canvasapi-get.paginated_list.PaginatedList` of
-            :class:`canvasapi-get.rubric.Rubric`
+        :rtype: :class:`canvasapi_get.paginated_list.PaginatedList` of
+            :class:`canvasapi_get.rubric.Rubric`
         """
         return PaginatedList(
             Rubric,
@@ -915,7 +915,7 @@ class Account(CanvasObject):
 
         :param grading_standard_id: The grading standard id
         :type grading_standard_id: int
-        :rtype: :class:`canvasapi-get.grading_standards.GradingStandard`
+        :rtype: :class:`canvasapi_get.grading_standards.GradingStandard`
         """
         response = self._requester.request(
             "GET",
@@ -932,7 +932,7 @@ class Account(CanvasObject):
         <https://canvas.instructure.com/doc/api/sis_imports.html#method.sis_imports_api.show>`_
 
         :param sis_import: The object or ID of the sis_import to retrieve.
-        :type sis_import: int, str or :class:`canvasapi-get.sis_import.SisImport`
+        :type sis_import: int, str or :class:`canvasapi_get.sis_import.SisImport`
 
         :rtype: :class:`canvasapi.sis_import.SisImport`
         """
@@ -956,8 +956,8 @@ class Account(CanvasObject):
         :calls: `GET /api/v1/accounts/:account_id/sis_imports \
         <https://canvas.instructure.com/doc/api/sis_imports.html#method.sis_imports_api.index>`_
 
-        :rtype: :class:`canvasapi-get.paginated_list.PaginatedList` of
-            :class:`canvasapi-get.sis_import.SisImport`
+        :rtype: :class:`canvasapi_get.paginated_list.PaginatedList` of
+            :class:`canvasapi_get.sis_import.SisImport`
         """
         return PaginatedList(
             SisImport,
@@ -976,8 +976,8 @@ class Account(CanvasObject):
         :calls: `GET /api/v1/accounts/:account_id/sis_imports/importing \
         <https://canvas.instructure.com/doc/api/sis_imports.html#method.sis_imports_api.importing>`_
 
-        :rtype: :class:`canvasapi-get.paginated_list.PaginatedList`
-            of :class:`canvasapi-get.sis_import.SisImport`
+        :rtype: :class:`canvasapi_get.paginated_list.PaginatedList`
+            of :class:`canvasapi_get.sis_import.SisImport`
         """
         return PaginatedList(
             SisImport,
@@ -999,8 +999,8 @@ class Account(CanvasObject):
         :param recursive: If true, the entire account tree underneath this account will \
         be returned. If false, only direct sub-accounts of this  account will be returned.
         :type recursive: bool
-        :rtype: :class:`canvasapi-get.paginated_list.PaginatedList` of
-            :class:`canvasapi-get.account.Account`
+        :rtype: :class:`canvasapi_get.paginated_list.PaginatedList` of
+            :class:`canvasapi_get.account.Account`
         """
         kwargs["recursive"] = recursive
         return PaginatedList(
@@ -1018,8 +1018,8 @@ class Account(CanvasObject):
         :calls: `GET /api/v1/accounts/:account_id/logins \
         <https://canvas.instructure.com/doc/api/logins.html#method.pseudonyms.index>`_
 
-        :rtype: :class:`canvasapi-get.paginated_list.PaginatedList` of
-            :class:`canvasapi-get.login.Login`
+        :rtype: :class:`canvasapi_get.paginated_list.PaginatedList` of
+            :class:`canvasapi_get.login.Login`
         """
         return PaginatedList(
             Login,
@@ -1041,8 +1041,8 @@ class Account(CanvasObject):
         :param user: The user object or ID to retrieve notifications for.
         :type user: :class:`canvasapi.user.User` or int
 
-        :rtype: :class:`canvasapi-get.paginated_list.PaginatedList` of
-            :class:`canvasapi-get.account.AccountNotification`
+        :rtype: :class:`canvasapi_get.paginated_list.PaginatedList` of
+            :class:`canvasapi_get.account.AccountNotification`
         """
         user_id = obj_or_id(user, "user", (User,))
 

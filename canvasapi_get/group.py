@@ -101,8 +101,8 @@ class Group(CanvasObject):
         :calls: `GET /api/v1/groups/:group_id/content_exports\
         <https://canvas.instructure.com/doc/api/content_exports.html#method.content_exports_api.index>`_
 
-        :rtype: :class:`canvasapi-get.paginated_list.PaginatedList` of
-            :class:`canvasapi-get.content_export.ContentExport`
+        :rtype: :class:`canvasapi_get.paginated_list.PaginatedList` of
+            :class:`canvasapi_get.content_export.ContentExport`
         """
         from canvasapi.content_export import ContentExport
 
@@ -122,7 +122,7 @@ class Group(CanvasObject):
         <https://canvas.instructure.com/doc/api/content_migrations.html#method.content_migrations.show>`_
 
         :param content_migration: The object or ID of the content migration to retrieve.
-        :type content_migration: int, str or :class:`canvasapi-get.content_migration.ContentMigration`
+        :type content_migration: int, str or :class:`canvasapi_get.content_migration.ContentMigration`
 
         :rtype: :class:`canvasapi.content_migration.ContentMigration`
         """
@@ -150,8 +150,8 @@ class Group(CanvasObject):
         :calls: `GET /api/v1/groups/:group_id/content_migrations/ \
         <https://canvas.instructure.com/doc/api/content_migrations.html#method.content_migrations.index>`_
 
-        :rtype: :class:`canvasapi-get.paginated_list.PaginatedList` of
-            :class:`canvasapi-get.content_migration.ContentMigration`
+        :rtype: :class:`canvasapi_get.paginated_list.PaginatedList` of
+            :class:`canvasapi_get.content_migration.ContentMigration`
         """
         from canvasapi.content_migration import ContentMigration
 
@@ -196,8 +196,8 @@ class Group(CanvasObject):
         :calls: `GET /api/v1/groups/:group_id/discussion_topics \
         <https://canvas.instructure.com/doc/api/discussion_topics.html#method.discussion_topics.index>`_
 
-        :rtype: :class:`canvasapi-get.paginated_list.PaginatedList` of
-            :class:`canvasapi-get.discussion_topic.DiscussionTopic`
+        :rtype: :class:`canvasapi_get.paginated_list.PaginatedList` of
+            :class:`canvasapi_get.discussion_topic.DiscussionTopic`
         """
 
         return PaginatedList(
@@ -216,8 +216,8 @@ class Group(CanvasObject):
         :calls: `GET /api/v1/groups/:group_id/external_feeds \
         <https://canvas.instructure.com/doc/api/announcement_external_feeds.html#method.external_feeds.index>`_
 
-        :rtype: :class:`canvasapi-get.paginated_list.PaginatedList` of
-            :class:`canvasapi-get.external_feed.ExternalFeed`
+        :rtype: :class:`canvasapi_get.paginated_list.PaginatedList` of
+            :class:`canvasapi_get.external_feed.ExternalFeed`
         """
         from canvasapi.external_feed import ExternalFeed
 
@@ -276,8 +276,8 @@ class Group(CanvasObject):
         :calls: `GET /api/v1/groups/:group_id/files \
         <https://canvas.instructure.com/doc/api/files.html#method.files.api_index>`_
 
-        :rtype: :class:`canvasapi-get.paginated_list.PaginatedList` of
-            :class:`canvasapi-get.file.File`
+        :rtype: :class:`canvasapi_get.paginated_list.PaginatedList` of
+            :class:`canvasapi_get.file.File`
         """
         from canvasapi.file import File
 
@@ -318,8 +318,8 @@ class Group(CanvasObject):
         :calls: `GET /api/v1/groups/:group_id/folders \
         <https://canvas.instructure.com/doc/api/files.html#method.folders.list_all_folders>`_
 
-        :rtype: :class:`canvasapi-get.paginated_list.PaginatedList` of
-            :class:`canvasapi-get.folder.Folder`
+        :rtype: :class:`canvasapi_get.paginated_list.PaginatedList` of
+            :class:`canvasapi_get.folder.Folder`
         """
         return PaginatedList(
             Folder, self._requester, "GET", "groups/{}/folders".format(self.id)
@@ -354,8 +354,8 @@ class Group(CanvasObject):
         :calls: `GET /api/v1/groups/:group_id/content_licenses \
         <https://canvas.instructure.com/doc/api/files.html#method.usage_rights.licenses>`_
 
-        :rtype: :class:`canvasapi-get.paginated_list.PaginatedList` of
-            :class:`canvasapi-get.license.License`
+        :rtype: :class:`canvasapi_get.paginated_list.PaginatedList` of
+            :class:`canvasapi_get.license.License`
         """
 
         return PaginatedList(
@@ -399,8 +399,8 @@ class Group(CanvasObject):
         :calls: `GET /api/v1/groups/:group_id/memberships \
         <https://canvas.instructure.com/doc/api/groups.html#method.group_memberships.index>`_
 
-        :rtype: :class:`canvasapi-get.paginated_list.PaginatedList` of
-            :class:`canvasapi-get.group.GroupMembership`
+        :rtype: :class:`canvasapi_get.paginated_list.PaginatedList` of
+            :class:`canvasapi_get.group.GroupMembership`
         """
         return PaginatedList(
             GroupMembership,
@@ -417,8 +417,8 @@ class Group(CanvasObject):
         :calls: `GET /api/v1/groups/:group_id/content_migrations/migrators \
         <https://canvas.instructure.com/doc/api/content_migrations.html#method.content_migrations.available_migrators>`_
 
-        :rtype: :class:`canvasapi-get.paginated_list.PaginatedList` of
-            :class:`canvasapi-get.content_migration.Migrator`
+        :rtype: :class:`canvasapi_get.paginated_list.PaginatedList` of
+            :class:`canvasapi_get.content_migration.Migrator`
         """
         from canvasapi.content_migration import Migrator
 
@@ -440,7 +440,7 @@ class Group(CanvasObject):
         :param url: The url for the page.
         :type url: str
         :returns: The specified page.
-        :rtype: :class:`canvasapi-get.groups.Group`
+        :rtype: :class:`canvasapi_get.groups.Group`
         """
         from canvasapi.course import Page
 
@@ -461,8 +461,8 @@ class Group(CanvasObject):
         :calls: `GET /api/v1/groups/:group_id/pages \
         <https://canvas.instructure.com/doc/api/pages.html#method.wiki_pages_api.index>`_
 
-        :rtype: :class:`canvasapi-get.paginated_list.PaginatedList` of
-            :class:`canvasapi-get.page.Page`
+        :rtype: :class:`canvasapi_get.paginated_list.PaginatedList` of
+            :class:`canvasapi_get.page.Page`
         """
         from canvasapi.course import Page
 
@@ -483,8 +483,8 @@ class Group(CanvasObject):
         :calls: `GET /api/v1/groups/:group_id/tabs \
         <https://canvas.instructure.com/doc/api/tabs.html#method.tabs.index>`_
 
-        :rtype: :class:`canvasapi-get.paginated_list.PaginatedList` of
-            :class:`canvasapi-get.tab.Tab`
+        :rtype: :class:`canvasapi_get.paginated_list.PaginatedList` of
+            :class:`canvasapi_get.tab.Tab`
         """
         return PaginatedList(
             Tab,
@@ -502,8 +502,8 @@ class Group(CanvasObject):
         :calls: `GET /api/v1/groups/:group_id/users \
         <https://canvas.instructure.com/doc/api/groups.html#method.groups.users>`_
 
-        :rtype: :class:`canvasapi-get.paginated_list.PaginatedList` of
-            :class:`canvasapi-get.user.User`
+        :rtype: :class:`canvasapi_get.paginated_list.PaginatedList` of
+            :class:`canvasapi_get.user.User`
         """
         from canvasapi.user import User
 
@@ -525,8 +525,8 @@ class Group(CanvasObject):
         :param invitees: list of user ids
         :type invitees: integer list
 
-        :rtype: :class:`canvasapi-get.paginated_list.PaginatedList` of
-            :class:`canvasapi-get.group.GroupMembership`
+        :rtype: :class:`canvasapi_get.paginated_list.PaginatedList` of
+            :class:`canvasapi_get.group.GroupMembership`
         """
         kwargs["invitees"] = invitees
         return PaginatedList(
@@ -549,8 +549,8 @@ class Group(CanvasObject):
         :param full_path: Full path to resolve, relative to group root.
         :type full_path: string
 
-        :rtype: :class:`canvasapi-get.paginated_list.PaginatedList` of
-            :class:`canvasapi-get.folder.Folder`
+        :rtype: :class:`canvasapi_get.paginated_list.PaginatedList` of
+            :class:`canvasapi_get.folder.Folder`
         """
 
         if full_path:
@@ -608,8 +608,8 @@ class GroupCategory(CanvasObject):
         :calls: `GET /api/v1/group_categories/:group_category_id/groups \
         <https://canvas.instructure.com/doc/api/group_categories.html#method.group_categories.groups>`_
 
-        :rtype: :class:`canvasapi-get.paginated_list.PaginatedList` of
-            :class:`canvasapi-get.group.Group`
+        :rtype: :class:`canvasapi_get.paginated_list.PaginatedList` of
+            :class:`canvasapi_get.group.Group`
         """
         return PaginatedList(
             Group, self._requester, "GET", "group_categories/{}/groups".format(self.id)
@@ -622,8 +622,8 @@ class GroupCategory(CanvasObject):
         :calls: `GET /api/v1/group_categories/:group_category_id/users \
         <https://canvas.instructure.com/doc/api/group_categories.html#method.group_categories.users>`_
 
-        :rtype: :class:`canvasapi-get.paginated_list.PaginatedList` of
-            :class:`canvasapi-get.user.User`
+        :rtype: :class:`canvasapi_get.paginated_list.PaginatedList` of
+            :class:`canvasapi_get.user.User`
         """
         from canvasapi.user import User
 

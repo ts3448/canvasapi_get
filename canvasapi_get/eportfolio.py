@@ -15,8 +15,8 @@ class EPortfolio(CanvasObject):
             <https://canvas.instructure.com/doc/api/e_portfolios.html#method.eportfolios_api.pages>`_
 
         :returns: List of ePortfolio pages.
-        :rtype: :class:`canvasapi-get.paginated_list.PaginatedList` of
-            :class:`canvasapi-get.eportfolio.EPortfolioPage`
+        :rtype: :class:`canvasapi_get.paginated_list.PaginatedList` of
+            :class:`canvasapi_get.eportfolio.EPortfolioPage`
         """
 
         return PaginatedList(

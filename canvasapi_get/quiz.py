@@ -17,8 +17,8 @@ class Quiz(CanvasObject):
         :calls: `GET /api/v1/courses/:course_id/quizzes/:quiz_id/reports \
         <https://canvas.instructure.com/doc/api/quiz_reports.html#method.quizzes/quiz_reports.index>`_
 
-        :rtype: :class:`canvasapi-get.paginated_list.PaginatedList` of
-            :class:`canvasapi-get.quiz.QuizReport`
+        :rtype: :class:`canvasapi_get.paginated_list.PaginatedList` of
+            :class:`canvasapi_get.quiz.QuizReport`
         """
         return PaginatedList(
             QuizReport,
@@ -36,7 +36,7 @@ class Quiz(CanvasObject):
         <https://canvas.instructure.com/doc/api/quiz_questions.html#method.quizzes/quiz_questions.show>`_
 
         :param question: The object or ID of the quiz question to retrieve.
-        :type question: int, str or :class:`canvasapi-get.quiz.QuizQuestion`
+        :type question: int, str or :class:`canvasapi_get.quiz.QuizQuestion`
 
         :rtype: :class:`canvasapi.quiz.QuizQuestion`
         """
@@ -61,8 +61,8 @@ class Quiz(CanvasObject):
         :calls: `GET /api/v1/courses/:course_id/quizzes/:quiz_id/questions \
         <https://canvas.instructure.com/doc/api/quiz_questions.html#method.quizzes/quiz_questions.index>`_
 
-        :rtype: :class:`canvasapi-get.paginated_list.PaginatedList` of
-            :class:`canvasapi-get.quiz.QuizQuestion`
+        :rtype: :class:`canvasapi_get.paginated_list.PaginatedList` of
+            :class:`canvasapi_get.quiz.QuizQuestion`
         """
         return PaginatedList(
             QuizQuestion,
@@ -131,7 +131,7 @@ class Quiz(CanvasObject):
         <https://canvas.instructure.com/doc/api/quiz_submissions.html#method.quizzes/quiz_submissions_api.show>`_
 
         :param quiz_submission: The object or ID of the quiz submission to retrieve.
-        :type quiz_submission: int, string, :class:`canvasapi-get.quiz.QuizSubmission`
+        :type quiz_submission: int, string, :class:`canvasapi_get.quiz.QuizSubmission`
 
         :rtype: :class:`canvasapi.quiz.QuizSubmission`
         """
@@ -175,8 +175,8 @@ class Quiz(CanvasObject):
         :calls: `GET /api/v1/courses/:course_id/quizzes/:quiz_id/statistics \
         <https://canvas.instructure.com/doc/api/quiz_statistics.html#method.quizzes/quiz_statistics.index>`_
 
-        :rtype: :class:`canvasapi-get.paginated_list.PaginatedList` of
-            :class:`canvasapi-get.quiz.QuizStatistic`
+        :rtype: :class:`canvasapi_get.paginated_list.PaginatedList` of
+            :class:`canvasapi_get.quiz.QuizStatistic`
         """
         return PaginatedList(
             QuizStatistic,
@@ -195,8 +195,8 @@ class Quiz(CanvasObject):
         :calls: `GET /api/v1/courses/:course_id/quizzes/:quiz_id/submissions \
         <https://canvas.instructure.com/doc/api/quiz_submissions.html#method.quizzes/quiz_submissions_api.index>`_
 
-        :rtype: :class:`canvasapi-get.paginated_list.PaginatedList` of
-            :class:`canvasapi-get.quiz.QuizSubmission`
+        :rtype: :class:`canvasapi_get.paginated_list.PaginatedList` of
+            :class:`canvasapi_get.quiz.QuizSubmission`
         """
         return PaginatedList(
             QuizSubmission,
@@ -226,8 +226,8 @@ class QuizSubmission(CanvasObject):
         <https://canvas.instructure.com/doc/api/quiz_submission_events.html#method.quizzes/quiz_submission_events_api.index>`_
 
         :returns: PaginatedList of QuizSubmissionEvents.
-        :rtype: :class:`canvasapi-get.paginated_list.PaginatedList` of
-          :class:`canvasapi-get.quiz.QuizSubmissionEvent`
+        :rtype: :class:`canvasapi_get.paginated_list.PaginatedList` of
+          :class:`canvasapi_get.quiz.QuizSubmissionEvent`
         """
         return PaginatedList(
             QuizSubmissionEvent,
