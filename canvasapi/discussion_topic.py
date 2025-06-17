@@ -25,6 +25,7 @@ class DiscussionTopic(CanvasObject):
             elif self.context_code.startswith("group_"):
                 self.group_id = self.context_code.split("_")[1]
                 return self.group_id
+            return None
         else:
             raise ValueError("Discussion Topic does not have a course_id or group_id")
 
@@ -44,30 +45,9 @@ class DiscussionTopic(CanvasObject):
                 return "course"
             elif self.context_code.startswith("group"):
                 return "group"
+            return None
         else:
             raise ValueError("Discussion Topic does not have a course_id or group_id")
-
-    def delete(self, **kwargs):
-        """
-        Deletes the discussion topic. This will also delete the assignment.
-
-        :calls: `DELETE /api/v1/courses/:course_id/discussion_topics/:topic_id \
-            <https://canvas.instructure.com/doc/api/discussion_topics.html#method.discussion_topics.destroy>`_
-
-            or `DELETE /api/v1/groups/:group_id/discussion_topics/:topic_id \
-            <https://canvas.instructure.com/doc/api/discussion_topics.html#method.discussion_topics.destroy>`_
-
-        :returns: True if the discussion topic was deleted, False otherwise.
-        :rtype: bool
-        """
-        response = self._requester.request(
-            "DELETE",
-            "{}s/{}/discussion_topics/{}".format(
-                self._parent_type, self._parent_id, self.id
-            ),
-            _kwargs=combine_kwargs(**kwargs),
-        )
-        return "deleted_at" in response.json()
 
     def get_entries(self, ids, **kwargs):
         """
@@ -123,6 +103,7 @@ class DiscussionTopic(CanvasObject):
             return Group(self._requester, response.json())
         elif self._parent_type == "course":
             return Course(self._requester, response.json())
+        return None
 
     def get_topic_entries(self, **kwargs):
         """
@@ -150,181 +131,6 @@ class DiscussionTopic(CanvasObject):
             },
             _kwargs=combine_kwargs(**kwargs),
         )
-
-    def mark_as_read(self, **kwargs):
-        """
-        Mark the initial text of the discussion topic as read.
-
-        :calls: `PUT /api/v1/courses/:course_id/discussion_topics/:topic_id/read \
-            <https://canvas.instructure.com/doc/api/discussion_topics.html#method.discussion_topics_api.mark_topic_read>`_
-
-            or `PUT /api/v1/groups/:group_id/discussion_topics/:topic_id/read \
-            <https://canvas.instructure.com/doc/api/discussion_topics.html#method.discussion_topics_api.mark_topic_read>`_
-
-        :rtype: bool
-        """
-        response = self._requester.request(
-            "PUT",
-            "{}s/{}/discussion_topics/{}/read".format(
-                self._parent_type, self._parent_id, self.id
-            ),
-            _kwargs=combine_kwargs(**kwargs),
-        )
-        return response.status_code == 204
-
-    def mark_as_unread(self, **kwargs):
-        """
-        Mark the initial text of the discussion topic as unread.
-
-        :calls: `DELETE /api/v1/courses/:course_id/discussion_topics/:topic_id/read \
-            <https://canvas.instructure.com/doc/api/discussion_topics.html#method.discussion_topics_api.mark_topic_unread>`_
-
-            or `DELETE /api/v1/groups/:group_id/discussion_topics/:topic_id/read \
-            <https://canvas.instructure.com/doc/api/discussion_topics.html#method.discussion_topics_api.mark_topic_unread>`_
-
-        :rtype: bool
-        """
-        response = self._requester.request(
-            "DELETE",
-            "{}s/{}/discussion_topics/{}/read".format(
-                self._parent_type, self._parent_id, self.id
-            ),
-            _kwargs=combine_kwargs(**kwargs),
-        )
-        return response.status_code == 204
-
-    def mark_entries_as_read(self, **kwargs):
-        """
-        Mark the discussion topic and all its entries as read.
-
-        :calls: `PUT /api/v1/courses/:course_id/discussion_topics/:topic_id/read_all \
-            <https://canvas.instructure.com/doc/api/discussion_topics.html#method.discussion_topics_api.mark_all_read>`_
-
-            or `PUT /api/v1/groups/:group_id/discussion_topics/:topic_id/read_all \
-            <https://canvas.instructure.com/doc/api/discussion_topics.html#method.discussion_topics_api.mark_all_read>`_
-
-        :rtype: bool
-        """
-        response = self._requester.request(
-            "PUT",
-            "{}s/{}/discussion_topics/{}/read_all".format(
-                self._parent_type, self._parent_id, self.id
-            ),
-            _kwargs=combine_kwargs(**kwargs),
-        )
-        return response.status_code == 204
-
-    def mark_entries_as_unread(self, **kwargs):
-        """
-        Mark the discussion topic and all its entries as unread.
-
-        :calls: `DELETE /api/v1/courses/:course_id/discussion_topics/:topic_id/read_all \
-            <https://canvas.instructure.com/doc/api/discussion_topics.html#method.discussion_topics_api.mark_all_unread>`_
-
-            or `DELETE /api/v1/groups/:group_id/discussion_topics/:topic_id/read_all \
-            <https://canvas.instructure.com/doc/api/discussion_topics.html#method.discussion_topics_api.mark_all_unread>`_
-
-        :rtype: bool
-        """
-        response = self._requester.request(
-            "DELETE",
-            "{}s/{}/discussion_topics/{}/read_all".format(
-                self._parent_type, self._parent_id, self.id
-            ),
-            _kwargs=combine_kwargs(**kwargs),
-        )
-        return response.status_code == 204
-
-    def post_entry(self, **kwargs):
-        """
-        Creates a new entry in a discussion topic.
-
-        :calls: `POST /api/v1/courses/:course_id/discussion_topics/:topic_id/entries \
-            <https://canvas.instructure.com/doc/api/discussion_topics.html#method.discussion_topics_api.add_entry>`_
-
-            or `POST /api/v1/groups/:group_id/discussion_topics/:topic_id/entries \
-            <https://canvas.instructure.com/doc/api/discussion_topics.html#method.discussion_topics_api.add_entry>`_
-
-        :rtype: :class:`canvasapi.discussion_topic.DiscussionEntry`
-        """
-        response = self._requester.request(
-            "POST",
-            "{}s/{}/discussion_topics/{}/entries".format(
-                self._parent_type, self._parent_id, self.id
-            ),
-            _kwargs=combine_kwargs(**kwargs),
-        )
-        response_json = response.json()
-        response_json.update(
-            {
-                "discussion_id": self.id,
-                "{}_id".format(self._parent_type): self._parent_id,
-            }
-        )
-        return DiscussionEntry(self._requester, response_json)
-
-    def subscribe(self, **kwargs):
-        """
-        Subscribe to a topic to receive notifications about new entries.
-
-        :calls: `PUT /api/v1/courses/:course_id/discussion_topics/:topic_id/subscribed \
-            <https://canvas.instructure.com/doc/api/discussion_topics.html#method.discussion_topics_api.subscribe_topic>`_
-
-            or `PUT /api/v1/groups/:group_id/discussion_topics/:topic_id/subscribed \
-            <https://canvas.instructure.com/doc/api/discussion_topics.html#method.discussion_topics_api.subscribe_topic>`_
-
-        :rtype: bool
-        """
-        response = self._requester.request(
-            "PUT",
-            "{}s/{}/discussion_topics/{}/subscribed".format(
-                self._parent_type, self._parent_id, self.id
-            ),
-            _kwargs=combine_kwargs(**kwargs),
-        )
-        return response.status_code == 204
-
-    def unsubscribe(self, **kwargs):
-        """
-        Unsubscribe from a topic to stop receiving notifications about new entries.
-
-        :calls: `DELETE /api/v1/courses/:course_id/discussion_topics/:topic_id/subscribed \
-            <https://canvas.instructure.com/doc/api/discussion_topics.html#method.discussion_topics_api.unsubscribe_topic>`_
-
-            or `DELETE /api/v1/groups/:group_id/discussion_topics/:topic_id/subscribed \
-            <https://canvas.instructure.com/doc/api/discussion_topics.html#method.discussion_topics_api.unsubscribe_topic>`_
-
-        :rtype: bool
-        """
-        response = self._requester.request(
-            "DELETE",
-            "{}s/{}/discussion_topics/{}/subscribed".format(
-                self._parent_type, self._parent_id, self.id
-            ),
-            _kwargs=combine_kwargs(**kwargs),
-        )
-        return response.status_code == 204
-
-    def update(self, **kwargs):
-        """
-        Updates an existing discussion topic for the course or group.
-
-        :calls: `PUT /api/v1/courses/:course_id/discussion_topics/:topic_id \
-            <https://canvas.instructure.com/doc/api/discussion_topics.html#method.discussion_topics.update>`_
-
-            or `PUT /api/v1/groups/:group_id/discussion_topics/:topic_id \
-            <https://canvas.instructure.com/doc/api/discussion_topics.html#method.discussion_topics.update>`_
-
-        :rtype: :class:`canvasapi.discussion_topic.DiscussionTopic`
-        """
-        response = self._requester.request(
-            "PUT",
-            "{}s/{}/discussion_topics/{}".format(
-                self._parent_type, self._parent_id, self.id
-            ),
-            _kwargs=combine_kwargs(**kwargs),
-        )
-        return DiscussionTopic(self._requester, response.json())
 
 
 class DiscussionEntry(CanvasObject):
@@ -358,30 +164,6 @@ class DiscussionEntry(CanvasObject):
             return "group"
         else:
             raise ValueError("Discussion Topic does not have a course_id or group_id")
-
-    def delete(self, **kwargs):
-        """
-        Delete this discussion entry.
-
-        :calls: `DELETE /api/v1/courses/:course_id/discussion_topics/:topic_id/entries/:id \
-            <https://canvas.instructure.com/doc/api/discussion_topics.html#method.discussion_entries.destroy>`_
-
-            or `DELETE /api/v1/groups/:group_id/discussion_topics/:topic_id/entries/:id \
-            <https://canvas.instructure.com/doc/api/discussion_topics.html#method.discussion_entries.destroy>`_
-
-        :rtype: bool
-        """
-        response = self._requester.request(
-            "DELETE",
-            "{}s/{}/discussion_topics/{}/entries/{}".format(
-                self._discussion_parent_type,
-                self._discussion_parent_id,
-                self.discussion_id,
-                self.id,
-            ),
-            _kwargs=combine_kwargs(**kwargs),
-        )
-        return "deleted_at" in response.json()
 
     def get_discussion(self, **kwargs):
         """
@@ -441,141 +223,6 @@ class DiscussionEntry(CanvasObject):
             _kwargs=combine_kwargs(**kwargs),
         )
 
-    def mark_as_read(self, **kwargs):
-        """
-        Mark a discussion entry as read.
-
-        :calls: `PUT /api/v1/courses/:course_id/discussion_topics/:topic_id/entries/:entry_id/read\
-            <https://canvas.instructure.com/doc/api/discussion_topics.html#method.discussion_topics_api.mark_entry_read>`_
-
-            or `PUT /api/v1/groups/:group_id/discussion_topics/:topic_id/entries/:entry_id/read \
-            <https://canvas.instructure.com/doc/api/discussion_topics.html#method.discussion_topics_api.mark_entry_read>`_
-
-        :rtype: bool
-        """
-        response = self._requester.request(
-            "PUT",
-            "{}s/{}/discussion_topics/{}/entries/{}/read".format(
-                self._discussion_parent_type,
-                self._discussion_parent_id,
-                self.discussion_id,
-                self.id,
-            ),
-            _kwargs=combine_kwargs(**kwargs),
-        )
-        return response.status_code == 204
-
-    def mark_as_unread(self, **kwargs):
-        """
-        Mark a discussion entry as unread.
-
-        :calls: `DELETE
-            /api/v1/courses/:course_id/discussion_topics/:topic_id/entries/:entry_id/read \
-            <https://canvas.instructure.com/doc/api/discussion_topics.html#method.discussion_topics_api.mark_entry_unread>`_
-
-            or `DELETE
-            /api/v1/groups/:group_id/discussion_topics/:topic_id/entries/:entry_id/read \
-            <https://canvas.instructure.com/doc/api/discussion_topics.html#method.discussion_topics_api.mark_entry_unread>`_
-
-        :rtype: bool
-        """
-        response = self._requester.request(
-            "DELETE",
-            "{}s/{}/discussion_topics/{}/entries/{}/read".format(
-                self._discussion_parent_type,
-                self._discussion_parent_id,
-                self.discussion_id,
-                self.id,
-            ),
-            _kwargs=combine_kwargs(**kwargs),
-        )
-        return response.status_code == 204
+    # TODO: update to use correct class
 
     # TODO: update to use correct class
-    def post_reply(self, **kwargs):
-        """
-        Add a reply to this entry.
-
-        :calls: `POST
-            /api/v1/courses/:course_id/discussion_topics/:topic_id/entries/:entry_id/replies
-            <https://canvas.instructure.com/doc/api/discussion_topics.html#method.discussion_topics_api.add_reply>`_
-
-            or `POST /api/v1/groups/:group_id/discussion_topics/:topic_id/entries/:entry_id/replies
-            <https://canvas.instructure.com/doc/api/discussion_topics.html#method.discussion_topics_api.add_reply>`_
-
-        :rtype: :class:`canvasapi.discussion_topic.DiscussionEntry`
-        """
-        response = self._requester.request(
-            "POST",
-            "{}s/{}/discussion_topics/{}/entries/{}/replies".format(
-                self._discussion_parent_type,
-                self._discussion_parent_id,
-                self.discussion_id,
-                self.id,
-            ),
-            _kwargs=combine_kwargs(**kwargs),
-        )
-        response_json = response.json()
-        response_json.update(discussion_id=self.discussion_id)
-        return DiscussionEntry(self._requester, response_json)
-
-    # TODO: update to use correct class
-    def rate(self, rating, **kwargs):
-        """
-        Rate this discussion entry.
-
-        :calls: `POST
-            /api/v1/courses/:course_id/discussion_topics/:topic_id/entries/:entry_id/rating \
-            <https://canvas.instructure.com/doc/api/discussion_topics.html#method.discussion_topics_api.rate_entry>`_
-
-            or `POST
-            /api/v1/groups/:group_id/discussion_topics/:topic_id/entries/:entry_id/rating \
-            <https://canvas.instructure.com/doc/api/discussion_topics.html#method.discussion_topics_api.rate_entry>`_
-
-        :param rating: A rating to set on this entry. Only 0 and 1 are accepted.
-        :type rating: int
-        :rtype: bool
-        """
-        if rating not in (0, 1):
-            raise ValueError("`rating` must be 0 or 1.")
-
-        response = self._requester.request(
-            "POST",
-            "{}s/{}/discussion_topics/{}/entries/{}/rating".format(
-                self._discussion_parent_type,
-                self._discussion_parent_id,
-                self.discussion_id,
-                self.id,
-            ),
-            rating=rating,
-            _kwargs=combine_kwargs(**kwargs),
-        )
-        return response.status_code == 204
-
-    def update(self, **kwargs):
-        """
-        Updates an existing discussion entry.
-
-        :calls: `PUT /api/v1/courses/:course_id/discussion_topics/:topic_id/entries/:id \
-            <https://canvas.instructure.com/doc/api/discussion_topics.html#method.discussion_entries.update>`_
-
-            or `PUT /api/v1/groups/:group_id/discussion_topics/:topic_id/entries/:id \
-            <https://canvas.instructure.com/doc/api/discussion_topics.html#method.discussion_entries.update>`_
-
-        :rtype: bool
-        """
-        response = self._requester.request(
-            "PUT",
-            "{}s/{}/discussion_topics/{}/entries/{}".format(
-                self._discussion_parent_type,
-                self._discussion_parent_id,
-                self.discussion_id,
-                self.id,
-            ),
-            _kwargs=combine_kwargs(**kwargs),
-        )
-
-        if response.json().get("updated_at"):
-            super(DiscussionEntry, self).set_attributes(response.json())
-
-        return "updated_at" in response.json()

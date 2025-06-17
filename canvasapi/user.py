@@ -4,178 +4,18 @@ from canvasapi.calendar_event import CalendarEvent
 from canvasapi.canvas_object import CanvasObject
 from canvasapi.communication_channel import CommunicationChannel
 from canvasapi.content_export import ContentExport
-from canvasapi.content_migration import ContentMigration, Migrator
 from canvasapi.feature import Feature, FeatureFlag
 from canvasapi.folder import Folder
 from canvasapi.grade_change_log import GradeChangeEvent
 from canvasapi.license import License
 from canvasapi.page_view import PageView
 from canvasapi.paginated_list import PaginatedList
-from canvasapi.pairing_code import PairingCode
-from canvasapi.upload import FileOrPathLike, Uploader
-from canvasapi.usage_rights import UsageRights
 from canvasapi.util import combine_kwargs, obj_or_id, obj_or_str
 
 
 class User(CanvasObject):
     def __str__(self):
         return "{} ({})".format(self.name, self.id)
-
-    def add_observee(self, observee_id, **kwargs):
-        """
-        Registers a user as being observed by the given user.
-
-        :calls: `PUT /api/v1/users/:user_id/observees/:observee_id \
-        <https://canvas.instructure.com/doc/api/user_observees.html#method.user_observees.update>`_
-
-        :param observee_id: The login id for the user to observe.
-        :type observee_id: int
-        :rtype: :class:`canvasapi.user.User`
-        """
-
-        response = self._requester.request(
-            "PUT",
-            "users/{}/observees/{}".format(self.id, observee_id),
-            _kwargs=combine_kwargs(**kwargs),
-        )
-        return User(self._requester, response.json())
-
-    def add_observee_with_credentials(self, **kwargs):
-        """
-        Register the given user to observe another user, given the observee's credentials.
-
-        :calls: `POST /api/v1/users/:user_id/observees \
-        <https://canvas.instructure.com/doc/api/user_observees.html#method.user_observees.create>`_
-
-        :rtype: :class:`canvasapi.user.User`
-        """
-
-        response = self._requester.request(
-            "POST",
-            "users/{}/observees".format(self.id),
-            _kwargs=combine_kwargs(**kwargs),
-        )
-        return User(self._requester, response.json())
-
-    def create_communication_channel(self, **kwargs):
-        """
-        Create a communication channel for this user
-
-        :calls: `POST /api/v1/users/:user_id/communication_channels \
-        <https://canvas.instructure.com/doc/api/communication_channels.html#method.communication_channels.create>`_
-
-        :rtype: :class:`canvasapi.communication_channel.CommunicationChannel`
-        """
-        response = self._requester.request(
-            "POST",
-            "users/{}/communication_channels".format(self.id),
-            _kwargs=combine_kwargs(**kwargs),
-        )
-
-        return CommunicationChannel(self._requester, response.json())
-
-    def create_content_migration(self, migration_type, **kwargs):
-        """
-        Create a content migration.
-
-        :calls: `POST /api/v1/users/:user_id/content_migrations \
-        <https://canvas.instructure.com/doc/api/content_migrations.html#method.content_migrations.create>`_
-
-        :param migration_type: The migrator type to use in this migration
-        :type migration_type: str or :class:`canvasapi.content_migration.Migrator`
-
-        :rtype: :class:`canvasapi.content_migration.ContentMigration`
-        """
-        if isinstance(migration_type, Migrator):
-            kwargs["migration_type"] = migration_type.type
-        elif isinstance(migration_type, str):
-            kwargs["migration_type"] = migration_type
-        else:
-            raise TypeError("Parameter migration_type must be of type Migrator or str")
-
-        response = self._requester.request(
-            "POST",
-            "users/{}/content_migrations".format(self.id),
-            _kwargs=combine_kwargs(**kwargs),
-        )
-
-        response_json = response.json()
-        response_json.update({"user_id": self.id})
-
-        return ContentMigration(self._requester, response_json)
-
-    def create_folder(self, name, **kwargs):
-        """
-        Creates a folder in this user.
-
-        :calls: `POST /api/v1/users/:user_id/folders \
-        <https://canvas.instructure.com/doc/api/files.html#method.folders.create>`_
-
-        :param name: The name of the folder.
-        :type name: str
-        :rtype: :class:`canvasapi.folder.Folder`
-        """
-        response = self._requester.request(
-            "POST",
-            "users/{}/folders".format(self.id),
-            name=name,
-            _kwargs=combine_kwargs(**kwargs),
-        )
-        return Folder(self._requester, response.json())
-
-    def create_pairing_code(self, **kwargs):
-        """
-        Create a pairing code for this user.
-
-        :calls: `POST /api/v1/users/:user_id/observer_pairing_codes \
-            <https://canvas.instructure.com/doc/api/user_observees.html#method.observer_pairing_codes_api.create>`_
-
-        :rtype: :class:`canvasapi.pairing_code.PairingCode`
-        """
-
-        response = self._requester.request(
-            "POST",
-            "users/{}/observer_pairing_codes".format(self.id),
-            _kwargs=combine_kwargs(**kwargs),
-        )
-
-        return PairingCode(self._requester, response.json())
-
-    def edit(self, **kwargs):
-        """
-        Modify this user's information.
-
-        :calls: `PUT /api/v1/users/:id \
-        <https://canvas.instructure.com/doc/api/users.html#method.users.update>`_
-
-        :rtype: :class:`canvasapi.user.User`
-        """
-        response = self._requester.request(
-            "PUT", "users/{}".format(self.id), _kwargs=combine_kwargs(**kwargs)
-        )
-        super(User, self).set_attributes(response.json())
-        return self
-
-    def export_content(self, export_type, **kwargs):
-        """
-        Begin a content export job for a user.
-
-        :calls: `POST /api/v1/users/:user_id/content_exports\
-        <https://canvas.instructure.com/doc/api/content_exports.html#method.content_exports_api.create>`_
-
-        :param export_type: The type of content to export.
-        :type export_type: str
-
-        :rtype: :class:`canvasapi.content_export.ContentExport`
-        """
-        kwargs["export_type"] = export_type
-
-        response = self._requester.request(
-            "POST",
-            "users/{}/content_exports".format(self.id),
-            _kwargs=combine_kwargs(**kwargs),
-        )
-        return ContentExport(self._requester, response.json())
 
     def get_assignments(self, course, **kwargs):
         """
@@ -854,28 +694,6 @@ class User(CanvasObject):
             _kwargs=combine_kwargs(**kwargs),
         )
 
-    def merge_into(self, destination_user, **kwargs):
-        """
-        Merge this user into another user.
-
-        :calls: `PUT /api/v1/users/:id/merge_into/:destination_user_id \
-        <https://canvas.instructure.com/doc/api/users.html#method.users.merge_into>`_
-
-        :param destination_user: The object or ID of the user to merge into.
-        :type destination_user: :class:`canvasapi.user.User` or int
-
-        :rtype: :class:`canvasapi.user.User`
-        """
-        dest_user_id = obj_or_id(destination_user, "destination_user", (User,))
-
-        response = self._requester.request(
-            "PUT",
-            "users/{}/merge_into/{}".format(self.id, dest_user_id),
-            _kwargs=combine_kwargs(**kwargs),
-        )
-        super(User, self).set_attributes(response.json())
-        return self
-
     def moderate_all_eportfolios(self, **kwargs):
         """
         Update the spam_status for all active eportfolios of a user.
@@ -900,43 +718,6 @@ class User(CanvasObject):
             "users/{}/eportfolios".format(self.id),
             _kwargs=combine_kwargs(**kwargs),
         )
-
-    def remove_observee(self, observee_id, **kwargs):
-        """
-        Unregisters a user as being observed by the given user.
-
-        :calls: `DELETE /api/v1/users/:user_id/observees/:observee_id \
-        <https://canvas.instructure.com/doc/api/user_observees.html#method.user_observees.destroy>`_
-
-        :param observee_id: The login id for the user to observe.
-        :type observee_id: int
-        :rtype: :class:`canvasapi.user.User`
-        """
-
-        response = self._requester.request(
-            "DELETE",
-            "users/{}/observees/{}".format(self.id, observee_id),
-            _kwargs=combine_kwargs(**kwargs),
-        )
-        return User(self._requester, response.json())
-
-    def remove_usage_rights(self, **kwargs):
-        """
-        Changes the usage rights for specified files that are under the user scope
-
-        :calls: `DELETE /api/v1/users/:user_id/usage_rights \
-        <https://canvas.instructure.com/doc/api/files.html#method.usage_rights.remove_usage_rights>`_
-
-        :rtype: dict
-        """
-
-        response = self._requester.request(
-            "DELETE",
-            "users/{}/usage_rights".format(self.id),
-            _kwargs=combine_kwargs(**kwargs),
-        )
-
-        return response.json()
 
     def resolve_path(self, full_path=None, **kwargs):
         """
@@ -971,24 +752,6 @@ class User(CanvasObject):
                 _kwargs=combine_kwargs(**kwargs),
             )
 
-    def set_usage_rights(self, **kwargs):
-        """
-        Changes the usage rights for specified files that are under the user scope
-
-        :calls: `PUT /api/v1/users/:user_id/usage_rights \
-        <https://canvas.instructure.com/doc/api/files.html#method.usage_rights.set_usage_rights>`_
-
-        :rtype: :class:`canvasapi.usage_rights.UsageRights`
-        """
-
-        response = self._requester.request(
-            "PUT",
-            "users/{}/usage_rights".format(self.id),
-            _kwargs=combine_kwargs(**kwargs),
-        )
-
-        return UsageRights(self._requester, response.json())
-
     def show_observee(self, observee_id, **kwargs):
         """
         Gets information about an observed user.
@@ -1007,87 +770,6 @@ class User(CanvasObject):
             _kwargs=combine_kwargs(**kwargs),
         )
         return User(self._requester, response.json())
-
-    def terminate_sessions(self, **kwargs):
-        """
-        Terminate all sessions for a user.
-
-        This includes all browser-based sessions and all access tokens,
-        including manually generated ones.
-
-        :calls: `DELETE /api/v1/users/:id/sessions \
-        <https://canvas.instructure.com/doc/api/users.html#method.users.terminate_sessions>`_
-
-        :rtype: str
-        """
-
-        response = self._requester.request(
-            "DELETE",
-            "users/{}/sessions".format(self.id),
-            _kwargs=combine_kwargs(**kwargs),
-        )
-        return response.json()
-
-    def update_color(self, asset_string, hexcode, **kwargs):
-        """
-        Update a custom color for this user for a given context.
-
-        This allows colors for the calendar and elsewhere to be customized on a user basis.
-
-        The `asset_string` parameter should be in the format 'context_id', for example 'course_42'.
-        The `hexcode` parameter need not include the '#'.
-
-        :calls: `PUT /api/v1/users/:id/colors/:asset_string \
-        <https://canvas.instructure.com/doc/api/users.html#method.users.set_custom_color>`_
-
-        :param asset_string: The asset to modify the color for.
-        :type asset_string: str
-        :param hexcode: The hexcode of the color to use.
-        :type hexcode: str
-        :rtype: dict
-        """
-        kwargs["hexcode"] = hexcode
-        response = self._requester.request(
-            "PUT",
-            "users/{}/colors/{}".format(self.id, asset_string),
-            _kwargs=combine_kwargs(**kwargs),
-        )
-        return response.json()
-
-    def update_settings(self, **kwargs):
-        """
-        Update this user's settings.
-
-        :calls: `PUT /api/v1/users/:id/settings \
-        <https://canvas.instructure.com/doc/api/users.html#method.users.settings>`_
-
-        :rtype: dict
-        """
-        response = self._requester.request(
-            "PUT", "users/{}/settings".format(self.id), _kwargs=combine_kwargs(**kwargs)
-        )
-        return response.json()
-
-    def upload(self, file: FileOrPathLike, **kwargs):
-        """
-        Upload a file for a user.
-
-        NOTE: You *must* have authenticated with this user's API key to
-        upload on their behalf no matter what permissions the issuer of the
-        request has.
-
-        :calls: `POST /api/v1/users/:user_id/files \
-        <https://canvas.instructure.com/doc/api/users.html#method.users.create_file>`_
-
-        :param file: The file or path of the file to upload.
-        :type file: file or str
-        :returns: True if the file uploaded successfully, False otherwise, \
-                    and the JSON response from the API.
-        :rtype: tuple
-        """
-        return Uploader(
-            self._requester, "users/{}/files".format(self.id), file, **kwargs
-        ).start()
 
 
 class UserDisplay(CanvasObject):

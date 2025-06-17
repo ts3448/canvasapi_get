@@ -1,24 +1,9 @@
 from canvasapi.canvas_object import CanvasObject
-from canvasapi.util import combine_kwargs
 
 
 class File(CanvasObject):
     def __str__(self):
         return "{}".format(self.display_name)
-
-    def delete(self, **kwargs):
-        """
-        Delete this file.
-
-        :calls: `DELETE /api/v1/files/:id  \
-        <https://canvas.instructure.com/doc/api/files.html#method.files.destroy>`_
-
-        :rtype: :class:`canvasapi.file.File`
-        """
-        response = self._requester.request(
-            "DELETE", "files/{}".format(self.id), _kwargs=combine_kwargs(**kwargs)
-        )
-        return File(self._requester, response.json())
 
     def download(self, location):
         """
@@ -44,17 +29,3 @@ class File(CanvasObject):
             return response.content
         else:
             return response.text
-
-    def update(self, **kwargs):
-        """
-        Update some settings on the specified file.
-
-        :calls: `PUT /api/v1/files/:id \
-        <https://canvas.instructure.com/doc/api/files.html#method.files.api_update>`_
-
-        :rtype: :class:`canvasapi.file.File`
-        """
-        response = self._requester.request(
-            "PUT", "files/{}".format(self.id), _kwargs=combine_kwargs(**kwargs)
-        )
-        return File(self._requester, response.json())

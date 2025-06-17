@@ -7,60 +7,6 @@ class BlueprintTemplate(CanvasObject):
     def __str__(self):
         return "{}".format(self.id)
 
-    def associated_course_migration(self, **kwargs):
-        """
-        Start a migration to update content in all associated courses.
-
-        :calls: `POST /api/v1/courses/:course_id/blueprint_templates/:template_id/migrations\
-        <https://canvas.instructure.com/doc/api/blueprint_courses.html#method.\
-        master_courses/master_templates.queue_migration>`_
-
-        :rtype: :class:`canvasapi.blueprint.BlueprintMigration`
-        """
-        response = self._requester.request(
-            "POST",
-            "courses/{}/blueprint_templates/{}/migrations".format(
-                self.course_id, self.id
-            ),
-            _kwargs=combine_kwargs(**kwargs),
-        )
-        response_json = response.json()
-        response_json.update({"course_id": self.course_id})
-        return BlueprintMigration(self._requester, response_json)
-
-    def change_blueprint_restrictions(
-        self, content_type, content_id, restricted, **kwargs
-    ):
-        """
-        Set or remove restrictions on a blueprint course object.
-        Must have all three parameters for this function call to work.
-
-        :calls: `PUT /api/v1/courses/:course_id/blueprint_templates/:template_id/restrict_item \
-        <https://canvas.instructure.com/doc/api/blueprint_courses.html#method.master_courses/master_templates.restrict_item>`_
-
-        :param content_type: type of object
-        :type content_type: str
-        :param content_id: id of the object
-        :type content_id: int
-        :param restricted: whether it's restricted or not
-        :type restricted: bool
-
-        :returns: True if the restriction was succesfully applied.
-        :rtype: bool
-        """
-        kwargs["content_type"] = content_type
-        kwargs["content_id"] = content_id
-        kwargs["restricted"] = restricted
-
-        response = self._requester.request(
-            "PUT",
-            "courses/{}/blueprint_templates/{}/restrict_item".format(
-                self.course_id, self.id
-            ),
-            _kwargs=combine_kwargs(**kwargs),
-        )
-        return response.json().get("success", False)
-
     def get_associated_courses(self, **kwargs):
         """
         Return a list of courses associated with the given blueprint.
@@ -155,26 +101,6 @@ class BlueprintTemplate(CanvasObject):
         response_json = response.json()
         response_json.update({"course_id": self.course_id})
         return BlueprintMigration(self._requester, response_json)
-
-    def update_associated_courses(self, **kwargs):
-        """
-        Add or remove new associations for the blueprint template.
-
-        :calls: `PUT \
-        /api/v1/courses/:course_id/blueprint_templates/:template_id/update_associations \
-        <https://canvas.instructure.com/doc/api/blueprint_courses.html#method.master_courses/master_templates.update_associations>`_
-
-        :returns: True if the course was added or removed, False otherwise.
-        :rtype: bool
-        """
-        response = self._requester.request(
-            "PUT",
-            "courses/{}/blueprint_templates/{}/update_associations".format(
-                self.course_id, self.id
-            ),
-            _kwargs=combine_kwargs(**kwargs),
-        )
-        return response.json().get("success", False)
 
 
 class BlueprintMigration(CanvasObject):

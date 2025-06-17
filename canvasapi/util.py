@@ -158,8 +158,8 @@ def obj_or_str(obj, attr, object_types):
                 try:
                     return str(getattr(obj, attr))
                 except AttributeError:
-                    raise AttributeError("{} object does not have {} attribute").format(
-                        obj, attr
+                    raise AttributeError(
+                        "{} object does not have {} attribute".format(obj, attr)
                     )
 
         obj_type_list = ",".join([obj_type.__name__ for obj_type in object_types])

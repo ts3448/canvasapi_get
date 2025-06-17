@@ -7,48 +7,6 @@ class Page(CanvasObject):
     def __str__(self):
         return "{} ({})".format(self.title, self.url)
 
-    def delete(self, **kwargs):
-        """
-        Delete this page.
-
-        :calls: `DELETE /api/v1/courses/:course_id/pages/:url \
-            <https://canvas.instructure.com/doc/api/pages.html#method.wiki_pages_api.destroy>`_
-            or
-            `DELETE /api/v1/groups/:group_id/pages/:url \
-            <https://canvas.instructure.com/doc/api/pages.html#method.wiki_pages_api.destroy>`_
-
-        :rtype: :class:`canvasapi.page.Page`
-        """
-
-        response = self._requester.request(
-            "DELETE",
-            "{}s/{}/pages/{}".format(self.parent_type, self.parent_id, self.url),
-            _kwargs=combine_kwargs(**kwargs),
-        )
-        return Page(self._requester, response.json())
-
-    def edit(self, **kwargs):
-        """
-        Update the title or the contents of a specified wiki
-        page.
-
-        :calls: `PUT /api/v1/courses/:course_id/pages/:url \
-        <https://canvas.instructure.com/doc/api/pages.html#method.wiki_pages_api.update>`_
-
-        :rtype: :class:`canvasapi.page.Page`
-        """
-        response = self._requester.request(
-            "PUT",
-            "{}s/{}/pages/{}".format(self.parent_type, self.parent_id, self.url),
-            _kwargs=combine_kwargs(**kwargs),
-        )
-
-        page_json = response.json()
-        page_json.update({"course_id": self.course_id})
-        super(Page, self).set_attributes(page_json)
-
-        return self
-
     def get_parent(self, **kwargs):
         """
         Return the object that spawned this page.
@@ -74,6 +32,7 @@ class Page(CanvasObject):
             return Group(self._requester, response.json())
         elif self.parent_type == "course":
             return Course(self._requester, response.json())
+        return None
 
     def get_revision_by_id(self, revision, **kwargs):
         """
@@ -153,32 +112,6 @@ class Page(CanvasObject):
         else:
             raise ValueError("ExternalTool does not have a course_id or group_id")
 
-    def revert_to_revision(self, revision, **kwargs):
-        """
-        Revert the page back to a specified revision.
-
-        :calls: `POST /api/v1/courses/:course_id/pages/:url/revisions/:revision_id \
-        <https://canvas.instructure.com/doc/api/pages.html#method.wiki_pages_api.revert>`_
-
-        :param revision: The object or ID of a specified revision.
-        :type revision: :class:`canvasapi.pagerevision.PageRevision` or int
-
-        :returns: Contents of the page revision.
-        :rtype: :class:`canvasapi.pagerevision.PageRevision`
-        """
-        revision_id = obj_or_id(revision, "revision", (PageRevision,))
-        response = self._requester.request(
-            "POST",
-            "{}s/{}/pages/{}/revisions/{}".format(
-                self.parent_type, self.parent_id, self.url, revision_id
-            ),
-            _kwargs=combine_kwargs(**kwargs),
-        )
-        pagerev_json = response.json()
-        pagerev_json.update({"{self.parent_type}_id": self.parent_id})
-
-        return PageRevision(self._requester, pagerev_json)
-
     def show_latest_revision(self, **kwargs):
         """
         Retrieve the contents of the latest revision.
@@ -226,6 +159,7 @@ class PageRevision(CanvasObject):
             return Group(self._requester, response.json())
         elif self.parent_type == "course":
             return Course(self._requester, response.json())
+        return None
 
     @property
     def parent_id(self):

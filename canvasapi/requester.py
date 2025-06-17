@@ -41,20 +41,7 @@ class Requester(object):
         self._session = requests.Session()
         self._cache = []
 
-    def _delete_request(self, url, headers, data=None, **kwargs):
-        """
-        Issue a DELETE request to the specified endpoint with the data provided.
-
-        :param url: The URL to request.
-        :type url: str
-        :param headers: The HTTP headers to send with this request.
-        :type headers: dict
-        :param data: The data to send with this request.
-        :type data: dict
-        """
-        return self._session.delete(url, headers=headers, data=data)
-
-    def _get_request(self, url, headers, params=None, **kwargs):
+    def _get_request(self, url, headers, params=None):
         """
         Issue a GET request to the specified endpoint with the data provided.
 
@@ -66,63 +53,6 @@ class Requester(object):
         :type params: dict
         """
         return self._session.get(url, headers=headers, params=params)
-
-    def _patch_request(self, url, headers, data=None, **kwargs):
-        """
-        Issue a PATCH request to the specified endpoint with the data provided.
-
-        :param url: The URL to request.
-        :type url: str
-        :param headers: The HTTP headers to send with this request.
-        :type headers: dict
-        :param data: The data to send with this request.
-        :type data: dict
-        """
-        return self._session.patch(url, headers=headers, data=data)
-
-    def _post_request(self, url, headers, data=None, json=False):
-        """
-        Issue a POST request to the specified endpoint with the data provided.
-
-        :param url: The URL to request.
-        :type url: str
-        :param headers: The HTTP headers to send with this request.
-        :type headers: dict
-        :param data: The data to send with this request.
-        :type data: dict
-        :param json: Whether or not to send the data as json
-        :type json: bool
-        """
-        if json:
-            return self._session.post(url, headers=headers, json=dict(data))
-
-        # Grab file from data.
-        files = None
-        for field, value in data:
-            if field == "file":
-                if isinstance(value, dict) or value is None:
-                    files = value
-                else:
-                    files = {"file": value}
-                break
-
-        # Remove file entry from data.
-        data[:] = [tup for tup in data if tup[0] != "file"]
-
-        return self._session.post(url, headers=headers, data=data, files=files)
-
-    def _put_request(self, url, headers, data=None, **kwargs):
-        """
-        Issue a PUT request to the specified endpoint with the data provided.
-
-        :param url: The URL to request.
-        :type url: str
-        :param headers: The HTTP headers to send with this request.
-        :type headers: dict
-        :param data: The data to send with this request.
-        :type data: dict
-        """
-        return self._session.put(url, headers=headers, data=data)
 
     def request(
         self,
@@ -202,16 +132,8 @@ class Requester(object):
                 _kwargs[i] = (kw, arg.isoformat())
 
         # Determine the appropriate request method.
-        if method == "GET":
-            req_method = self._get_request
-        elif method == "POST":
-            req_method = self._post_request
-        elif method == "DELETE":
-            req_method = self._delete_request
-        elif method == "PUT":
-            req_method = self._put_request
-        elif method == "PATCH":
-            req_method = self._patch_request
+
+        req_method = self._get_request
 
         # Call the request method
         logger.info("Request: {method} {url}".format(method=method, url=full_url))

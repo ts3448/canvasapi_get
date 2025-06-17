@@ -35,52 +35,6 @@ class ExternalTool(CanvasObject):
         else:
             raise ValueError("ExternalTool does not have a course_id or account_id")
 
-    def delete(self, **kwargs):
-        """
-        Remove the specified external tool.
-
-        :calls: `DELETE /api/v1/courses/:course_id/external_tools/:external_tool_id
-            <https://canvas.instructure.com/doc/api/external_tools.html#method.external_tools.destroy>`_
-            or `DELETE /api/v1/accounts/:account_id/external_tools/:external_tool_id
-            <https://canvas.instructure.com/doc/api/external_tools.html#method.external_tools.destroy>`_
-
-        :rtype: :class:`canvasapi.external_tool.ExternalTool`
-        """
-        response = self._requester.request(
-            "DELETE",
-            "{}s/{}/external_tools/{}".format(
-                self.parent_type, self.parent_id, self.id
-            ),
-            _kwargs=combine_kwargs(**kwargs),
-        )
-
-        return ExternalTool(self._requester, response.json())
-
-    def edit(self, **kwargs):
-        """
-        Update the specified external tool.
-
-        :calls: `PUT /api/v1/courses/:course_id/external_tools/:external_tool_id
-            <https://canvas.instructure.com/doc/api/external_tools.html#method.external_tools.update>`_
-            or `PUT /api/v1/accounts/:account_id/external_tools/:external_tool_id
-            <https://canvas.instructure.com/doc/api/external_tools.html#method.external_tools.update>`_
-
-        :rtype: :class:`canvasapi.external_tool.ExternalTool`
-        """
-        response = self._requester.request(
-            "PUT",
-            "{}s/{}/external_tools/{}".format(
-                self.parent_type, self.parent_id, self.id
-            ),
-            _kwargs=combine_kwargs(**kwargs),
-        )
-        response_json = response.json()
-
-        if "name" in response_json:
-            super(ExternalTool, self).set_attributes(response_json)
-
-        return ExternalTool(self._requester, response_json)
-
     def get_parent(self, **kwargs):
         """
         Return the object that spawned this tool.
@@ -100,6 +54,7 @@ class ExternalTool(CanvasObject):
             return Account(self._requester, response.json())
         elif self.parent_type == "course":
             return Course(self._requester, response.json())
+        return None
 
     def get_sessionless_launch_url(self, **kwargs):
         """

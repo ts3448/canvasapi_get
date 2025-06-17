@@ -228,39 +228,6 @@ class ContentMigration(CanvasObject):
             _kwargs=combine_kwargs(**kwargs),
         )
 
-    def update(self, **kwargs):
-        """
-        Update an existing content migration.
-
-        :calls: `PUT /api/v1/accounts/:account_id/content_migrations/:id
-            <https://canvas.instructure.com/doc/api/content_migrations.html#method.content_migrations.update>`_
-
-            or `PUT /api/v1/courses/:course_id/content_migrations/:id
-            <https://canvas.instructure.com/doc/api/content_migrations.html#method.content_migrations.update>`_
-
-            or `PUT /api/v1/groups/:group_id/content_migrations/:id
-            <https://canvas.instructure.com/doc/api/content_migrations.html#method.content_migrations.update>`_
-
-            or `PUT /api/v1/users/:user_id/content_migrations/:id
-            <https://canvas.instructure.com/doc/api/content_migrations.html#method.content_migrations.update>`_
-
-        :returns: True if the migration was updated, False otherwise.
-        :rtype: bool
-        """
-        response = self._requester.request(
-            "PUT",
-            "{}s/{}/content_migrations/{}".format(
-                self._parent_type, self._parent_id, self.id
-            ),
-            _kwargs=combine_kwargs(**kwargs),
-        )
-
-        if "migration_type" in response.json():
-            super(ContentMigration, self).set_attributes(response.json())
-            return True
-        else:
-            return False
-
 
 class ContentMigrationSelectionNode(CanvasObject):
     def __str__(self):
@@ -270,40 +237,6 @@ class ContentMigrationSelectionNode(CanvasObject):
 class MigrationIssue(CanvasObject):
     def __str__(self):
         return "{}: {}".format(self.id, self.description)
-
-    def update(self, **kwargs):
-        """
-        Update an existing migration issue.
-
-        :calls: `PUT
-            /api/v1/accounts/:account_id/content_migrations/:content_migration_id/migration_issues/:id
-            <https://canvas.instructure.com/doc/api/content_migrations.html#method.migration_issues.update>`_
-            or `PUT
-            /api/v1/courses/:course_id/content_migrations/:content_migration_id/migration_issues/:id
-            <https://canvas.instructure.com/doc/api/content_migrations.html#method.migration_issues.update>`_
-            or `PUT
-            /api/v1/groups/:group_id/content_migrations/:content_migration_id/migration_issues/:id
-            <https://canvas.instructure.com/doc/api/content_migrations.html#method.migration_issues.update>`_
-            or `PUT
-            /api/v1/users/:user_id/content_migrations/:content_migration_id/migration_issues/:id
-            <https://canvas.instructure.com/doc/api/content_migrations.html#method.migration_issues.update>`_
-
-        :returns: True if the issue was updated, False otherwise.
-        :rtype: bool
-        """
-        response = self._requester.request(
-            "PUT",
-            "{}s/{}/content_migrations/{}/migration_issues/{}".format(
-                self.context_type, self.context_id, self.content_migration_id, self.id
-            ),
-            _kwargs=combine_kwargs(**kwargs),
-        )
-
-        if "workflow_state" in response.json():
-            super(MigrationIssue, self).set_attributes(response.json())
-            return True
-        else:
-            return False
 
 
 class Migrator(CanvasObject):
