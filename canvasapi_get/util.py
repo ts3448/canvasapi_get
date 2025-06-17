@@ -110,7 +110,7 @@ def obj_or_id(parameter, param_name, object_types):
     :param object_types: tuple
     :rtype: int
     """
-    from canvasapi.user import User
+    from canvasapi_get.user import User
 
     try:
         return int(parameter)

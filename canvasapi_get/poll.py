@@ -1,8 +1,8 @@
-from canvasapi.canvas_object import CanvasObject
-from canvasapi.paginated_list import PaginatedList
-from canvasapi.poll_choice import PollChoice
-from canvasapi.poll_session import PollSession
-from canvasapi.util import combine_kwargs, obj_or_id
+from canvasapi_get.canvas_object import CanvasObject
+from canvasapi_get.paginated_list import PaginatedList
+from canvasapi_get.poll_choice import PollChoice
+from canvasapi_get.poll_session import PollSession
+from canvasapi_get.util import combine_kwargs, obj_or_id
 
 
 class Poll(CanvasObject):
@@ -16,7 +16,7 @@ class Poll(CanvasObject):
         :calls: `GET /api/v1/polls/:poll_id/poll_choices/:id \
         <https://canvas.instructure.com/doc/api/poll_choices.html#method.polling/poll_choices.show>`_
 
-        :rtype: :class:`canvasapi.poll_choice.PollChoice`
+        :rtype: :class:`canvasapi_get.poll_choice.PollChoice`
         """
         poll_choice_id = obj_or_id(poll_choice, "poll_choice", (PollChoice,))
 
@@ -56,7 +56,7 @@ class Poll(CanvasObject):
         :param poll_session: List of arguments. Takes a poll session id (int) or poll session \
         object.
 
-        :rtype: :class:`canvasapi.poll_session.PollSession`
+        :rtype: :class:`canvasapi_get.poll_session.PollSession`
         """
         poll_session_id = obj_or_id(poll_session, "poll_session", (PollSession,))
 

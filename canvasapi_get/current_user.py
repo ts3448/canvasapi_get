@@ -1,9 +1,9 @@
-from canvasapi.bookmark import Bookmark
-from canvasapi.course import Course
-from canvasapi.group import Group
-from canvasapi.paginated_list import PaginatedList
-from canvasapi.user import User
-from canvasapi.util import combine_kwargs, obj_or_id
+from canvasapi_get.bookmark import Bookmark
+from canvasapi_get.course import Course
+from canvasapi_get.group import Group
+from canvasapi_get.paginated_list import PaginatedList
+from canvasapi_get.user import User
+from canvasapi_get.util import combine_kwargs, obj_or_id
 
 
 class CurrentUser(User):
@@ -25,11 +25,11 @@ class CurrentUser(User):
         <https://canvas.instructure.com/doc/api/bookmarks.html#method.bookmarks/bookmarks.show>`_
 
         :param bookmark: The object or ID of the bookmark.
-        :type bookmark: :class:`canvasapi.bookmark.Bookmark` or int
+        :type bookmark: :class:`canvasapi_get.bookmark.Bookmark` or int
 
-        :rtype: :class:`canvasapi.bookmark.Bookmark`
+        :rtype: :class:`canvasapi_get.bookmark.Bookmark`
         """
-        from canvasapi.bookmark import Bookmark
+        from canvasapi_get.bookmark import Bookmark
 
         bookmark_id = obj_or_id(bookmark, "bookmark", (Bookmark,))
 
@@ -101,9 +101,9 @@ class CurrentUser(User):
         :calls: `GET /api/v1/users/self/groups \
         <https://canvas.instructure.com/doc/api/groups.html#method.groups.index>`_
 
-        :rtype: :class:`canvasapi.paginated_list.PaginatedList` of :class:`canvasapi.group.Group`
+        :rtype: :class:`canvasapi_get.paginated_list.PaginatedList` of :class:`canvasapi_get.group.Group`
         """
-        from canvasapi.group import Group
+        from canvasapi_get.group import Group
 
         return PaginatedList(
             Group,

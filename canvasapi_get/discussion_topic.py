@@ -1,6 +1,6 @@
-from canvasapi.canvas_object import CanvasObject
-from canvasapi.paginated_list import PaginatedList
-from canvasapi.util import combine_kwargs, obj_or_id
+from canvasapi_get.canvas_object import CanvasObject
+from canvasapi_get.paginated_list import PaginatedList
+from canvasapi_get.util import combine_kwargs, obj_or_id
 
 
 class DiscussionTopic(CanvasObject):
@@ -88,10 +88,10 @@ class DiscussionTopic(CanvasObject):
         """
         Return the object that spawned this discussion topic.
 
-        :rtype: :class:`canvasapi.group.Group` or :class:`canvasapi.course.Course`
+        :rtype: :class:`canvasapi_get.group.Group` or :class:`canvasapi_get.course.Course`
         """
-        from canvasapi.course import Course
-        from canvasapi.group import Group
+        from canvasapi_get.course import Course
+        from canvasapi_get.group import Group
 
         response = self._requester.request(
             "GET",
@@ -169,7 +169,7 @@ class DiscussionEntry(CanvasObject):
         """
         Return the discussion topic object this entry is related to
 
-        :rtype: :class:`canvasapi.discussion_topic.DiscussionTopic`
+        :rtype: :class:`canvasapi_get.discussion_topic.DiscussionTopic`
         """
 
         response = self._requester.request(

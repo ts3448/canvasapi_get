@@ -6,7 +6,7 @@ from pprint import pformat
 
 import requests
 
-from canvasapi.exceptions import (
+from canvasapi_get.exceptions import (
     BadRequest,
     CanvasException,
     Conflict,
@@ -17,7 +17,7 @@ from canvasapi.exceptions import (
     Unauthorized,
     UnprocessableEntity,
 )
-from canvasapi.util import clean_headers
+from canvasapi_get.util import clean_headers
 
 logger = logging.getLogger(__name__)
 

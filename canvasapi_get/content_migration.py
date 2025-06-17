@@ -1,6 +1,6 @@
-from canvasapi.canvas_object import CanvasObject
-from canvasapi.paginated_list import PaginatedList
-from canvasapi.util import combine_kwargs, obj_or_id
+from canvasapi_get.canvas_object import CanvasObject
+from canvasapi_get.paginated_list import PaginatedList
+from canvasapi_get.util import combine_kwargs, obj_or_id
 
 
 class ContentMigration(CanvasObject):
@@ -71,9 +71,9 @@ class ContentMigration(CanvasObject):
         :param migration_issue: The object or ID of the issue to retrieve.
         :type migration_issue: int, str or :class:`canvasapi_get.content_migration.ContentMigration`
 
-        :rtype: :class:`canvasapi.content_migration.MigrationIssue`
+        :rtype: :class:`canvasapi_get.content_migration.MigrationIssue`
         """
-        from canvasapi.content_migration import MigrationIssue
+        from canvasapi_get.content_migration import MigrationIssue
 
         migration_issue_id = obj_or_id(
             migration_issue, "migration_issue", (MigrationIssue,)
@@ -119,9 +119,9 @@ class ContentMigration(CanvasObject):
             /api/v1/users/:user_id/content_migrations/:content_migration_id/migration_issues
             <https://canvas.instructure.com/doc/api/content_migrations.html#method.migration_issues.index>`_
 
-        :rtype: :class:`canvasapi.content_migration.MigrationIssue`
+        :rtype: :class:`canvasapi_get.content_migration.MigrationIssue`
         """
-        from canvasapi.content_migration import MigrationIssue
+        from canvasapi_get.content_migration import MigrationIssue
 
         return PaginatedList(
             MigrationIssue,
@@ -147,10 +147,10 @@ class ContentMigration(CanvasObject):
             or :class:`canvasapi_get.course.Group`,
             or :class:`canvasapi_get.course.User`
         """
-        from canvasapi.account import Account
-        from canvasapi.course import Course
-        from canvasapi.group import Group
-        from canvasapi.user import User
+        from canvasapi_get.account import Account
+        from canvasapi_get.course import Course
+        from canvasapi_get.group import Group
+        from canvasapi_get.user import User
 
         response = self._requester.request(
             "GET",
@@ -174,10 +174,10 @@ class ContentMigration(CanvasObject):
         :calls: `GET /api/v1/progress/:id
             <https://canvas.instructure.com/doc/api/progress.html#method.progress.show>`_
 
-        :rtype: :class:`canvasapi.progress.Progress`
+        :rtype: :class:`canvasapi_get.progress.Progress`
         """
 
-        from canvasapi.progress import Progress
+        from canvasapi_get.progress import Progress
 
         progress_id = self.progress_url.split("/")[-1]
 
@@ -209,9 +209,9 @@ class ContentMigration(CanvasObject):
             <https://canvas.instructure.com/doc/api/content_migrations.html#method.content_migrations.content_list>`_
 
         :returns: Paginated List of of nodes available for selection in this migration
-        :rtype: :class:`canvasapi.content_migration.ContentMigrationSelectionNode`
+        :rtype: :class:`canvasapi_get.content_migration.ContentMigrationSelectionNode`
         """
-        from canvasapi.content_migration import ContentMigrationSelectionNode
+        from canvasapi_get.content_migration import ContentMigrationSelectionNode
 
         return PaginatedList(
             ContentMigrationSelectionNode,

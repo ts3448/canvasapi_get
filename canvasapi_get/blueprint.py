@@ -1,6 +1,6 @@
-from canvasapi.canvas_object import CanvasObject
-from canvasapi.paginated_list import PaginatedList
-from canvasapi.util import combine_kwargs, obj_or_id
+from canvasapi_get.canvas_object import CanvasObject
+from canvasapi_get.paginated_list import PaginatedList
+from canvasapi_get.util import combine_kwargs, obj_or_id
 
 
 class BlueprintTemplate(CanvasObject):
@@ -18,7 +18,7 @@ class BlueprintTemplate(CanvasObject):
         :rtype: :class:`canvasapi_get.paginated_list.PaginatedList` of
             :class:`canvasapi_get.course.Course`
         """
-        from canvasapi.course import Course
+        from canvasapi_get.course import Course
 
         return PaginatedList(
             Course,
@@ -85,9 +85,9 @@ class BlueprintTemplate(CanvasObject):
         master_templates.migrations_show>`_
 
         :param migration: migration id or object
-        :type migration: int or :class:`canvasapi.blueprint.BlueprintMigration`
+        :type migration: int or :class:`canvasapi_get.blueprint.BlueprintMigration`
 
-        :rtype: :class:`canvasapi.blueprint.BlueprintMigration`
+        :rtype: :class:`canvasapi_get.blueprint.BlueprintMigration`
         """
 
         migration_id = obj_or_id(migration, "migration", (BlueprintMigration,))
@@ -197,9 +197,9 @@ class BlueprintSubscription(CanvasObject):
         master_courses/master_templates.imports_show>`_
 
         :param migration: migration id or object
-        :type migration: int or :class:`canvasapi.blueprint.BlueprintMigration`
+        :type migration: int or :class:`canvasapi_get.blueprint.BlueprintMigration`
 
-        :rtype: :class:`canvasapi.blueprint.BlueprintMigration`
+        :rtype: :class:`canvasapi_get.blueprint.BlueprintMigration`
         """
 
         migration_id = obj_or_id(migration, "migration", (BlueprintMigration,))

@@ -1,26 +1,26 @@
-from canvasapi.account_calendar import AccountCalendar
-from canvasapi.authentication_event import AuthenticationEvent
-from canvasapi.authentication_provider import AuthenticationProvider
-from canvasapi.canvas_object import CanvasObject
-from canvasapi.content_migration import ContentMigration, Migrator
-from canvasapi.course import Course
-from canvasapi.course_event import CourseEvent
-from canvasapi.enrollment import Enrollment
-from canvasapi.enrollment_term import EnrollmentTerm
-from canvasapi.external_tool import ExternalTool
-from canvasapi.feature import Feature, FeatureFlag
-from canvasapi.grading_period import GradingPeriod
-from canvasapi.grading_standard import GradingStandard
-from canvasapi.group import Group, GroupCategory
-from canvasapi.login import Login
-from canvasapi.outcome import OutcomeGroup, OutcomeLink
-from canvasapi.outcome_import import OutcomeImport
-from canvasapi.paginated_list import PaginatedList
-from canvasapi.rubric import Rubric
-from canvasapi.scope import Scope
-from canvasapi.sis_import import SisImport
-from canvasapi.user import User
-from canvasapi.util import combine_kwargs, obj_or_id, obj_or_str
+from canvasapi_get.account_calendar import AccountCalendar
+from canvasapi_get.authentication_event import AuthenticationEvent
+from canvasapi_get.authentication_provider import AuthenticationProvider
+from canvasapi_get.canvas_object import CanvasObject
+from canvasapi_get.content_migration import ContentMigration, Migrator
+from canvasapi_get.course import Course
+from canvasapi_get.course_event import CourseEvent
+from canvasapi_get.enrollment import Enrollment
+from canvasapi_get.enrollment_term import EnrollmentTerm
+from canvasapi_get.external_tool import ExternalTool
+from canvasapi_get.feature import Feature, FeatureFlag
+from canvasapi_get.grading_period import GradingPeriod
+from canvasapi_get.grading_standard import GradingStandard
+from canvasapi_get.group import Group, GroupCategory
+from canvasapi_get.login import Login
+from canvasapi_get.outcome import OutcomeGroup, OutcomeLink
+from canvasapi_get.outcome_import import OutcomeImport
+from canvasapi_get.paginated_list import PaginatedList
+from canvasapi_get.rubric import Rubric
+from canvasapi_get.scope import Scope
+from canvasapi_get.sis_import import SisImport
+from canvasapi_get.user import User
+from canvasapi_get.util import combine_kwargs, obj_or_id, obj_or_str
 
 
 class Account(CanvasObject):
@@ -34,7 +34,7 @@ class Account(CanvasObject):
         :calls: `GET /api/v1/account_calendars/:account_id \
         <https://canvas.instructure.com/doc/api/account_calendars.html#method.account_calendars_api.show>`_
 
-        :rtype: :class:`canvasapi.account_calendar.AccountCalendar`
+        :rtype: :class:`canvasapi_get.account_calendar.AccountCalendar`
         """
 
         response = self._requester.request(
@@ -52,7 +52,7 @@ class Account(CanvasObject):
         :calls: `GET /api/v1/accounts/:account_id/admins \
         <https://canvas.instructure.com/doc/api/admins.html#method.admins.index>`_
 
-        :rtype: :class:`canvasapi.paginated_list.PaginatedList` of :class:`canvasapi.account.Admin`
+        :rtype: :class:`canvasapi_get.paginated_list.PaginatedList` of :class:`canvasapi_get.account.Admin`
         """
 
         return PaginatedList(
@@ -130,7 +130,7 @@ class Account(CanvasObject):
         :type authentication_provider:
             :class:`canvasapi_get.authentication_provider.AuthenticationProvider` or int
 
-        :rtype: :class:`canvasapi.authentication_provider.AuthenticationProvider`
+        :rtype: :class:`canvasapi_get.authentication_provider.AuthenticationProvider`
         """
         authentication_providers_id = obj_or_id(
             authentication_provider,
@@ -177,7 +177,7 @@ class Account(CanvasObject):
         :param content_migration: The object or ID of the content migration to retrieve.
         :type contnet_migration: int, str or :class:`canvasapi_get.content_migration.ContentMigration`
 
-        :rtype: :class:`canvasapi.content_migration.ContentMigration`
+        :rtype: :class:`canvasapi_get.content_migration.ContentMigration`
         """
         migration_id = obj_or_id(
             content_migration, "content_migration", (ContentMigration,)
@@ -411,9 +411,9 @@ class Account(CanvasObject):
         <https://canvas.instructure.com/doc/api/enrollments.html#method.enrollments_api.show>`_
 
         :param enrollment: The object or ID of the enrollment to retrieve.
-        :type enrollment: :class:`canvasapi.enrollment.Enrollment` or int
+        :type enrollment: :class:`canvasapi_get.enrollment.Enrollment` or int
 
-        :rtype: :class:`canvasapi.enrollment.Enrollment`
+        :rtype: :class:`canvasapi_get.enrollment.Enrollment`
         """
         enrollment_id = obj_or_id(enrollment, "enrollment", (Enrollment,))
 
@@ -432,9 +432,9 @@ class Account(CanvasObject):
         <https://canvas.instructure.com/doc/api/enrollment_terms.html#method.terms_api.show>`_
 
         :param term: The object or ID of the enrollment term to retrieve.
-        :type term: :class:`canvasapi.enrollment_term.EnrollmentTerm` or int
+        :type term: :class:`canvasapi_get.enrollment_term.EnrollmentTerm` or int
 
-        :rtype: :class:`canvasapi.enrollment_term.EnrollmentTerm`
+        :rtype: :class:`canvasapi_get.enrollment_term.EnrollmentTerm`
         """
         term_id = obj_or_id(term, "term", (EnrollmentTerm,))
 
@@ -469,9 +469,9 @@ class Account(CanvasObject):
         <https://canvas.instructure.com/doc/api/external_tools.html#method.external_tools.show>`_
 
         :param tool: The object or ID of the tool
-        :type tool: :class:`canvasapi.external_tool.ExternalTool` or int
+        :type tool: :class:`canvasapi_get.external_tool.ExternalTool` or int
 
-        :rtype: :class:`canvasapi.external_tool.ExternalTool`
+        :rtype: :class:`canvasapi_get.external_tool.ExternalTool`
         """
         tool_id = obj_or_id(tool, "tool", (ExternalTool,))
 
@@ -510,9 +510,9 @@ class Account(CanvasObject):
         <https://canvas.instructure.com/doc/api/feature_flags.html#method.feature_flags.show>`_
 
         :param feature: The feature object or name of the feature to retrieve.
-        :type feature: :class:`canvasapi.feature.Feature` or str
+        :type feature: :class:`canvasapi_get.feature.Feature` or str
 
-        :rtype: :class:`canvasapi.feature.FeatureFlag`
+        :rtype: :class:`canvasapi_get.feature.FeatureFlag`
         """
         feature_name = obj_or_str(feature, "name", (Feature,))
 
@@ -552,7 +552,7 @@ class Account(CanvasObject):
         :param notification_id: The notification ID of the desired notification.
         :type notification_id: `int`
 
-        :rtype: :class:`canvasapi.account.AccountNotification`
+        :rtype: :class:`canvasapi_get.account.AccountNotification`
         """
         response = self._requester.request(
             "GET",
@@ -628,7 +628,7 @@ class Account(CanvasObject):
         :calls: `GET /api/v1/accounts/:account_id/groups \
         <https://canvas.instructure.com/doc/api/groups.html#method.groups.context_index>`_
 
-        :rtype: :class:`canvasapi.paginated_list.PaginatedList` of :class:`canvasapi.group.Group`
+        :rtype: :class:`canvasapi_get.paginated_list.PaginatedList` of :class:`canvasapi_get.group.Group`
         """
         return PaginatedList(
             Group,
@@ -686,10 +686,10 @@ class Account(CanvasObject):
             <https://canvas.instructure.com/doc/api/outcome_groups.html#method.outcome_groups_api.show>`_
 
         :param group: The outcome group object or ID to return.
-        :type group: :class:`canvasapi.outcome.OutcomeGroup` or int
+        :type group: :class:`canvasapi_get.outcome.OutcomeGroup` or int
 
         :returns: An outcome group object.
-        :rtype: :class:`canvasapi.outcome.OutcomeGroup`
+        :rtype: :class:`canvasapi_get.outcome.OutcomeGroup`
         """
         outcome_group_id = obj_or_id(group, "outcome group", (OutcomeGroup,))
         response = self._requester.request(
@@ -731,7 +731,7 @@ class Account(CanvasObject):
         :type outcome_import: :class:`canvasapi_get.outcome_import.OutcomeImport`,
             int, or string: "latest"
 
-        :rtype: :class:`canvasapi.outcome_import.OutcomeImport`
+        :rtype: :class:`canvasapi_get.outcome_import.OutcomeImport`
         """
         if outcome_import == "latest":
             outcome_import_id = "latest"
@@ -764,7 +764,7 @@ class Account(CanvasObject):
         :param report_id: The id for the report which is being looked up.
         :type report_id: `int`
 
-        :rtype: :class:`canvasapi.account.AccountReport`
+        :rtype: :class:`canvasapi_get.account.AccountReport`
         """
         response = self._requester.request(
             "GET",
@@ -804,9 +804,9 @@ class Account(CanvasObject):
         <https://canvas.instructure.com/doc/api/roles.html#method.role_overrides.show>`_
 
         :param role: The object or ID of the role.
-        :type role: :class:`canvasapi.account.Role` or int
+        :type role: :class:`canvasapi_get.account.Role` or int
 
-        :rtype: :class:`canvasapi.account.Role`
+        :rtype: :class:`canvasapi_get.account.Role`
         """
         role_id = obj_or_id(role, "role", (Role,))
 
@@ -843,7 +843,7 @@ class Account(CanvasObject):
         <https://canvas.instructure.com/doc/api/outcome_groups.html#method.outcome_groups_api.redirect>`_
 
         :returns: The OutcomeGroup of the context.
-        :rtype: :class:`canvasapi.outcome.OutcomeGroup`
+        :rtype: :class:`canvasapi_get.outcome.OutcomeGroup`
         """
         response = self._requester.request(
             "GET",
@@ -861,7 +861,7 @@ class Account(CanvasObject):
 
         :param rubric_id: The ID of the rubric.
         :type rubric_id: int
-        :rtype: :class:`canvasapi.rubric.Rubric`
+        :rtype: :class:`canvasapi_get.rubric.Rubric`
         """
         response = self._requester.request(
             "GET",
@@ -896,7 +896,7 @@ class Account(CanvasObject):
         :calls: `GET /api/v1/accounts/:account_id/scopes \
         <https://canvas.instructure.com/doc/api/api_token_scopes.html#method.scopes_api.index>`_
 
-        :rtype: :class:`canvasapi.paginated_list.PaginatedList` of :class:`canvasapi.scope.Scope`
+        :rtype: :class:`canvasapi_get.paginated_list.PaginatedList` of :class:`canvasapi_get.scope.Scope`
         """
         return PaginatedList(
             Scope,
@@ -934,7 +934,7 @@ class Account(CanvasObject):
         :param sis_import: The object or ID of the sis_import to retrieve.
         :type sis_import: int, str or :class:`canvasapi_get.sis_import.SisImport`
 
-        :rtype: :class:`canvasapi.sis_import.SisImport`
+        :rtype: :class:`canvasapi_get.sis_import.SisImport`
         """
         sis_import_id = obj_or_id(sis_import, "sis_import", (SisImport,))
 
@@ -1039,7 +1039,7 @@ class Account(CanvasObject):
         <https://canvas.instructure.com/doc/api/account_notifications.html#method.account_notifications.user_index>`_
 
         :param user: The user object or ID to retrieve notifications for.
-        :type user: :class:`canvasapi.user.User` or int
+        :type user: :class:`canvasapi_get.user.User` or int
 
         :rtype: :class:`canvasapi_get.paginated_list.PaginatedList` of
             :class:`canvasapi_get.account.AccountNotification`
@@ -1061,7 +1061,7 @@ class Account(CanvasObject):
         :calls: `GET /api/v1/accounts/:account_id/users \
         <https://canvas.instructure.com/doc/api/users.html#method.users.index>`_
 
-        :rtype: :class:`canvasapi.paginated_list.PaginatedList` of :class:`canvasapi.user.User`
+        :rtype: :class:`canvasapi_get.paginated_list.PaginatedList` of :class:`canvasapi_get.user.User`
         """
         return PaginatedList(
             User,
@@ -1078,7 +1078,7 @@ class Account(CanvasObject):
         :calls: `GET /api/v1/audit/course/accounts/:account_id \
         <https://canvas.instructure.com/doc/api/course_audit_log.html#method.course_audit_api.for_account>`_
 
-        :rtype: list of :class:`canvasapi.course_event.CourseEvent`
+        :rtype: list of :class:`canvasapi_get.course_event.CourseEvent`
         """
 
         return PaginatedList(
@@ -1096,7 +1096,7 @@ class Account(CanvasObject):
         :calls: `GET /api/v1/accounts/:account_id/sso_settings \
         <https://canvas.instructure.com/doc/api/authentication_providers.html#method.account_authorization_configs.show_sso_settings>`_
 
-        :rtype: :class:`canvasapi.account.SSOSettings`
+        :rtype: :class:`canvasapi_get.account.SSOSettings`
         """
         response = self._requester.request(
             "GET",

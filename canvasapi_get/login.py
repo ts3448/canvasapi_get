@@ -1,6 +1,6 @@
-from canvasapi.canvas_object import CanvasObject
-from canvasapi.paginated_list import PaginatedList
-from canvasapi.util import combine_kwargs
+from canvasapi_get.canvas_object import CanvasObject
+from canvasapi_get.paginated_list import PaginatedList
+from canvasapi_get.util import combine_kwargs
 
 
 class Login(CanvasObject):
@@ -17,7 +17,7 @@ class Login(CanvasObject):
         :rtype: :class:`canvasapi_get.paginated_list.PaginatedList` of
                 :class:`canvasapi_get.authentication_event.AuthenticationEvent`
         """
-        from canvasapi.authentication_event import AuthenticationEvent
+        from canvasapi_get.authentication_event import AuthenticationEvent
 
         return PaginatedList(
             AuthenticationEvent,

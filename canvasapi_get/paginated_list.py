@@ -37,7 +37,7 @@ class PaginatedList(Iterable[T]):
         :param content_class: The expected type to return in the list.
         :type content_class: class
         :param requester: The requester to pass HTTP requests through.
-        :type requester: :class:`canvasapi.requester.Requester`
+        :type requester: :class:`canvasapi_get.requester.Requester`
         :param request_method: HTTP request method
         :type request_method: str
         :param first_url: Canvas endpoint for the initial request

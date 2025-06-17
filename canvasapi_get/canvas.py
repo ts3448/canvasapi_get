@@ -1,31 +1,31 @@
 import warnings
 
-from canvasapi.account import Account
-from canvasapi.account_calendar import AccountCalendar
-from canvasapi.appointment_group import AppointmentGroup
-from canvasapi.calendar_event import CalendarEvent
-from canvasapi.comm_message import CommMessage
-from canvasapi.conversation import Conversation
-from canvasapi.course import Course, CourseNickname
-from canvasapi.course_epub_export import CourseEpubExport
-from canvasapi.current_user import CurrentUser
-from canvasapi.discussion_topic import DiscussionTopic
-from canvasapi.eportfolio import EPortfolio
-from canvasapi.exceptions import RequiredFieldMissing
-from canvasapi.file import File
-from canvasapi.folder import Folder
-from canvasapi.group import Group, GroupCategory
-from canvasapi.jwt import JWT
-from canvasapi.outcome import Outcome, OutcomeGroup
-from canvasapi.paginated_list import PaginatedList
-from canvasapi.planner import PlannerNote, PlannerOverride
-from canvasapi.poll import Poll
-from canvasapi.progress import Progress
-from canvasapi.requester import Requester
-from canvasapi.section import Section
-from canvasapi.todo import Todo
-from canvasapi.user import User
-from canvasapi.util import combine_kwargs, get_institution_url, obj_or_id
+from canvasapi_get.account import Account
+from canvasapi_get.account_calendar import AccountCalendar
+from canvasapi_get.appointment_group import AppointmentGroup
+from canvasapi_get.calendar_event import CalendarEvent
+from canvasapi_get.comm_message import CommMessage
+from canvasapi_get.conversation import Conversation
+from canvasapi_get.course import Course, CourseNickname
+from canvasapi_get.course_epub_export import CourseEpubExport
+from canvasapi_get.current_user import CurrentUser
+from canvasapi_get.discussion_topic import DiscussionTopic
+from canvasapi_get.eportfolio import EPortfolio
+from canvasapi_get.exceptions import RequiredFieldMissing
+from canvasapi_get.file import File
+from canvasapi_get.folder import Folder
+from canvasapi_get.group import Group, GroupCategory
+from canvasapi_get.jwt import JWT
+from canvasapi_get.outcome import Outcome, OutcomeGroup
+from canvasapi_get.paginated_list import PaginatedList
+from canvasapi_get.planner import PlannerNote, PlannerOverride
+from canvasapi_get.poll import Poll
+from canvasapi_get.progress import Progress
+from canvasapi_get.requester import Requester
+from canvasapi_get.section import Section
+from canvasapi_get.todo import Todo
+from canvasapi_get.user import User
+from canvasapi_get.util import combine_kwargs, get_institution_url, obj_or_id
 
 
 class Canvas(object):
@@ -101,7 +101,7 @@ class Canvas(object):
         :type conversation_ids: `list` of `str`
         :param event: The action to take on each conversation.
         :type event: `str`
-        :rtype: :class:`canvasapi.progress.Progress`
+        :rtype: :class:`canvasapi_get.progress.Progress`
         """
         ALLOWED_EVENTS = [
             "mark_as_read",
@@ -193,7 +193,7 @@ class Canvas(object):
         :calls: `POST /api/v1/accounts \
         <https://canvas.instructure.com/doc/api/accounts.html#method.accounts.create>`_
 
-        :rtype: :class:`canvasapi.account.Account`
+        :rtype: :class:`canvasapi_get.account.Account`
         """
         response = self.__requester.request(
             "POST", "accounts", _kwargs=combine_kwargs(**kwargs)
@@ -211,7 +211,7 @@ class Canvas(object):
         :type appointment_group: `dict`
         :param title: The title of the appointment group.
         :type title: `str`
-        :rtype: :class:`canvasapi.appointment_group.AppointmentGroup`
+        :rtype: :class:`canvasapi_get.appointment_group.AppointmentGroup`
         """
         if (
             isinstance(appointment_group, dict)
@@ -246,7 +246,7 @@ class Canvas(object):
 
         :param calendar_event: The attributes of the calendar event.
         :type calendar_event: `dict`
-        :rtype: :class:`canvasapi.calendar_event.CalendarEvent`
+        :rtype: :class:`canvasapi_get.calendar_event.CalendarEvent`
         """
         if isinstance(calendar_event, dict) and "context_code" in calendar_event:
             kwargs["calendar_event"] = calendar_event
@@ -275,7 +275,7 @@ class Canvas(object):
         :type recipients: `list` of `str`
         :param body: The body of the message being added.
         :type body: `str`
-        :rtype: list of :class:`canvasapi.conversation.Conversation`
+        :rtype: list of :class:`canvasapi_get.conversation.Conversation`
         """
         kwargs["recipients"] = recipients
         kwargs["body"] = body
@@ -292,7 +292,7 @@ class Canvas(object):
         :calls: `POST /api/v1/groups/ \
         <https://canvas.instructure.com/doc/api/groups.html#method.groups.create>`_
 
-        :rtype: :class:`canvasapi.group.Group`
+        :rtype: :class:`canvasapi_get.group.Group`
         """
         response = self.__requester.request(
             "POST", "groups", _kwargs=combine_kwargs(**kwargs)
@@ -306,7 +306,7 @@ class Canvas(object):
         :calls: `POST /api/v1/jwts \
         <https://canvas.instructure.com/doc/api/jw_ts.html#method.jwts.create>`_
 
-        :rtype: list of :class:`canvasapi.jwt.JWT`
+        :rtype: list of :class:`canvasapi_get.jwt.JWT`
         """
         response = self.__requester.request(
             "POST", "jwts", _kwargs=combine_kwargs(**kwargs)
@@ -321,7 +321,7 @@ class Canvas(object):
         :calls: `POST /api/v1/planner_notes \
         <https://canvas.instructure.com/doc/api/planner.html#method.planner_notes.create>`_
 
-        :rtype: :class:`canvasapi.planner.PlannerNote`
+        :rtype: :class:`canvasapi_get.planner.PlannerNote`
         """
         response = self.__requester.request(
             "POST", "planner_notes", _kwargs=combine_kwargs(**kwargs)
@@ -339,9 +339,9 @@ class Canvas(object):
         :type plannable_type: str
 
         :param plannable_id: ID of the item that you are overriding in the planner
-        :type plannable_id: int or :class:`canvasapi.planner.PlannerOverride`
+        :type plannable_id: int or :class:`canvasapi_get.planner.PlannerOverride`
 
-        :rtype: :class:`canvasapi.planner.PlannerOverride`
+        :rtype: :class:`canvasapi_get.planner.PlannerOverride`
         """
         if isinstance(plannable_type, str):
             kwargs["plannable_type"] = plannable_type
@@ -366,7 +366,7 @@ class Canvas(object):
 
         :param polls: List of polls to create. `'question'` key is required.
         :type polls: list of dict
-        :rtype: :class:`canvasapi.poll.Poll`
+        :rtype: :class:`canvasapi_get.poll.Poll`
         """
         if (
             isinstance(polls, list)
@@ -397,7 +397,7 @@ class Canvas(object):
             Defaults to `False`.
         :type use_sis_id: bool
 
-        :rtype: :class:`canvasapi.account.Account`
+        :rtype: :class:`canvasapi_get.account.Account`
         """
         if use_sis_id:
             account_id = account
@@ -515,9 +515,9 @@ class Canvas(object):
         <https://canvas.instructure.com/doc/api/appointment_groups.html#method.appointment_groups.show>`_
 
         :param appointment_group: The ID of the appointment group.
-        :type appointment_group: :class:`canvasapi.appointment_group.AppointmentGroup` or int
+        :type appointment_group: :class:`canvasapi_get.appointment_group.AppointmentGroup` or int
 
-        :rtype: :class:`canvasapi.appointment_group.AppointmentGroup`
+        :rtype: :class:`canvasapi_get.appointment_group.AppointmentGroup`
         """
         appointment_group_id = obj_or_id(
             appointment_group, "appointment_group", (AppointmentGroup,)
@@ -571,9 +571,9 @@ class Canvas(object):
         <https://canvas.instructure.com/doc/api/calendar_events.html#method.calendar_events_api.show>`_
 
         :param calendar_event: The object or ID of the calendar event.
-        :type calendar_event: :class:`canvasapi.calendar_event.CalendarEvent` or int
+        :type calendar_event: :class:`canvasapi_get.calendar_event.CalendarEvent` or int
 
-        :rtype: :class:`canvasapi.calendar_event.CalendarEvent`
+        :rtype: :class:`canvasapi_get.calendar_event.CalendarEvent`
         """
         calendar_event_id = obj_or_id(
             calendar_event, "calendar_event", (CalendarEvent,)
@@ -612,7 +612,7 @@ class Canvas(object):
         <https://canvas.instructure.com/doc/api/comm_messages.html#method.comm_messages_api.index>`_
 
         :param user: The object or ID of the user.
-        :type user: :class:`canvasapi.user.User` or int
+        :type user: :class:`canvasapi_get.user.User` or int
 
         :returns: Paginated list containing messages sent to user
         :rtype: :class:`canvasapi_get.paginated_list.PaginatedList` of
@@ -638,9 +638,9 @@ class Canvas(object):
         <https://canvas.instructure.com/doc/api/conversations.html#method.conversations.show>`_
 
         :param conversation: The object or ID of the conversation.
-        :type conversation: :class:`canvasapi.conversation.Conversation` or int
+        :type conversation: :class:`canvasapi_get.conversation.Conversation` or int
 
-        :rtype: :class:`canvasapi.conversation.Conversation`
+        :rtype: :class:`canvasapi_get.conversation.Conversation`
         """
         conversation_id = obj_or_id(conversation, "conversation", (Conversation,))
 
@@ -682,7 +682,7 @@ class Canvas(object):
             Defaults to `False`.
         :type use_sis_id: bool
 
-        :rtype: :class:`canvasapi.course.Course`
+        :rtype: :class:`canvasapi_get.course.Course`
         """
         if use_sis_id:
             course_id = course
@@ -726,9 +726,9 @@ class Canvas(object):
         <https://canvas.instructure.com/doc/api/users.html#method.course_nicknames.show>`_
 
         :param course: The object or ID of the course.
-        :type course: :class:`canvasapi.course.Course` or int
+        :type course: :class:`canvasapi_get.course.Course` or int
 
-        :rtype: :class:`canvasapi.course.CourseNickname`
+        :rtype: :class:`canvasapi_get.course.CourseNickname`
         """
         course_id = obj_or_id(course, "course", (Course,))
 
@@ -778,7 +778,7 @@ class Canvas(object):
         :calls: `GET /api/v1/users/:user_id \
         <https://canvas.instructure.com/doc/api/users.html#method.current_user.show>`_
 
-        :rtype: :class:`canvasapi.current_user.CurrentUser`
+        :rtype: :class:`canvasapi_get.current_user.CurrentUser`
         """
         return CurrentUser(self.__requester)
 
@@ -792,7 +792,7 @@ class Canvas(object):
         :calls: `GET /api/v1/eportfolios/:id` \
             `<https://canvas.instructure.com/doc/api/e_portfolios.html#method.eportfolios_api.show>`_
 
-        :rtype: :class:`canvasapi.eportfolio.EPortfolio`
+        :rtype: :class:`canvasapi_get.eportfolio.EPortfolio`
         """
         eportfolio_id = obj_or_id(eportfolio, "eportfolio", (EPortfolio,))
         response = self.__requester.request(
@@ -831,9 +831,9 @@ class Canvas(object):
         <https://canvas.instructure.com/doc/api/files.html#method.files.api_show>`_
 
         :param file: The object or ID of the file to retrieve.
-        :type file: :class:`canvasapi.file.File` or int
+        :type file: :class:`canvasapi_get.file.File` or int
 
-        :rtype: :class:`canvasapi.file.File`
+        :rtype: :class:`canvasapi_get.file.File`
         """
         file_id = obj_or_id(file, "file", (File,))
 
@@ -850,9 +850,9 @@ class Canvas(object):
         <https://canvas.instructure.com/doc/api/files.html#method.folders.show>`_
 
         :param folder: The object or ID of the folder to retrieve.
-        :type folder: :class:`canvasapi.folder.Folder` or int
+        :type folder: :class:`canvasapi_get.folder.Folder` or int
 
-        :rtype: :class:`canvasapi.folder.Folder`
+        :rtype: :class:`canvasapi_get.folder.Folder`
         """
         folder_id = obj_or_id(folder, "folder", (Folder,))
 
@@ -870,13 +870,13 @@ class Canvas(object):
         <https://canvas.instructure.com/doc/api/groups.html#method.groups.show>`_
 
         :param group: The object or ID of the group to get.
-        :type group: :class:`canvasapi.group.Group` or int
+        :type group: :class:`canvasapi_get.group.Group` or int
 
         :param use_sis_id: Whether or not group_id is an sis ID.
             Defaults to `False`.
         :type use_sis_id: bool
 
-        :rtype: :class:`canvasapi.group.Group`
+        :rtype: :class:`canvasapi_get.group.Group`
         """
 
         if use_sis_id:
@@ -899,9 +899,9 @@ class Canvas(object):
         <https://canvas.instructure.com/doc/api/group_categories.html#method.group_categories.show>`_
 
         :param category: The object or ID of the category.
-        :type category: :class:`canvasapi.group.GroupCategory` or int
+        :type category: :class:`canvasapi_get.group.GroupCategory` or int
 
-        :rtype: :class:`canvasapi.group.GroupCategory`
+        :rtype: :class:`canvasapi_get.group.GroupCategory`
         """
         category_id = obj_or_id(category, "category", (GroupCategory,))
 
@@ -920,9 +920,9 @@ class Canvas(object):
         <https://canvas.instructure.com/doc/api/appointment_groups.html#method.appointment_groups.groups>`_
 
         :param appointment_group: The object or ID of the appointment group.
-        :type appointment_group: :class:`canvasapi.appointment_group.AppointmentGroup` or int
+        :type appointment_group: :class:`canvasapi_get.appointment_group.AppointmentGroup` or int
 
-        :rtype: :class:`canvasapi.paginated_list.PaginatedList` of :class:`canvasapi.group.Group`
+        :rtype: :class:`canvasapi_get.paginated_list.PaginatedList` of :class:`canvasapi_get.group.Group`
         """
         appointment_group_id = obj_or_id(
             appointment_group, "appointment_group", (AppointmentGroup,)
@@ -944,10 +944,10 @@ class Canvas(object):
         <https://canvas.instructure.com/doc/api/outcomes.html#method.outcomes_api.show>`_
 
         :param outcome: The outcome object or ID to return.
-        :type outcome: :class:`canvasapi.outcome.Outcome` or int
+        :type outcome: :class:`canvasapi_get.outcome.Outcome` or int
 
         :returns: An Outcome object.
-        :rtype: :class:`canvasapi.outcome.Outcome`
+        :rtype: :class:`canvasapi_get.outcome.Outcome`
         """
         outcome_id = obj_or_id(outcome, "outcome", (Outcome,))
         response = self.__requester.request(
@@ -963,10 +963,10 @@ class Canvas(object):
             <https://canvas.instructure.com/doc/api/outcome_groups.html#method.outcome_groups_api.show>`_
 
         :param group: The outcome group object or ID to return.
-        :type group: :class:`canvasapi.outcome.OutcomeGroup` or int
+        :type group: :class:`canvasapi_get.outcome.OutcomeGroup` or int
 
         :returns: An outcome group object.
-        :rtype: :class:`canvasapi.outcome.OutcomeGroup`
+        :rtype: :class:`canvasapi_get.outcome.OutcomeGroup`
         """
         outcome_group_id = obj_or_id(group, "group", (OutcomeGroup,))
 
@@ -986,9 +986,9 @@ class Canvas(object):
         <https://canvas.instructure.com/doc/api/planner.html#method.planner_notes.show>`_
 
         :param planner_note: The ID of the planner note to retrieve.
-        :type planner_note: int or :class:`canvasapi.planner.PlannerNote`
+        :type planner_note: int or :class:`canvasapi_get.planner.PlannerNote`
 
-        :rtype: :class:`canvasapi.planner.PlannerNote`
+        :rtype: :class:`canvasapi_get.planner.PlannerNote`
         """
         if isinstance(planner_note, int) or isinstance(planner_note, PlannerNote):
             planner_note_id = obj_or_id(planner_note, "planner_note", (PlannerNote,))
@@ -1031,9 +1031,9 @@ class Canvas(object):
         <https://canvas.instructure.com/doc/api/planner.html#method.planner_overrides.show>`_
 
         :param planner_override: The override or the ID of the planner override to retrieve.
-        :type planner_override: int or :class:`canvasapi.planner.PlannerOverride`
+        :type planner_override: int or :class:`canvasapi_get.planner.PlannerOverride`
 
-        :rtype: :class:`canvasapi.planner.PlannerOverride`
+        :rtype: :class:`canvasapi_get.planner.PlannerOverride`
         """
         if isinstance(planner_override, int) or isinstance(
             planner_override, PlannerOverride
@@ -1081,7 +1081,7 @@ class Canvas(object):
 
         :param poll: The ID of the poll or the poll to change.
         :type poll: int
-        :rtype: :class:`canvasapi.poll.Poll`
+        :rtype: :class:`canvasapi_get.poll.Poll`
         """
         poll_id = obj_or_id(poll, "poll", (Poll,))
 
@@ -1119,7 +1119,7 @@ class Canvas(object):
         :param progress: The object or ID of the progress to retrieve.
         :type progress: int, str or :class:`canvasapi_get.progress.Progress`
 
-        :rtype: :class:`canvasapi.progress.Progress`
+        :rtype: :class:`canvasapi_get.progress.Progress`
         """
         progress_id = obj_or_id(progress, "progress", (Progress,))
 
@@ -1136,7 +1136,7 @@ class Canvas(object):
         <https://canvas.instructure.com/doc/api/outcome_groups.html#method.outcome_groups_api.redirect>`_
 
         :returns: The OutcomeGroup of the context.
-        :rtype: :class:`canvasapi.outcome.OutcomeGroup`
+        :rtype: :class:`canvasapi_get.outcome.OutcomeGroup`
         """
         response = self.__requester.request(
             "GET", "global/root_outcome_group", _kwargs=combine_kwargs(**kwargs)
@@ -1151,12 +1151,12 @@ class Canvas(object):
         <https://canvas.instructure.com/doc/api/sections.html#method.sections.show>`_
 
         :param section: The object or ID of the section to get.
-        :type section: :class:`canvasapi.section.Section` or int
+        :type section: :class:`canvasapi_get.section.Section` or int
         :param use_sis_id: Whether or not section_id is an sis ID.
             Defaults to `False`.
         :type use_sis_id: bool
 
-        :rtype: :class:`canvasapi.section.Section`
+        :rtype: :class:`canvasapi_get.section.Section`
         """
         if use_sis_id:
             section_id = section
@@ -1215,11 +1215,11 @@ class Canvas(object):
         <https://canvas.instructure.com/doc/api/users.html#method.users.api_show>`_
 
         :param user: The user's object or ID.
-        :type user: :class:`canvasapi.user.User` or int
+        :type user: :class:`canvasapi_get.user.User` or int
         :param id_type: The ID type.
         :type id_type: str
 
-        :rtype: :class:`canvasapi.user.User`
+        :rtype: :class:`canvasapi_get.user.User`
         """
         if id_type:
             uri = "users/{}:{}".format(id_type, user)
@@ -1242,9 +1242,9 @@ class Canvas(object):
         <https://canvas.instructure.com/doc/api/appointment_groups.html#method.appointment_groups.users>`_
 
         :param appointment_group: The object or ID of the appointment group.
-        :type appointment_group: :class:`canvasapi.appointment_group.AppointmentGroup` or int
+        :type appointment_group: :class:`canvasapi_get.appointment_group.AppointmentGroup` or int
 
-        :rtype: :class:`canvasapi.paginated_list.PaginatedList` of :class:`canvasapi.user.User`
+        :rtype: :class:`canvasapi_get.paginated_list.PaginatedList` of :class:`canvasapi_get.user.User`
         """
         appointment_group_id = obj_or_id(
             appointment_group, "appointment_group", (AppointmentGroup,)
@@ -1294,8 +1294,8 @@ class Canvas(object):
         <https://canvas.instructure.com/doc/api/jw_ts.html#method.jwts.refresh>`_
 
         :param jwt: An existing JWT to refresh.
-        :type jwt: str or :class:`canvasapi.jwt.JWT`
-        :rtype: :class:`canvasapi.jwt.JWT`
+        :type jwt: str or :class:`canvasapi_get.jwt.JWT`
+        :rtype: :class:`canvasapi_get.jwt.JWT`
         """
         if isinstance(jwt, JWT):
             jwt = jwt.token
@@ -1314,12 +1314,12 @@ class Canvas(object):
         <https://canvas.instructure.com/doc/api/calendar_events.html#method.calendar_events_api.reserve>`_
 
         :param calendar_event: The object or ID of the calendar event.
-        :type calendar_event: :class:`canvasapi.calendar_event.CalendarEvent` or int
+        :type calendar_event: :class:`canvasapi_get.calendar_event.CalendarEvent` or int
 
         :param participant_id: The ID of the participant, if given.
         :type participant_id: str
 
-        :rtype: :class:`canvasapi.calendar_event.CalendarEvent`
+        :rtype: :class:`canvasapi_get.calendar_event.CalendarEvent`
         """
         calendar_event_id = obj_or_id(
             calendar_event, "calendar_event", (CalendarEvent,)
@@ -1396,11 +1396,11 @@ class Canvas(object):
         <https://canvas.instructure.com/doc/api/users.html#method.course_nicknames.update>`_
 
         :param course: The ID of the course.
-        :type course: :class:`canvasapi.course.Course` or int
+        :type course: :class:`canvasapi_get.course.Course` or int
         :param nickname: The nickname for the course.
         :type nickname: str
 
-        :rtype: :class:`canvasapi.course.CourseNickname`
+        :rtype: :class:`canvasapi_get.course.CourseNickname`
         """
         course_id = obj_or_id(course, "course", (Course,))
 

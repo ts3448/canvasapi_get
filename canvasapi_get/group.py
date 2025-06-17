@@ -1,11 +1,11 @@
-from canvasapi.canvas_object import CanvasObject
-from canvasapi.collaboration import Collaboration
-from canvasapi.discussion_topic import DiscussionTopic
-from canvasapi.folder import Folder
-from canvasapi.license import License
-from canvasapi.paginated_list import PaginatedList
-from canvasapi.tab import Tab
-from canvasapi.util import combine_kwargs, obj_or_id
+from canvasapi_get.canvas_object import CanvasObject
+from canvasapi_get.collaboration import Collaboration
+from canvasapi_get.discussion_topic import DiscussionTopic
+from canvasapi_get.folder import Folder
+from canvasapi_get.license import License
+from canvasapi_get.paginated_list import PaginatedList
+from canvasapi_get.tab import Tab
+from canvasapi_get.util import combine_kwargs, obj_or_id
 
 
 class Group(CanvasObject):
@@ -33,14 +33,14 @@ class Group(CanvasObject):
         Return override for the specified assignment for this group.
 
         :param assignment: The assignment to get an override for
-        :type assignment: :class:`canvasapi.assignment.Assignment` or int
+        :type assignment: :class:`canvasapi_get.assignment.Assignment` or int
 
         :calls: `GET /api/v1/groups/:group_id/assignments/:assignment_id/override \
         <https://canvas.instructure.com/doc/api/assignments.html#method.assignment_overrides.group_alias>`_
 
-        :rtype: :class:`canvasapi.assignment.AssignmentOverride`
+        :rtype: :class:`canvasapi_get.assignment.AssignmentOverride`
         """
-        from canvasapi.assignment import Assignment, AssignmentOverride
+        from canvasapi_get.assignment import Assignment, AssignmentOverride
 
         assignment_id = obj_or_id(assignment, "assignment", (Assignment,))
 
@@ -59,7 +59,7 @@ class Group(CanvasObject):
         :calls: `GET /api/v1/groups/:group_id/collaborations \
         <https://canvas.instructure.com/doc/api/collaborations.html#method.collaborations.api_index>`_
 
-        :rtype: :class:`canvasapi.collaboration.Collaboration`
+        :rtype: :class:`canvasapi_get.collaboration.Collaboration`
         """
         return PaginatedList(
             Collaboration,
@@ -78,11 +78,11 @@ class Group(CanvasObject):
         <https://canvas.instructure.com/doc/api/content_exports.html#method.content_exports_api.show>`_
 
         :param content_export: The object or ID of the content export to show.
-        :type content_export: int or :class:`canvasapi.content_export.ContentExport`
+        :type content_export: int or :class:`canvasapi_get.content_export.ContentExport`
 
-        :rtype: :class:`canvasapi.content_export.ContentExport`
+        :rtype: :class:`canvasapi_get.content_export.ContentExport`
         """
-        from canvasapi.content_export import ContentExport
+        from canvasapi_get.content_export import ContentExport
 
         export_id = obj_or_id(content_export, "content_export", (ContentExport,))
 
@@ -104,7 +104,7 @@ class Group(CanvasObject):
         :rtype: :class:`canvasapi_get.paginated_list.PaginatedList` of
             :class:`canvasapi_get.content_export.ContentExport`
         """
-        from canvasapi.content_export import ContentExport
+        from canvasapi_get.content_export import ContentExport
 
         return PaginatedList(
             ContentExport,
@@ -124,9 +124,9 @@ class Group(CanvasObject):
         :param content_migration: The object or ID of the content migration to retrieve.
         :type content_migration: int, str or :class:`canvasapi_get.content_migration.ContentMigration`
 
-        :rtype: :class:`canvasapi.content_migration.ContentMigration`
+        :rtype: :class:`canvasapi_get.content_migration.ContentMigration`
         """
-        from canvasapi.content_migration import ContentMigration
+        from canvasapi_get.content_migration import ContentMigration
 
         migration_id = obj_or_id(
             content_migration, "content_migration", (ContentMigration,)
@@ -153,7 +153,7 @@ class Group(CanvasObject):
         :rtype: :class:`canvasapi_get.paginated_list.PaginatedList` of
             :class:`canvasapi_get.content_migration.ContentMigration`
         """
-        from canvasapi.content_migration import ContentMigration
+        from canvasapi_get.content_migration import ContentMigration
 
         return PaginatedList(
             ContentMigration,
@@ -172,9 +172,9 @@ class Group(CanvasObject):
         <https://canvas.instructure.com/doc/api/discussion_topics.html#method.discussion_topics_api.show>`_
 
         :param topic: The object or ID of the discussion topic.
-        :type topic: :class:`canvasapi.discussion_topic.DiscussionTopic` or int
+        :type topic: :class:`canvasapi_get.discussion_topic.DiscussionTopic` or int
 
-        :rtype: :class:`canvasapi.discussion_topic.DiscussionTopic`
+        :rtype: :class:`canvasapi_get.discussion_topic.DiscussionTopic`
         """
         topic_id = obj_or_id(topic, "topic", (DiscussionTopic,))
 
@@ -219,7 +219,7 @@ class Group(CanvasObject):
         :rtype: :class:`canvasapi_get.paginated_list.PaginatedList` of
             :class:`canvasapi_get.external_feed.ExternalFeed`
         """
-        from canvasapi.external_feed import ExternalFeed
+        from canvasapi_get.external_feed import ExternalFeed
 
         return PaginatedList(
             ExternalFeed,
@@ -236,11 +236,11 @@ class Group(CanvasObject):
         <https://canvas.instructure.com/doc/api/files.html#method.files.api_show>`_
 
         :param file: The object or ID of the file to retrieve.
-        :type file: :class:`canvasapi.file.File` or int
+        :type file: :class:`canvasapi_get.file.File` or int
 
-        :rtype: :class:`canvasapi.file.File`
+        :rtype: :class:`canvasapi_get.file.File`
         """
-        from canvasapi.file import File
+        from canvasapi_get.file import File
 
         file_id = obj_or_id(file, "file", (File,))
 
@@ -279,7 +279,7 @@ class Group(CanvasObject):
         :rtype: :class:`canvasapi_get.paginated_list.PaginatedList` of
             :class:`canvasapi_get.file.File`
         """
-        from canvasapi.file import File
+        from canvasapi_get.file import File
 
         return PaginatedList(
             File,
@@ -297,9 +297,9 @@ class Group(CanvasObject):
         <https://canvas.instructure.com/doc/api/files.html#method.folders.show>`_
 
         :param folder: The object or ID of the folder to retrieve.
-        :type folder: :class:`canvasapi.folder.Folder` or int
+        :type folder: :class:`canvasapi_get.folder.Folder` or int
 
-        :rtype: :class:`canvasapi.folder.Folder`
+        :rtype: :class:`canvasapi_get.folder.Folder`
         """
         folder_id = obj_or_id(folder, "folder", (Folder,))
 
@@ -333,7 +333,7 @@ class Group(CanvasObject):
         <https://canvas.instructure.com/doc/api/discussion_topics.html#method.discussion_topics_api.view>`_
 
         :param topic: The object or ID of the discussion topic.
-        :type topic: :class:`canvasapi.discussion_topic.DiscussionTopic` or int
+        :type topic: :class:`canvasapi_get.discussion_topic.DiscussionTopic` or int
 
         :rtype: dict
         """
@@ -377,11 +377,11 @@ class Group(CanvasObject):
             <https://canvas.instructure.com/doc/api/groups.html#method.group_memberships.show>`_
 
         :param user: list of user ids
-        :type user: :class:`canvasapi.user.User` or int
+        :type user: :class:`canvasapi_get.user.User` or int
 
-        :rtype: :class:`canvasapi.group.GroupMembership`
+        :rtype: :class:`canvasapi_get.group.GroupMembership`
         """
-        from canvasapi.user import User
+        from canvasapi_get.user import User
 
         user_id = obj_or_id(user, "user", (User,))
 
@@ -420,7 +420,7 @@ class Group(CanvasObject):
         :rtype: :class:`canvasapi_get.paginated_list.PaginatedList` of
             :class:`canvasapi_get.content_migration.Migrator`
         """
-        from canvasapi.content_migration import Migrator
+        from canvasapi_get.content_migration import Migrator
 
         return PaginatedList(
             Migrator,
@@ -442,7 +442,7 @@ class Group(CanvasObject):
         :returns: The specified page.
         :rtype: :class:`canvasapi_get.groups.Group`
         """
-        from canvasapi.course import Page
+        from canvasapi_get.course import Page
 
         response = self._requester.request(
             "GET",
@@ -464,7 +464,7 @@ class Group(CanvasObject):
         :rtype: :class:`canvasapi_get.paginated_list.PaginatedList` of
             :class:`canvasapi_get.page.Page`
         """
-        from canvasapi.course import Page
+        from canvasapi_get.course import Page
 
         return PaginatedList(
             Page,
@@ -505,7 +505,7 @@ class Group(CanvasObject):
         :rtype: :class:`canvasapi_get.paginated_list.PaginatedList` of
             :class:`canvasapi_get.user.User`
         """
-        from canvasapi.user import User
+        from canvasapi_get.user import User
 
         return PaginatedList(
             User,
@@ -577,9 +577,9 @@ class Group(CanvasObject):
         :calls: `GET /api/v1/groups/:group_id/front_page \
         <https://canvas.instructure.com/doc/api/pages.html#method.wiki_pages_api.show_front_page>`_
 
-        :rtype: :class:`canvasapi.group.Group`
+        :rtype: :class:`canvasapi_get.group.Group`
         """
-        from canvasapi.course import Page
+        from canvasapi_get.course import Page
 
         response = self._requester.request(
             "GET",
@@ -625,7 +625,7 @@ class GroupCategory(CanvasObject):
         :rtype: :class:`canvasapi_get.paginated_list.PaginatedList` of
             :class:`canvasapi_get.user.User`
         """
-        from canvasapi.user import User
+        from canvasapi_get.user import User
 
         return PaginatedList(
             User,

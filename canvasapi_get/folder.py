@@ -1,6 +1,6 @@
-from canvasapi.canvas_object import CanvasObject
-from canvasapi.paginated_list import PaginatedList
-from canvasapi.util import combine_kwargs
+from canvasapi_get.canvas_object import CanvasObject
+from canvasapi_get.paginated_list import PaginatedList
+from canvasapi_get.util import combine_kwargs
 
 
 class Folder(CanvasObject):
@@ -17,7 +17,7 @@ class Folder(CanvasObject):
         :rtype: :class:`canvasapi_get.paginated_list.PaginatedList` of
             :class:`canvasapi_get.file.File`
         """
-        from canvasapi.file import File
+        from canvasapi_get.file import File
 
         return PaginatedList(
             File,

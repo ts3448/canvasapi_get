@@ -1,9 +1,9 @@
-from canvasapi.canvas_object import CanvasObject
-from canvasapi.paginated_list import PaginatedList
-from canvasapi.quiz_group import QuizGroup
-from canvasapi.submission import Submission
-from canvasapi.user import User
-from canvasapi.util import combine_kwargs, obj_or_id
+from canvasapi_get.canvas_object import CanvasObject
+from canvasapi_get.paginated_list import PaginatedList
+from canvasapi_get.quiz_group import QuizGroup
+from canvasapi_get.submission import Submission
+from canvasapi_get.user import User
+from canvasapi_get.util import combine_kwargs, obj_or_id
 
 
 class Quiz(CanvasObject):
@@ -38,7 +38,7 @@ class Quiz(CanvasObject):
         :param question: The object or ID of the quiz question to retrieve.
         :type question: int, str or :class:`canvasapi_get.quiz.QuizQuestion`
 
-        :rtype: :class:`canvasapi.quiz.QuizQuestion`
+        :rtype: :class:`canvasapi_get.quiz.QuizQuestion`
         """
         question_id = obj_or_id(question, "question", (QuizQuestion,))
 
@@ -84,7 +84,7 @@ class Quiz(CanvasObject):
         :type id: int
 
         :returns: `QuizGroup` object
-        :rtype: :class:`canvasapi.quiz_group.QuizGroup`
+        :rtype: :class:`canvasapi_get.quiz_group.QuizGroup`
         """
         response = self._requester.request(
             "GET",
@@ -105,10 +105,10 @@ class Quiz(CanvasObject):
         <https://canvas.instructure.com/doc/api/quiz_reports.html#method.quizzes/quiz_reports.show>`_
 
         :param id: The ID of the quiz report you want to retrieve, or the report object
-        :type id: int or :class:`canvasapi.quiz.QuizReport`
+        :type id: int or :class:`canvasapi_get.quiz.QuizReport`
 
         :returns: `QuizReport` object
-        :rtype: :class:`canvasapi.quiz.QuizReport`
+        :rtype: :class:`canvasapi_get.quiz.QuizReport`
         """
         id = obj_or_id(id, "id", (QuizReport,))
 
@@ -133,7 +133,7 @@ class Quiz(CanvasObject):
         :param quiz_submission: The object or ID of the quiz submission to retrieve.
         :type quiz_submission: int, string, :class:`canvasapi_get.quiz.QuizSubmission`
 
-        :rtype: :class:`canvasapi.quiz.QuizSubmission`
+        :rtype: :class:`canvasapi_get.quiz.QuizSubmission`
         """
         quiz_submission_id = obj_or_id(
             quiz_submission, "quiz_submission", (QuizSubmission,)
@@ -248,7 +248,7 @@ class QuizSubmission(CanvasObject):
         <https://canvas.instructure.com/doc/api/quiz_submission_questions.html#method.quizzes/quiz_submission_questions.index>`_
 
         :returns: A list of quiz submission questions.
-        :rtype: list of :class:`canvasapi.quiz.QuizSubmissionQuestion`
+        :rtype: list of :class:`canvasapi_get.quiz.QuizSubmissionQuestion`
         """
         response = self._requester.request(
             "GET",

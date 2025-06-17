@@ -1,10 +1,10 @@
-from canvasapi.canvas_object import CanvasObject
-from canvasapi.grade_change_log import GradeChangeEvent
-from canvasapi.paginated_list import PaginatedList
-from canvasapi.peer_review import PeerReview
-from canvasapi.submission import Submission
-from canvasapi.user import User, UserDisplay
-from canvasapi.util import combine_kwargs, obj_or_id
+from canvasapi_get.canvas_object import CanvasObject
+from canvasapi_get.grade_change_log import GradeChangeEvent
+from canvasapi_get.paginated_list import PaginatedList
+from canvasapi_get.peer_review import PeerReview
+from canvasapi_get.submission import Submission
+from canvasapi_get.user import User, UserDisplay
+from canvasapi_get.util import combine_kwargs, obj_or_id
 
 
 class Assignment(CanvasObject):
@@ -69,9 +69,9 @@ class Assignment(CanvasObject):
         <https://canvas.instructure.com/doc/api/assignments.html#method.assignment_overrides.show>`_
 
         :param override: The object or ID of the override to get
-        :type override: :class:`canvasapi.assignment.AssignmentOverride` or int
+        :type override: :class:`canvasapi_get.assignment.AssignmentOverride` or int
 
-        :rtype: :class:`canvasapi.assignment.AssignmentOverride`
+        :rtype: :class:`canvasapi_get.assignment.AssignmentOverride`
         """
         override_id = obj_or_id(override, "override", (AssignmentOverride,))
 
@@ -133,7 +133,7 @@ class Assignment(CanvasObject):
         <https://canvas.instructure.com/doc/api/all_resources.html#method.provisional_grades.status>`_
 
         :param student_id: The object or ID of the related student
-        :type student_id: :class:`canvasapi.user.User` or int
+        :type student_id: :class:`canvasapi_get.user.User` or int
 
         :rtype: bool
         """
@@ -178,9 +178,9 @@ class Assignment(CanvasObject):
         <https://canvas.instructure.com/doc/api/submissions.html#method.submissions_api.show>`_
 
         :param user: The object or ID of the related user
-        :type user: :class:`canvasapi.user.User` or int
+        :type user: :class:`canvasapi_get.user.User` or int
 
-        :rtype: :class:`canvasapi.submission.Submission`
+        :rtype: :class:`canvasapi_get.submission.Submission`
         """
         user_id = obj_or_id(user, "user", (User,))
 
@@ -243,7 +243,7 @@ class Assignment(CanvasObject):
         <https://canvas.instructure.com/doc/api/all_resources.html#method.anonymous_provisional_grades.status>`_
 
         :param anonymous_id: The ID of the student to show the status for
-        :type anonymous_id: :class:`canvasapi.user.User` or int
+        :type anonymous_id: :class:`canvasapi_get.user.User` or int
 
         :rtype: dict
         """

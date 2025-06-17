@@ -1,6 +1,6 @@
-from canvasapi.canvas_object import CanvasObject
-from canvasapi.notification_preference import NotificationPreference
-from canvasapi.util import combine_kwargs
+from canvasapi_get.canvas_object import CanvasObject
+from canvasapi_get.notification_preference import NotificationPreference
+from canvasapi_get.util import combine_kwargs
 
 
 class CommunicationChannel(CanvasObject):
@@ -19,7 +19,7 @@ class CommunicationChannel(CanvasObject):
 
         :param notification: The name of the notification.
         :type notification: str
-        :rtype: :class:`canvasapi.notification_preference.NotificationPreference`
+        :rtype: :class:`canvasapi_get.notification_preference.NotificationPreference`
         """
         response = self._requester.request(
             "GET",

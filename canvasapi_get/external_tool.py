@@ -1,6 +1,6 @@
-from canvasapi.canvas_object import CanvasObject
-from canvasapi.exceptions import CanvasException
-from canvasapi.util import combine_kwargs
+from canvasapi_get.canvas_object import CanvasObject
+from canvasapi_get.exceptions import CanvasException
+from canvasapi_get.util import combine_kwargs
 
 
 class ExternalTool(CanvasObject):
@@ -39,10 +39,10 @@ class ExternalTool(CanvasObject):
         """
         Return the object that spawned this tool.
 
-        :rtype: :class:`canvasapi.account.Account` or :class:`canvasapi.account.Course`
+        :rtype: :class:`canvasapi_get.account.Account` or :class:`canvasapi_get.account.Course`
         """
-        from canvasapi.account import Account
-        from canvasapi.course import Course
+        from canvasapi_get.account import Account
+        from canvasapi_get.course import Course
 
         response = self._requester.request(
             "GET",

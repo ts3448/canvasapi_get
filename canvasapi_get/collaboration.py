@@ -1,6 +1,6 @@
-from canvasapi.canvas_object import CanvasObject
-from canvasapi.paginated_list import PaginatedList
-from canvasapi.util import combine_kwargs
+from canvasapi_get.canvas_object import CanvasObject
+from canvasapi_get.paginated_list import PaginatedList
+from canvasapi_get.util import combine_kwargs
 
 
 class Collaboration(CanvasObject):
@@ -14,7 +14,7 @@ class Collaboration(CanvasObject):
         :calls: `GET /api/v1/collaborations/:id/members \
         <https://canvas.instructure.com/doc/api/collaborations.html#method.collaborations.potential_collaborators>`_
 
-        :rtype: :class:`canvasapi.collaboration.Collaborator`
+        :rtype: :class:`canvasapi_get.collaboration.Collaborator`
         """
         return PaginatedList(
             Collaborator,

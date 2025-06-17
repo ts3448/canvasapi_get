@@ -1,16 +1,16 @@
-from canvasapi.authentication_event import AuthenticationEvent
-from canvasapi.avatar import Avatar
-from canvasapi.calendar_event import CalendarEvent
-from canvasapi.canvas_object import CanvasObject
-from canvasapi.communication_channel import CommunicationChannel
-from canvasapi.content_export import ContentExport
-from canvasapi.feature import Feature, FeatureFlag
-from canvasapi.folder import Folder
-from canvasapi.grade_change_log import GradeChangeEvent
-from canvasapi.license import License
-from canvasapi.page_view import PageView
-from canvasapi.paginated_list import PaginatedList
-from canvasapi.util import combine_kwargs, obj_or_id, obj_or_str
+from canvasapi_get.authentication_event import AuthenticationEvent
+from canvasapi_get.avatar import Avatar
+from canvasapi_get.calendar_event import CalendarEvent
+from canvasapi_get.canvas_object import CanvasObject
+from canvasapi_get.communication_channel import CommunicationChannel
+from canvasapi_get.content_export import ContentExport
+from canvasapi_get.feature import Feature, FeatureFlag
+from canvasapi_get.folder import Folder
+from canvasapi_get.grade_change_log import GradeChangeEvent
+from canvasapi_get.license import License
+from canvasapi_get.page_view import PageView
+from canvasapi_get.paginated_list import PaginatedList
+from canvasapi_get.util import combine_kwargs, obj_or_id, obj_or_str
 
 
 class User(CanvasObject):
@@ -26,13 +26,13 @@ class User(CanvasObject):
         <https://canvas.instructure.com/doc/api/assignments.html#method.assignments_api.user_index>`_
 
         :param course: The object or ID of the course to retrieve.
-        :type course: :class:`canvasapi.course.Course` or int
+        :type course: :class:`canvasapi_get.course.Course` or int
 
         :rtype: :class:`canvasapi_get.paginated_list.PaginatedList` of
             :class:`canvasapi_get.assignment.Assignment`
         """
-        from canvasapi.assignment import Assignment
-        from canvasapi.course import Course
+        from canvasapi_get.assignment import Assignment
+        from canvasapi_get.course import Course
 
         course_id = obj_or_id(course, "course", (Course,))
 
@@ -108,7 +108,7 @@ class User(CanvasObject):
         :rtype: :class:`canvasapi_get.paginated_list.PaginatedList` of
             :class:`canvasapi_get.poll_session.PollSession`
         """
-        from canvasapi.poll_session import PollSession
+        from canvasapi_get.poll_session import PollSession
 
         return PaginatedList(
             PollSession,
@@ -182,9 +182,9 @@ class User(CanvasObject):
         <https://canvas.instructure.com/doc/api/content_exports.html#method.content_exports_api.show>`_
 
         :param content_export: The object or ID of the content export to show.
-        :type content_export: int or :class:`canvasapi.content_export.ContentExport`
+        :type content_export: int or :class:`canvasapi_get.content_export.ContentExport`
 
-        :rtype: :class:`canvasapi.content_export.ContentExport`
+        :rtype: :class:`canvasapi_get.content_export.ContentExport`
         """
         export_id = obj_or_id(content_export, "content_export", (ContentExport,))
 
@@ -224,9 +224,9 @@ class User(CanvasObject):
         :param content_migration: The object or ID of the content migration to retrieve.
         :type content_migration: int, str or :class:`canvasapi_get.content_migration.ContentMigration`
 
-        :rtype: :class:`canvasapi.content_migration.ContentMigration`
+        :rtype: :class:`canvasapi_get.content_migration.ContentMigration`
         """
-        from canvasapi.content_migration import ContentMigration
+        from canvasapi_get.content_migration import ContentMigration
 
         migration_id = obj_or_id(
             content_migration, "content_migration", (ContentMigration,)
@@ -253,7 +253,7 @@ class User(CanvasObject):
         :rtype: :class:`canvasapi_get.paginated_list.PaginatedList` of
             :class:`canvasapi_get.content_migration.ContentMigration`
         """
-        from canvasapi.content_migration import ContentMigration
+        from canvasapi_get.content_migration import ContentMigration
 
         return PaginatedList(
             ContentMigration,
@@ -274,7 +274,7 @@ class User(CanvasObject):
         :rtype: :class:`canvasapi_get.paginated_list.PaginatedList` of
             :class:`canvasapi_get.course.Course`
         """
-        from canvasapi.course import Course
+        from canvasapi_get.course import Course
 
         return PaginatedList(
             Course,
@@ -311,7 +311,7 @@ class User(CanvasObject):
         :rtype: :class:`canvasapi_get.paginated_list.PaginatedList` of
             :class:`canvasapi_get.enrollment.Enrollment`
         """
-        from canvasapi.enrollment import Enrollment
+        from canvasapi_get.enrollment import Enrollment
 
         return PaginatedList(
             Enrollment,
@@ -330,7 +330,7 @@ class User(CanvasObject):
         :rtype: :class:`canvasapi_get.paginated_list.PaginatedList` of
             :class:`canvasapi_get.eportfolio.EPortfolio`
         """
-        from canvasapi.eportfolio import EPortfolio
+        from canvasapi_get.eportfolio import EPortfolio
 
         return PaginatedList(
             EPortfolio,
@@ -348,9 +348,9 @@ class User(CanvasObject):
         <https://canvas.instructure.com/doc/api/feature_flags.html#method.feature_flags.show>`_
 
         :param feature: The feature object or name of the feature to retrieve.
-        :type feature: :class:`canvasapi.feature.Feature` or str
+        :type feature: :class:`canvasapi_get.feature.Feature` or str
 
-        :rtype: :class:`canvasapi.feature.FeatureFlag`
+        :rtype: :class:`canvasapi_get.feature.FeatureFlag`
         """
         feature_name = obj_or_str(feature, "name", (Feature,))
 
@@ -388,11 +388,11 @@ class User(CanvasObject):
         <https://canvas.instructure.com/doc/api/files.html#method.files.api_show>`_
 
         :param file: The object or ID of the file to retrieve.
-        :type file: :class:`canvasapi.file.File` or int
+        :type file: :class:`canvasapi_get.file.File` or int
 
-        :rtype: :class:`canvasapi.file.File`
+        :rtype: :class:`canvasapi_get.file.File`
         """
-        from canvasapi.file import File
+        from canvasapi_get.file import File
 
         file_id = obj_or_id(file, "file", (File,))
 
@@ -431,7 +431,7 @@ class User(CanvasObject):
         :rtype: :class:`canvasapi_get.paginated_list.PaginatedList` of
             :class:`canvasapi_get.file.File`
         """
-        from canvasapi.file import File
+        from canvasapi_get.file import File
 
         return PaginatedList(
             File,
@@ -449,11 +449,11 @@ class User(CanvasObject):
         <https://canvas.instructure.com/doc/api/files.html#method.folders.show>`_
 
         :param folder: The object or ID of the folder to retrieve.
-        :type folder: :class:`canvasapi.folder.Folder` or int
+        :type folder: :class:`canvasapi_get.folder.Folder` or int
 
-        :rtype: :class:`canvasapi.folder.Folder`
+        :rtype: :class:`canvasapi_get.folder.Folder`
         """
-        from canvasapi.folder import Folder
+        from canvasapi_get.folder import Folder
 
         folder_id = obj_or_id(folder, "folder", (Folder,))
 
@@ -552,7 +552,7 @@ class User(CanvasObject):
         :rtype: :class:`canvasapi_get.paginated_list.PaginatedList` of
             :class:`canvasapi_get.content_migration.Migrator`
         """
-        from canvasapi.content_migration import Migrator
+        from canvasapi_get.content_migration import Migrator
 
         return PaginatedList(
             Migrator,
@@ -573,7 +573,7 @@ class User(CanvasObject):
         :rtype: :class:`canvasapi_get.paginated_list.PaginatedList` of
             :class:`canvasapi_get.assignment.Assignment`
         """
-        from canvasapi.assignment import Assignment
+        from canvasapi_get.assignment import Assignment
 
         return PaginatedList(
             Assignment,
@@ -631,7 +631,7 @@ class User(CanvasObject):
         :rtype: :class:`canvasapi_get.paginated_list.PaginatedList` of
             :class:`canvasapi_get.poll_session.PollSession`
         """
-        from canvasapi.poll_session import PollSession
+        from canvasapi_get.poll_session import PollSession
 
         return PaginatedList(
             PollSession,
@@ -684,7 +684,7 @@ class User(CanvasObject):
         :rtype: :class:`canvasapi_get.paginated_list.PaginatedList` of
             :class:`canvasapi_get.login.Login`
         """
-        from canvasapi.login import Login
+        from canvasapi_get.login import Login
 
         return PaginatedList(
             Login,
@@ -700,7 +700,7 @@ class User(CanvasObject):
         Only available to admins who can moderate_user_content.
 
         :param eportfolio: The object or ID of the ePortfolio to retrieve.
-        :type eportfolio: :class:`canvasapi.eportfolio.EPortfolio` or int
+        :type eportfolio: :class:`canvasapi_get.eportfolio.EPortfolio` or int
 
         :calls: `PUT /api/v1/users/:user_id/eportfolios \
             <https://canvas.instructure.com/doc/api/e_portfolios.html#method.eportfolios_api.moderate_all>`_
@@ -709,7 +709,7 @@ class User(CanvasObject):
         :rtype: :class:`canvasapi_get.paginated_list.PaginatedList` of
             :class:`canvasapi_get.eportfolio.EPortfolio`
         """
-        from canvasapi.eportfolio import EPortfolio
+        from canvasapi_get.eportfolio import EPortfolio
 
         return PaginatedList(
             EPortfolio,
@@ -761,7 +761,7 @@ class User(CanvasObject):
 
         :param observee_id: The login id for the user to observe.
         :type observee_id: int
-        :rtype: :class:`canvasapi.user.User`
+        :rtype: :class:`canvasapi_get.user.User`
         """
 
         response = self._requester.request(

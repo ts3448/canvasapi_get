@@ -1,6 +1,6 @@
-from canvasapi.canvas_object import CanvasObject
-from canvasapi.paginated_list import PaginatedList
-from canvasapi.util import combine_kwargs, obj_or_id
+from canvasapi_get.canvas_object import CanvasObject
+from canvasapi_get.paginated_list import PaginatedList
+from canvasapi_get.util import combine_kwargs, obj_or_id
 
 
 class Page(CanvasObject):
@@ -17,10 +17,10 @@ class Page(CanvasObject):
             `GET /api/v1/courses/:id \
             <https://canvas.instructure.com/doc/api/courses.html#method.courses.show>`_
 
-        :rtype: :class:`canvasapi.group.Group` or :class:`canvasapi.course.Course`
+        :rtype: :class:`canvasapi_get.group.Group` or :class:`canvasapi_get.course.Course`
         """
-        from canvasapi.course import Course
-        from canvasapi.group import Group
+        from canvasapi_get.course import Course
+        from canvasapi_get.group import Group
 
         response = self._requester.request(
             "GET",
@@ -144,10 +144,10 @@ class PageRevision(CanvasObject):
             or :calls: `GET /api/v1/courses/:id \
             <https://canvas.instructure.com/doc/api/courses.html#method.courses.show>`_
 
-        :rtype: :class:`canvasapi.group.Group` or :class:`canvasapi.course.Course`
+        :rtype: :class:`canvasapi_get.group.Group` or :class:`canvasapi_get.course.Course`
         """
-        from canvasapi.course import Course
-        from canvasapi.group import Group
+        from canvasapi_get.course import Course
+        from canvasapi_get.group import Group
 
         response = self._requester.request(
             "GET",

@@ -1,4 +1,4 @@
-from canvasapi.canvas_object import CanvasObject
+from canvasapi_get.canvas_object import CanvasObject
 
 
 class CourseEvent(CanvasObject):

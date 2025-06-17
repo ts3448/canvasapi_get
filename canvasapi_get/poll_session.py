@@ -1,6 +1,6 @@
-from canvasapi.canvas_object import CanvasObject
-from canvasapi.poll_submission import PollSubmission
-from canvasapi.util import combine_kwargs, obj_or_id
+from canvasapi_get.canvas_object import CanvasObject
+from canvasapi_get.poll_submission import PollSubmission
+from canvasapi_get.util import combine_kwargs, obj_or_id
 
 
 class PollSession(CanvasObject):
@@ -31,9 +31,9 @@ class PollSession(CanvasObject):
         <https://canvas.instructure.com/doc/api/poll_submissions.html#method.polling/poll_submissions.show>`_
 
         :param poll_submission: Takes a poll submission id (int) or object.
-        :type poll_submission: int or :class:`canvasapi.poll_submission.PollSubmission`
+        :type poll_submission: int or :class:`canvasapi_get.poll_submission.PollSubmission`
 
-        :rtype: :class:`canvasapi.poll_submission.PollSubmission`
+        :rtype: :class:`canvasapi_get.poll_submission.PollSubmission`
         """
         poll_submission_id = obj_or_id(
             poll_submission, "poll_submission", (PollSubmission,)

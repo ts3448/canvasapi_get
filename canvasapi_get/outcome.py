@@ -1,6 +1,6 @@
-from canvasapi.canvas_object import CanvasObject
-from canvasapi.paginated_list import PaginatedList
-from canvasapi.util import combine_kwargs
+from canvasapi_get.canvas_object import CanvasObject
+from canvasapi_get.paginated_list import PaginatedList
+from canvasapi_get.util import combine_kwargs
 
 
 class Outcome(CanvasObject):
@@ -29,7 +29,7 @@ class OutcomeLink(CanvasObject):
         <https://canvas.instructure.com/doc/api/outcomes.html#method.outcomes_api.show>`_
 
         :returns: Outcome object that was in the OutcomeLink
-        :rtype: :class:`canvasapi.outcome.Outcome`
+        :rtype: :class:`canvasapi_get.outcome.Outcome`
         """
         oid = self.outcome["id"]
         response = self._requester.request(
@@ -50,7 +50,7 @@ class OutcomeLink(CanvasObject):
             <https://canvas.instructure.com/doc/api/outcome_groups.html#method.outcome_groups_api.show>`_
 
         :returns: Linked outcome group object.
-        :rtype: :class:`canvasapi.outcome.OutcomeGroup`
+        :rtype: :class:`canvasapi_get.outcome.OutcomeGroup`
         """
         ogid = self.outcome_group["id"]
         response = self._requester.request(

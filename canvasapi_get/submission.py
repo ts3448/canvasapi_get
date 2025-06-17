@@ -1,8 +1,8 @@
-from canvasapi.canvas_object import CanvasObject
-from canvasapi.file import File
-from canvasapi.paginated_list import PaginatedList
-from canvasapi.peer_review import PeerReview
-from canvasapi.util import combine_kwargs
+from canvasapi_get.canvas_object import CanvasObject
+from canvasapi_get.file import File
+from canvasapi_get.paginated_list import PaginatedList
+from canvasapi_get.peer_review import PeerReview
+from canvasapi_get.util import combine_kwargs
 
 
 class Submission(CanvasObject):

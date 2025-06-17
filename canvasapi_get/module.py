@@ -1,6 +1,6 @@
-from canvasapi.canvas_object import CanvasObject
-from canvasapi.paginated_list import PaginatedList
-from canvasapi.util import combine_kwargs, obj_or_id
+from canvasapi_get.canvas_object import CanvasObject
+from canvasapi_get.paginated_list import PaginatedList
+from canvasapi_get.util import combine_kwargs, obj_or_id
 
 
 class Module(CanvasObject):
@@ -15,9 +15,9 @@ class Module(CanvasObject):
         <https://canvas.instructure.com/doc/api/modules.html#method.context_module_items_api.show>`_
 
         :param module_item: The object or ID of the module item.
-        :type module_item: :class:`canvasapi.module.ModuleItem` or dict
+        :type module_item: :class:`canvasapi_get.module.ModuleItem` or dict
 
-        :rtype: :class:`canvasapi.module.ModuleItem`
+        :rtype: :class:`canvasapi_get.module.ModuleItem`
         """
         module_item_id = obj_or_id(module_item, "module_item", (ModuleItem,))
 

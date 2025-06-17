@@ -1,7 +1,7 @@
-from canvasapi.canvas_object import CanvasObject
-from canvasapi.paginated_list import PaginatedList
-from canvasapi.submission import GroupedSubmission, Submission
-from canvasapi.util import combine_kwargs, normalize_bool, obj_or_id
+from canvasapi_get.canvas_object import CanvasObject
+from canvasapi_get.paginated_list import PaginatedList
+from canvasapi_get.submission import GroupedSubmission, Submission
+from canvasapi_get.util import combine_kwargs, normalize_bool, obj_or_id
 
 
 class Section(CanvasObject):
@@ -13,14 +13,14 @@ class Section(CanvasObject):
         Return override for the specified assignment for this section.
 
         :param assignment: The assignment to get an override for
-        :type assignment: :class:`canvasapi.assignment.Assignment` or int
+        :type assignment: :class:`canvasapi_get.assignment.Assignment` or int
 
         :calls: `GET /api/v1/sections/:course_section_id/assignments/:assignment_id/override \
         <https://canvas.instructure.com/doc/api/assignments.html#method.assignment_overrides.section_alias>`_
 
-        :rtype: :class:`canvasapi.assignment.AssignmentOverride`
+        :rtype: :class:`canvasapi_get.assignment.AssignmentOverride`
         """
-        from canvasapi.assignment import Assignment, AssignmentOverride
+        from canvasapi_get.assignment import Assignment, AssignmentOverride
 
         assignment_id = obj_or_id(assignment, "assignment", (Assignment,))
 
@@ -42,7 +42,7 @@ class Section(CanvasObject):
         :rtype: :class:`canvasapi_get.paginated_list.PaginatedList` of
             :class:`canvasapi_get.enrollment.Enrollment`
         """
-        from canvasapi.enrollment import Enrollment
+        from canvasapi_get.enrollment import Enrollment
 
         return PaginatedList(
             Enrollment,
