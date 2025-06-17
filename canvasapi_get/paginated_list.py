@@ -58,28 +58,37 @@ class PaginatedList(Iterable):
             from canvasapi_get.async_paginated_list import AsyncPaginatedList
 
             async def _fetch_all_async():
-                async_list = AsyncPaginatedList(
-                    content_class,
-                    requester,
-                    request_method,
-                    first_url,
-                    extra_attribs=extra_attribs,
-                    _root=_root,
-                    _url_override=_url_override,
-                    **kwargs,
-                )
+                # Use context manager to get the actual async requester
+                async with requester as async_requester:
+                    async_list = AsyncPaginatedList(
+                        content_class,
+                        async_requester,  # Use the actual async requester
+                        request_method,
+                        first_url,
+                        extra_attribs=extra_attribs,
+                        _root=_root,
+                        _url_override=_url_override,
+                        **kwargs,
+                    )
 
-                # Use context manager for proper session handling
-                async with requester:
                     await async_list.fetch_all()
                     return await async_list.to_list()
 
             # Fetch all pages concurrently and populate _elements
             self._elements = asyncio.run(_fetch_all_async())
 
-            # Set attributes for compatibility
+            # Set attributes for compatibility with sync interface
             self._requester = requester
             self._content_class = content_class
+            self._first_url = first_url
+            self._first_params = kwargs or {}
+            self._first_params["per_page"] = kwargs.get("per_page", 100)
+            self._next_url = None  # No more pages since async fetching is complete
+            self._next_params = {}
+            self._extra_attribs = extra_attribs or {}
+            self._request_method = request_method
+            self._root = _root
+            self._url_override = _url_override
             return
 
         # Standard sync pagination behavior

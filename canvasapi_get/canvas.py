@@ -1,4 +1,5 @@
 import warnings
+import asyncio
 
 from canvasapi_get.account import Account
 from canvasapi_get.account_calendar import AccountCalendar
@@ -26,6 +27,95 @@ from canvasapi_get.section import Section
 from canvasapi_get.todo import Todo
 from canvasapi_get.user import User
 from canvasapi_get.util import combine_kwargs, get_institution_url, obj_or_id
+
+
+class HybridRequester:
+    """
+    Hybrid requester that provides sync interface while exposing async capabilities.
+    
+    This wrapper allows Canvas methods to continue working synchronously while
+    enabling PaginatedList to automatically detect and use async pagination.
+    """
+    
+    def __init__(self, sync_requester, async_requester):
+        """
+        Initialize hybrid requester with both sync and async requesters.
+        
+        Args:
+            sync_requester: Synchronous requester for individual Canvas API calls
+            async_requester: Asynchronous requester for PaginatedList detection and use
+        """
+        self._sync_requester = sync_requester
+        self._async_requester = async_requester
+        
+        # Expose async requester attributes for PaginatedList detection
+        self.rate_limit_state = async_requester.rate_limit_state
+        self.coordinator = async_requester.coordinator
+        
+        # Expose other requester attributes for compatibility
+        self.base_url = sync_requester.base_url
+        self.new_quizzes_url = sync_requester.new_quizzes_url
+        self.original_url = sync_requester.original_url
+        self.access_token = sync_requester.access_token
+    
+    def request(self, method, endpoint=None, headers=None, use_auth=True, _url=None, _kwargs=None, **kwargs):
+        """
+        Make a request using the sync requester (for Canvas method compatibility).
+        
+        Args:
+            method: HTTP method for the request
+            endpoint: API endpoint to call
+            headers: Optional HTTP headers
+            use_auth: Whether to include authentication header
+            _url: Optional URL override
+            _kwargs: Processed keyword arguments
+            **kwargs: Additional request parameters
+            
+        Returns:
+            HTTP response object
+        """
+        return self._sync_requester.request(
+            method=method,
+            endpoint=endpoint, 
+            headers=headers,
+            use_auth=use_auth,
+            _url=_url,
+            _kwargs=_kwargs,
+            **kwargs
+        )
+    
+    async def __aenter__(self):
+        """
+        Async context manager entry - delegate to async requester.
+        
+        Returns:
+            The async requester for use in async context
+        """
+        await self._async_requester.__aenter__()
+        return self._async_requester
+    
+    async def __aexit__(self, exc_type, exc_val, exc_tb):
+        """
+        Async context manager exit - delegate to async requester.
+        
+        Args:
+            exc_type: Exception type if an exception occurred
+            exc_val: Exception value if an exception occurred  
+            exc_tb: Exception traceback if an exception occurred
+        """
+        return await self._async_requester.__aexit__(exc_type, exc_val, exc_tb)
+    
+    def __getattr__(self, name):
+        """
+        Delegate any other attribute access to the sync requester for compatibility.
+        
+        Args:
+            name: Attribute name to access
+            
+        Returns:
+            Attribute value from sync requester
+        """
+        return getattr(self._sync_requester, name)
 
 
 class Canvas(object):
@@ -73,10 +163,14 @@ class Canvas(object):
         base_url = get_institution_url(base_url)
 
         if use_async_pagination:
+            # Create hybrid requester that provides sync interface but enables async pagination
             from canvasapi_get.async_requester import AsyncRequester
-
-            self.__requester = AsyncRequester(base_url, access_token)
+            
+            sync_requester = Requester(base_url, access_token)
+            async_requester = AsyncRequester(base_url, access_token)
+            self.__requester = HybridRequester(sync_requester, async_requester)
         else:
+            # Standard sync-only requester
             self.__requester = Requester(base_url, access_token)
 
     @property
@@ -456,7 +550,7 @@ class Canvas(object):
         """
         return PaginatedList(
             Account,
-            self.__requester,
+            self._get_requester_for_pagination(),
             "GET",
             "accounts",
             _kwargs=combine_kwargs(**kwargs),

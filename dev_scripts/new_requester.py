@@ -14,10 +14,14 @@ CANVAS_API_URL = os.environ.get("CANVAS_API_URL")
 CANVAS_API_KEY = os.environ.get("CANVAS_API_KEY")
 
 
-canvas = Canvas(CANVAS_API_URL, CANVAS_API_KEY)
+canvas = Canvas(
+    CANVAS_API_URL,
+    CANVAS_API_KEY,
+    use_async_pagination=True,
+)
 
 account = canvas.get_account(439)
 
-courses = account.get_courses()
+courses = account.get_courses(enrollment_term_id=583)
 
 print(len(courses))
