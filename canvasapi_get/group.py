@@ -515,28 +515,6 @@ class Group(CanvasObject):
             _kwargs=combine_kwargs(**kwargs),
         )
 
-    def invite(self, invitees, **kwargs):
-        """
-        Invite users to group.
-
-        :calls: `POST /api/v1/groups/:group_id/invite \
-        <https://canvas.instructure.com/doc/api/groups.html#method.groups.invite>`_
-
-        :param invitees: list of user ids
-        :type invitees: integer list
-
-        :rtype: :class:`canvasapi_get.paginated_list.PaginatedList` of
-            :class:`canvasapi_get.group.GroupMembership`
-        """
-        kwargs["invitees"] = invitees
-        return PaginatedList(
-            GroupMembership,
-            self._requester,
-            "POST",
-            "groups/{}/invite".format(self.id),
-            _kwargs=combine_kwargs(**kwargs),
-        )
-
     def resolve_path(self, full_path=None, **kwargs):
         """
         Returns the paginated list of all of the folders in the given

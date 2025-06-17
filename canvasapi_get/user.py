@@ -694,31 +694,6 @@ class User(CanvasObject):
             _kwargs=combine_kwargs(**kwargs),
         )
 
-    def moderate_all_eportfolios(self, **kwargs):
-        """
-        Update the spam_status for all active eportfolios of a user.
-        Only available to admins who can moderate_user_content.
-
-        :param eportfolio: The object or ID of the ePortfolio to retrieve.
-        :type eportfolio: :class:`canvasapi_get.eportfolio.EPortfolio` or int
-
-        :calls: `PUT /api/v1/users/:user_id/eportfolios \
-            <https://canvas.instructure.com/doc/api/e_portfolios.html#method.eportfolios_api.moderate_all>`_
-
-        :returns: A list of all user ePortfolios.
-        :rtype: :class:`canvasapi_get.paginated_list.PaginatedList` of
-            :class:`canvasapi_get.eportfolio.EPortfolio`
-        """
-        from canvasapi_get.eportfolio import EPortfolio
-
-        return PaginatedList(
-            EPortfolio,
-            self._requester,
-            "PUT",
-            "users/{}/eportfolios".format(self.id),
-            _kwargs=combine_kwargs(**kwargs),
-        )
-
     def resolve_path(self, full_path=None, **kwargs):
         """
         Returns the paginated list of all of the folders in the given

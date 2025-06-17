@@ -15,6 +15,7 @@ from canvasapi_get.async_requester import AsyncRequester, AsyncResponse
 from canvasapi_get.async_rate_limit_state import AsyncRateLimitState
 from canvasapi_get.background_loop import get_background_loop
 from canvasapi_get.exceptions import CanvasException
+from canvasapi_get.rate_limit_monitor import RateLimitMonitor
 from canvasapi_get.util import clean_headers
 
 logger = logging.getLogger(__name__)
@@ -145,6 +146,10 @@ class UnifiedRequester:
 
         # Thread safety for cache operations
         self._cache_lock = threading.Lock()
+
+        # Enhanced monitoring and observability
+        self._monitor: RateLimitMonitor | None = None
+        self._monitoring_enabled = False
 
     async def _async_request(
         self,
@@ -306,6 +311,78 @@ class UnifiedRequester:
         self._background_loop.run_coroutine_threadsafe(
             self._async_requester.reset_rate_limit_stats()
         )
+
+    def enable_monitoring(self, alert_threshold: float = 30.0, monitor_interval: float = 60.0) -> None:
+        """
+        Enable comprehensive rate limiting monitoring and alerting.
+
+        Args:
+            alert_threshold: Health score threshold for alerts (0-100).
+            monitor_interval: Monitoring check interval in seconds.
+        """
+        if self._monitoring_enabled:
+            logger.warning("Rate limit monitoring is already enabled")
+            return
+
+        self._monitor = RateLimitMonitor(
+            self.rate_limit_state,
+            self.coordinator,
+            alert_threshold=alert_threshold,
+            monitor_interval=monitor_interval,
+        )
+
+        # Start monitoring via background loop
+        self._background_loop.run_coroutine_threadsafe(
+            self._monitor.start_monitoring()
+        )
+        self._monitoring_enabled = True
+        logger.info("Rate limit monitoring enabled")
+
+    def disable_monitoring(self) -> None:
+        """Disable rate limiting monitoring."""
+        if not self._monitoring_enabled or not self._monitor:
+            return
+
+        # Stop monitoring via background loop
+        self._background_loop.run_coroutine_threadsafe(
+            self._monitor.stop_monitoring()
+        )
+        self._monitoring_enabled = False
+        self._monitor = None
+        logger.info("Rate limit monitoring disabled")
+
+    def get_performance_report(self) -> dict:
+        """
+        Get comprehensive performance report from monitoring system.
+
+        Returns:
+            Dictionary containing detailed performance analysis.
+
+        Raises:
+            RuntimeError: If monitoring is not enabled.
+        """
+        if not self._monitoring_enabled or not self._monitor:
+            raise RuntimeError("Monitoring must be enabled to get performance report")
+
+        return self._background_loop.run_coroutine_threadsafe(
+            self._monitor.get_performance_report()
+        )
+
+    def get_monitoring_status(self) -> dict:
+        """
+        Get current monitoring status synchronously.
+
+        Returns:
+            Dictionary with monitoring status and basic metrics.
+        """
+        if not self._monitoring_enabled or not self._monitor:
+            return {
+                "monitoring_enabled": False,
+                "rate_limit": self.rate_limit_state.get_sync_stats(),
+                "coordinator": self.coordinator.get_sync_health_status(),
+            }
+
+        return self._monitor.get_sync_status()
 
     def __getattr__(self, name):
         """

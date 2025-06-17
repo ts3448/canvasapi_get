@@ -215,27 +215,6 @@ class Assignment(CanvasObject):
             _kwargs=combine_kwargs(**kwargs),
         )
 
-    def select_students_for_moderation(self, **kwargs):
-        """
-        Select student(s) for moderation.
-
-        :calls: `POST /api/v1/courses/:course_id/assignments/:assignment_id/moderated_students \
-        <https://canvas.instructure.com/doc/api/moderated_grading.html#method.moderation_set.create>`_
-
-        :returns: The list of users that were selected
-        :rtype: :class:`canvasapi_get.paginated_list.PaginatedList` of
-            :class:`canvasapi_get.user.User`
-        """
-        return PaginatedList(
-            User,
-            self._requester,
-            "POST",
-            "courses/{}/assignments/{}/moderated_students".format(
-                self.course_id, self.id
-            ),
-            _kwargs=combine_kwargs(**kwargs),
-        )
-
     def show_provisonal_grades_for_student(self, anonymous_id, **kwargs):
         """
         :call: `GET /api/v1/courses/:course_id/assignments/:assignment_id/

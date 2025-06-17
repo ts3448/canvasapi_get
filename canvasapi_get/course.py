@@ -42,32 +42,6 @@ class Course(CanvasObject):
     def __str__(self):
         return "{} {} ({})".format(self.course_code, self.name, self.id)
 
-    def create_assignment_overrides(self, assignment_overrides, **kwargs):
-        """
-        Create the specified overrides for each assignment.
-
-        :calls: `POST /api/v1/courses/:course_id/assignments/overrides \
-        <https://canvas.instructure.com/doc/api/assignments.html#method.assignment_overrides.batch_create>`_
-
-        :param assignment_overrides: Attributes for the new assignment overrides.
-        :type assignment_overrides: list
-
-        :rtype: :class:`canvasapi_get.paginated_list.PaginatedList` of
-            :class:`canvasapi_get.assignment.AssignmentOverride`
-        """
-        from canvasapi_get.assignment import AssignmentOverride
-
-        kwargs["assignment_overrides"] = assignment_overrides
-
-        return PaginatedList(
-            AssignmentOverride,
-            self._requester,
-            "POST",
-            "courses/{}/assignments/overrides".format(self.id),
-            {"course_id": self.id},
-            _kwargs=combine_kwargs(**kwargs),
-        )
-
     def get_all_outcome_links_in_context(self, **kwargs):
         """
         Get all outcome links for context - BETA
@@ -1848,34 +1822,6 @@ class Course(CanvasObject):
         page_json.update({"course_id": self.id})
 
         return Page(self._requester, page_json)
-
-    def update_assignment_overrides(self, assignment_overrides, **kwargs):
-        """
-        Update a list of specified overrides for each assignment.
-
-        Note: All current overridden values must be supplied if they are to be retained.
-
-        :calls: `PUT /api/v1/courses/:course_id/assignments/overrides \
-        <https://canvas.instructure.com/doc/api/assignments.html#method.assignment_overrides.batch_update>`_
-
-        :param assignment_overrides: Attributes for the updated assignment overrides.
-        :type assignment_overrides: list
-
-        :rtype: :class:`canvasapi_get.paginated_list.PaginatedList` of
-            :class:`canvasapi_get.assignment.AssignmentOverride`
-        """
-        from canvasapi_get.assignment import AssignmentOverride
-
-        kwargs["assignment_overrides"] = assignment_overrides
-
-        return PaginatedList(
-            AssignmentOverride,
-            self._requester,
-            "PUT",
-            "courses/{}/assignments/overrides".format(self.id),
-            {"course_id": self.id},
-            _kwargs=combine_kwargs(**kwargs),
-        )
 
 
 class CourseNickname(CanvasObject):
