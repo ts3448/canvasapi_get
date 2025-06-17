@@ -6,7 +6,7 @@ class CanvasObject(object):
     """
     Base class for all classes representing objects returned by the API.
 
-    This makes a call to :func:`canvasapi.canvas_object.CanvasObject.set_attributes`
+    This makes a call to :func:`canvasapi-get.canvas_object.CanvasObject.set_attributes`
     to dynamically construct this object's attributes with a JSON object.
     """
 

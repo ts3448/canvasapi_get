@@ -14,8 +14,8 @@ class CustomGradebookColumn(CanvasObject):
         :calls: `GET /api/v1/courses/:course_id/custom_gradebook_columns/:id/data \
             <https://canvas.instructure.com/doc/api/custom_gradebook_columns.html#method.custom_gradebook_column_data_api.index>`_
 
-        :rtype: :class:`canvasapi.paginated_list.PaginatedList` of
-            :class:`canvasapi.custom_gradebook_columns.ColumnData`
+        :rtype: :class:`canvasapi-get.paginated_list.PaginatedList` of
+            :class:`canvasapi-get.custom_gradebook_columns.ColumnData`
         """
         return PaginatedList(
             ColumnData,

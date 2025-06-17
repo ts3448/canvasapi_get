@@ -87,8 +87,8 @@ class OutcomeGroup(CanvasObject):
             <https://canvas.instructure.com/doc/api/outcome_groups.html#method.outcome_groups_api.outcomes>`_
 
         :returns: Paginated List of Outcomes linked to the group.
-        :rtype: :class:`canvasapi.paginated_list.PaginatedList` of
-            :class:`canvasapi.outcome.OutcomeLink`
+        :rtype: :class:`canvasapi-get.paginated_list.PaginatedList` of
+            :class:`canvasapi-get.outcome.OutcomeLink`
         """
         return PaginatedList(
             OutcomeLink,
@@ -110,8 +110,8 @@ class OutcomeGroup(CanvasObject):
             <https://canvas.instructure.com/doc/api/outcome_groups.html#method.outcome_groups_api.subgroups>`_
 
         :returns: Paginated List of OutcomeGroups linked to the current group.
-        :rtype: :class:`canvasapi.paginated_list.PaginatedList` of
-            :class:`canvasapi.outcome.OutcomeGroup`
+        :rtype: :class:`canvasapi-get.paginated_list.PaginatedList` of
+            :class:`canvasapi-get.outcome.OutcomeGroup`
         """
         return PaginatedList(
             OutcomeGroup,

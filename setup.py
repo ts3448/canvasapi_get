@@ -4,7 +4,7 @@ from os import path
 from setuptools import setup
 
 # get version number
-with open("canvasapi/__init__.py", "r") as fd:
+with open("canvasapi-get/__init__.py", "r") as fd:
     version = re.search(
         r'^__version__\s*=\s*[\'"]([^\'"]*)[\'"]', fd.read(), re.MULTILINE
     ).group(1)
@@ -18,7 +18,7 @@ with open(path.join(this_directory, "README.md"), encoding="utf-8") as f:
     long_description = f.read()
 
 setup(
-    name="canvasapi",
+    name="canvasapi-get",
     version=version,
     description="API wrapper for the Canvas LMS",
     long_description=long_description,
@@ -27,7 +27,7 @@ setup(
     author="University of Central Florida - Center for Distributed Learning",
     author_email="techrangers@ucf.edu",
     license="MIT License",
-    packages=["canvasapi"],
+    packages=["canvasapi-get"],
     include_package_data=True,
     install_requires=["arrow", "pytz", "requests"],
     zip_safe=False,

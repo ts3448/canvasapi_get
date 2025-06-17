@@ -10,14 +10,14 @@ exempt_files = ("__init__",)
 
 
 def find_missing_modules():
-    # get all modules visile to inspect from `canvasapi.__init__`
+    # get all modules visile to inspect from `canvasapi-get.__init__`
     module_names = [
         module_name
         for module_name, module in inspect.getmembers(canvasapi, inspect.ismodule)
     ]
 
-    # get all .py files in canvasapi dir (without .py extension)
-    path = "canvasapi"
+    # get all .py files in canvasapi-get dir (without .py extension)
+    path = "canvasapi-get"
     filenames = [fname[:-3] for fname in os.listdir(path) if fname.endswith(".py")]
 
     missing_modules = list()

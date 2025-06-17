@@ -26,9 +26,9 @@ jobs:
       - name: Lint with flake8
         run: flake8
       - name: Check formatting
-        run: black --check canvasapi tests
+        run: black --check canvasapi-get tests
       - name: Check import sorting
-        run: isort --check canvasapi tests
+        run: isort --check canvasapi-get tests
       - name: Run tests
         run: coverage run -m unittest discover
       - name: Lint markdown files

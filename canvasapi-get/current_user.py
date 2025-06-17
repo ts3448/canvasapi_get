@@ -47,8 +47,8 @@ class CurrentUser(User):
         :calls: `GET /api/v1/users/self/bookmarks \
         <https://canvas.instructure.com/doc/api/bookmarks.html#method.bookmarks/bookmarks.index>`_
 
-        :rtype: :class:`canvasapi.paginated_list.PaginatedList` of
-            :class:`canvasapi.bookmark.Bookmark`
+        :rtype: :class:`canvasapi-get.paginated_list.PaginatedList` of
+            :class:`canvasapi-get.bookmark.Bookmark`
         """
         return PaginatedList(Bookmark, self._requester, "GET", "users/self/bookmarks")
 
@@ -61,8 +61,8 @@ class CurrentUser(User):
         :calls: `GET /api/v1/users/self/favorites/courses \
         <https://canvas.instructure.com/doc/api/favorites.html#method.favorites.list_favorite_courses>`_
 
-        :rtype: :class:`canvasapi.paginated_list.PaginatedList` of
-            :class:`canvasapi.course.Course`
+        :rtype: :class:`canvasapi-get.paginated_list.PaginatedList` of
+            :class:`canvasapi-get.course.Course`
         """
 
         return PaginatedList(
@@ -82,8 +82,8 @@ class CurrentUser(User):
         :calls: `GET /api/v1/users/self/favorites/groups \
         <https://canvas.instructure.com/doc/api/favorites.html#method.favorites.list_favorite_groups>`_
 
-        :rtype: :class:`canvasapi.paginated_list.PaginatedList` of
-            :class:`canvasapi.group.Group`
+        :rtype: :class:`canvasapi-get.paginated_list.PaginatedList` of
+            :class:`canvasapi-get.group.Group`
         """
 
         return PaginatedList(

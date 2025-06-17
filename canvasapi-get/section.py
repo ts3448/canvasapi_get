@@ -39,8 +39,8 @@ class Section(CanvasObject):
         :calls: `GET /api/v1/sections/:section_id/enrollments \
         <https://canvas.instructure.com/doc/api/enrollments.html#method.enrollments_api.index>`_
 
-        :rtype: :class:`canvasapi.paginated_list.PaginatedList` of
-            :class:`canvasapi.enrollment.Enrollment`
+        :rtype: :class:`canvasapi-get.paginated_list.PaginatedList` of
+            :class:`canvasapi-get.enrollment.Enrollment`
         """
         from canvasapi.enrollment import Enrollment
 
@@ -60,8 +60,8 @@ class Section(CanvasObject):
         :calls: `GET /api/v1/sections/:section_id/students/submissions \
         <https://canvas.instructure.com/doc/api/submissions.html#method.submissions_api.for_students>`_
 
-        :rtype: :class:`canvasapi.paginated_list.PaginatedList` of
-            :class:`canvasapi.submission.Submission`
+        :rtype: :class:`canvasapi-get.paginated_list.PaginatedList` of
+            :class:`canvasapi-get.submission.Submission`
         """
         is_grouped = kwargs.get("grouped", False)
 

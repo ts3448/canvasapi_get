@@ -102,7 +102,7 @@ class RequestCallVisitor(ast.NodeVisitor):
 
 
 def find_python_files(project_root: str) -> list[Path]:
-    """Find all Python files in the canvasapi directory.
+    """Find all Python files in the canvasapi-get directory.
 
     Args:
         project_root: Path to the project root directory.
@@ -111,7 +111,7 @@ def find_python_files(project_root: str) -> list[Path]:
         List of Python file paths.
     """
     root_path = Path(project_root)
-    canvasapi_dir = root_path / "canvasapi"
+    canvasapi_dir = root_path / "canvasapi-get"
 
     if not canvasapi_dir.exists():
         return []

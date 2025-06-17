@@ -25,8 +25,8 @@ class Submission(CanvasObject):
             submissions/:submission_id/peer_reviews \
         <https://canvas.instructure.com/doc/api/peer_reviews.html#method.peer_reviews_api.index>`_
 
-        :rtype: :class:`canvasapi.paginated_list.PaginatedList` of
-            :class:`canvasapi.peer_review.PeerReview`
+        :rtype: :class:`canvasapi-get.paginated_list.PaginatedList` of
+            :class:`canvasapi-get.peer_review.PeerReview`
         """
         return PaginatedList(
             PeerReview,
