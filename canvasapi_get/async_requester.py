@@ -4,6 +4,8 @@ import asyncio
 import logging
 import random
 import ssl
+import threading
+import weakref
 from datetime import datetime
 from pprint import pformat
 
@@ -57,8 +59,14 @@ class AsyncRequester:
 
     This class handles HTTP requests with dynamic concurrency control, exponential
     backoff, and circuit breaker patterns to maximize throughput while respecting
-    Canvas rate limits.
+    Canvas rate limits. Enhanced with per-loop session management for background
+    loop compatibility.
     """
+
+    # Class-level session registry for all AsyncRequester instances
+    _session_registry: dict[asyncio.AbstractEventLoop, aiohttp.ClientSession] = {}
+    _registry_lock = threading.Lock()
+    _cleanup_callbacks: dict[asyncio.AbstractEventLoop, list] = {}
 
     def __init__(
         self,
@@ -86,7 +94,7 @@ class AsyncRequester:
             enable_rate_limiting: Whether to enable intelligent rate limiting.
             base_concurrency: Default number of concurrent requests.
             max_concurrency: Maximum number of concurrent requests.
-            session: Optional existing aiohttp session to use.
+            session: Optional existing aiohttp session to use (deprecated in favor of per-loop sessions).
         """
         # Preserve the original base url and add "/api/v1" to it
         self.original_url = base_url
@@ -94,11 +102,6 @@ class AsyncRequester:
         self.new_quizzes_url = base_url + "/api/quiz/v1/"
         self.graphql = base_url + "/api/graphql"
         self.access_token = access_token
-
-        # HTTP session management
-        self._session = session
-        self._owns_session = session is None
-        self._session_lock = asyncio.Lock()
 
         # Cache for responses
         self._cache: list = []
@@ -118,6 +121,19 @@ class AsyncRequester:
             max_concurrency=max_concurrency,
         )
 
+        # Store session configuration for per-loop session creation
+        self._session_config = {
+            "ssl_context": ssl.create_default_context(cafile=certifi.where()),
+            "connector_kwargs": {
+                "limit": 100,
+                "limit_per_host": 30,
+            },
+            "timeout": aiohttp.ClientTimeout(total=300, connect=30),
+        }
+
+        # If a session was provided, we'll use it as a fallback but prefer per-loop sessions
+        self._fallback_session = session
+
     async def __aenter__(self):
         """Async context manager entry."""
         await self._ensure_session()
@@ -125,29 +141,170 @@ class AsyncRequester:
 
     async def __aexit__(self, exc_type, exc_val, exc_tb):
         """Async context manager exit."""
-        await self.close()
+        # Note: We don't close per-loop sessions here as they may be shared
+        # Session cleanup is handled by loop shutdown hooks
+        pass
 
-    async def _ensure_session(self) -> None:
-        """Ensure aiohttp session is available."""
-        async with self._session_lock:
-            if self._session is None or self._session.closed:
-                ssl_context = ssl.create_default_context(cafile=certifi.where())
-                connector = aiohttp.TCPConnector(
-                    ssl=ssl_context,
-                    limit=100,
-                    limit_per_host=30,
-                )
-                timeout = aiohttp.ClientTimeout(total=300, connect=30)
-                self._session = aiohttp.ClientSession(
-                    connector=connector,
-                    timeout=timeout,
-                    raise_for_status=False,
-                )
+    @classmethod
+    def _get_current_loop(cls) -> asyncio.AbstractEventLoop | None:
+        """
+        Get the currently running event loop.
+
+        Returns:
+            The current event loop or None if no loop is running.
+        """
+        try:
+            return asyncio.get_running_loop()
+        except RuntimeError:
+            return None
+
+    @classmethod
+    def _create_session_for_loop(
+        cls, loop: asyncio.AbstractEventLoop
+    ) -> aiohttp.ClientSession:
+        """
+        Create a new aiohttp session for the specified loop.
+
+        Args:
+            loop: The event loop to create the session for.
+
+        Returns:
+            A new aiohttp ClientSession configured for Canvas API use.
+        """
+        ssl_context = ssl.create_default_context(cafile=certifi.where())
+        connector = aiohttp.TCPConnector(
+            ssl=ssl_context,
+            limit=100,
+            limit_per_host=30,
+        )
+        timeout = aiohttp.ClientTimeout(total=300, connect=30)
+
+        session = aiohttp.ClientSession(
+            connector=connector,
+            timeout=timeout,
+            raise_for_status=False,
+        )
+
+        logger.debug(f"Created new aiohttp session for loop {id(loop)}")
+        return session
+
+    @classmethod
+    def _register_loop_cleanup(cls, loop: asyncio.AbstractEventLoop) -> None:
+        """
+        Register cleanup callback for when the event loop shuts down.
+
+        Args:
+            loop: The event loop to register cleanup for.
+        """
+
+        def cleanup_session():
+            """Cleanup callback to remove session when loop shuts down."""
+            with cls._registry_lock:
+                session = cls._session_registry.pop(loop, None)
+                if session and not session.closed:
+                    # Schedule session closure in the loop if it's still running
+                    try:
+                        if not loop.is_closed():
+                            loop.create_task(session.close())
+                    except RuntimeError:
+                        # Loop is already closed, session will be garbage collected
+                        pass
+
+                # Remove cleanup callbacks for this loop
+                cls._cleanup_callbacks.pop(loop, None)
+
+            logger.debug(f"Cleaned up session for loop {id(loop)}")
+
+        # Use weak reference to avoid keeping the loop alive
+        loop_ref = weakref.ref(loop, lambda ref: cleanup_session())
+
+        # Store cleanup callback
+        with cls._registry_lock:
+            if loop not in cls._cleanup_callbacks:
+                cls._cleanup_callbacks[loop] = []
+            cls._cleanup_callbacks[loop].append(cleanup_session)
+
+    @classmethod
+    def _get_session_for_loop(
+        cls, loop: asyncio.AbstractEventLoop
+    ) -> aiohttp.ClientSession:
+        """
+        Get or create an aiohttp session for the specified event loop.
+
+        Args:
+            loop: The event loop to get a session for.
+
+        Returns:
+            An aiohttp ClientSession associated with the specified loop.
+        """
+        with cls._registry_lock:
+            # Check if we already have a session for this loop
+            session = cls._session_registry.get(loop)
+
+            if session is None or session.closed:
+                # Create new session for this loop
+                session = cls._create_session_for_loop(loop)
+                cls._session_registry[loop] = session
+
+                # Register cleanup callback
+                cls._register_loop_cleanup(loop)
+
+            return session
+
+    async def _ensure_session(self) -> aiohttp.ClientSession:
+        """
+        Ensure an aiohttp session is available for the current loop.
+
+        Returns:
+            An aiohttp ClientSession ready for use.
+
+        Raises:
+            RuntimeError: If no event loop is running and no fallback session available.
+        """
+        current_loop = self._get_current_loop()
+
+        if current_loop is not None:
+            # We're in an async context, use per-loop session
+            return self._get_session_for_loop(current_loop)
+
+        elif self._fallback_session is not None and not self._fallback_session.closed:
+            # Use fallback session if available
+            logger.debug("Using fallback session (no running event loop)")
+            return self._fallback_session
+
+        else:
+            raise RuntimeError(
+                "No event loop is running and no fallback session available. "
+                "AsyncRequester must be used within an async context."
+            )
+
+    @classmethod
+    async def cleanup_all_sessions(cls) -> None:
+        """
+        Cleanup all sessions in the registry.
+
+        This is typically called during application shutdown.
+        """
+        with cls._registry_lock:
+            sessions_to_close = list(cls._session_registry.values())
+            cls._session_registry.clear()
+            cls._cleanup_callbacks.clear()
+
+        # Close all sessions
+        for session in sessions_to_close:
+            if not session.closed:
+                try:
+                    await session.close()
+                except Exception as e:
+                    logger.warning(f"Error closing session during cleanup: {e}")
+
+        logger.debug("Cleaned up all AsyncRequester sessions")
 
     async def close(self) -> None:
-        """Close the HTTP session if we own it."""
-        if self._owns_session and self._session and not self._session.closed:
-            await self._session.close()
+        """Close any fallback session owned by this instance."""
+        if self._fallback_session is not None and not self._fallback_session.closed:
+            await self._fallback_session.close()
+            logger.debug("Closed fallback session")
 
     @staticmethod
     def _parse_rate_limit_headers(
@@ -297,13 +454,14 @@ class AsyncRequester:
             ResourceDoesNotExist: For 404 responses.
             Conflict: For 409 responses.
             UnprocessableEntity: For 422 responses.
+            RuntimeError: If no session is available.
         """
         if method.upper() != "GET":
             raise CanvasException(
                 f"Unsupported HTTP method: {method}; only GET allowed"
             )
 
-        await self._ensure_session()
+        session = await self._ensure_session()
 
         # Build URL
         if not _url:
@@ -358,7 +516,7 @@ class AsyncRequester:
                     logger.debug(f"Params: {pformat(params)}")
 
                 # Make the request
-                async with self._session.get(
+                async with session.get(
                     full_url, headers=headers, params=params
                 ) as response:
                     # Read response content
