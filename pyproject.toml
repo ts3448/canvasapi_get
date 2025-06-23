@@ -13,6 +13,7 @@ arrow = "^1.3.0"
 pytz = "^2025.2"
 requests = "^2.32.4"
 aiohttp = "^3.12.13"
+python-dotenv = "^1.1.0"
 
 
 [build-system]
