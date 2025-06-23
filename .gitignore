@@ -24,3 +24,5 @@ setup.sh
 .*.swp
 
 .idea
+
+.env
