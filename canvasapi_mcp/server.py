@@ -13,7 +13,7 @@ from mcp.types import Resource, Tool, TextContent, ListResourcesResult, ListTool
 from canvasapi_get.canvas import Canvas
 from canvasapi_get.exceptions import CanvasException
 from .tools.canvas_query import CanvasQueryTool
-from .tools.method_discovery import MethodDiscoveryTool, MethodInfoTool
+from .tools.method_discovery import MethodDiscoveryTool, MethodInfoTool, PandasOperationsTool
 from .resolvers.method_resolver import MethodResolver
 from .validation import ValidationError
 
@@ -51,6 +51,7 @@ class CanvasAPIMCPServer:
         self.query_tool = CanvasQueryTool(self.canvas)
         self.discovery_tool = MethodDiscoveryTool(self.canvas)
         self.method_info_tool = MethodInfoTool(self.canvas)
+        self.pandas_operations_tool = PandasOperationsTool(self.canvas)
         self.method_resolver = MethodResolver(self.canvas)
         
         # Initialize MCP server
@@ -181,6 +182,7 @@ class CanvasAPIMCPServer:
             tools = [
                 self.discovery_tool.get_tool_definition(),
                 self.method_info_tool.get_tool_definition(),
+                self.pandas_operations_tool.get_tool_definition(),
                 self.query_tool.get_tool_definition()
             ]
             return ListToolsResult(tools=tools)
@@ -195,13 +197,16 @@ class CanvasAPIMCPServer:
                 elif name == "get_canvas_method_info":
                     result = await self.method_info_tool.execute(arguments)
                     return CallToolResult(content=result)
+                elif name == "get_pandas_operations":
+                    result = await self.pandas_operations_tool.execute(arguments)
+                    return CallToolResult(content=result)
                 elif name == "canvas_query":
                     result = await self.query_tool.execute(arguments)
                     return CallToolResult(content=result)
                 else:
                     error_content = [TextContent(
                         type="text",
-                        text=f"Unknown tool: {name}. Available tools: discover_canvas_methods, get_canvas_method_info, canvas_query"
+                        text=f"Unknown tool: {name}. Available tools: discover_canvas_methods, get_canvas_method_info, get_pandas_operations, canvas_query"
                     )]
                     return CallToolResult(content=error_content)
                     
@@ -249,7 +254,7 @@ class CanvasAPIMCPServer:
         return {
             "server_name": self.server_name,
             "canvas_url": self.canvas_url,
-            "available_tools": ["discover_canvas_methods", "get_canvas_method_info", "canvas_query"],
+            "available_tools": ["discover_canvas_methods", "get_canvas_method_info", "get_pandas_operations", "canvas_query"],
             "supported_object_types": self.method_resolver.get_available_object_types(),
             "version": "0.1.0"
         }

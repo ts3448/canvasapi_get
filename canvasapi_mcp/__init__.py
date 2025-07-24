@@ -15,7 +15,7 @@ Key Features:
 from .server import CanvasAPIMCPServer
 from .validation import validator, ValidationError
 from .tools.canvas_query import CanvasQueryTool
-from .tools.method_discovery import MethodDiscoveryTool, MethodInfoTool
+from .tools.method_discovery import MethodDiscoveryTool, MethodInfoTool, PandasOperationsTool
 from .resolvers.method_resolver import MethodResolver
 
 __version__ = "0.1.0"
@@ -23,7 +23,8 @@ __all__ = [
     "CanvasAPIMCPServer",
     "CanvasQueryTool",
     "MethodDiscoveryTool",
-    "MethodInfoTool", 
+    "MethodInfoTool",
+    "PandasOperationsTool", 
     "MethodResolver",
     "validator",
     "ValidationError"

@@ -15,6 +15,7 @@ from canvasapi_get.exceptions import CanvasException
 from ..resolvers.method_resolver import MethodResolver, MethodResolutionError
 from ..validation import validator, ValidationError
 from ..utils.dataframe_converter import converter as df_converter
+from ..utils.pandas_engine import PandasEngine, PandasOperationError
 
 
 class CanvasQueryTool:
@@ -36,6 +37,7 @@ class CanvasQueryTool:
         """
         self.canvas = canvas
         self.resolver = MethodResolver(canvas)
+        self.pandas_engine = PandasEngine()
     
     def get_tool_definition(self) -> Tool:
         """
@@ -54,6 +56,7 @@ class CanvasQueryTool:
             - Retrieve courses, users, assignments, etc. with full parameter support
             - Chain method calls (e.g., get assignment from specific course)
             - Handle pagination automatically
+            - Apply server-side pandas operations for filtering and processing
             - Get comprehensive error information
             
             Examples:
@@ -93,6 +96,21 @@ class CanvasQueryTool:
                         "enum": ["json", "summary", "count", "dataframe", "csv"],
                         "default": "json"
                     },
+                    "pandas_operations": {
+                        "type": "array",
+                        "description": "List of pandas operations to apply server-side",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "operation": {
+                                    "type": "string",
+                                    "description": "Pandas operation name (query, sort_values, head, etc.)"
+                                }
+                            },
+                            "required": ["operation"],
+                            "additionalProperties": True
+                        }
+                    },
                     "limit": {
                         "type": "integer",
                         "description": "Limit number of results (for paginated responses)",
@@ -122,6 +140,7 @@ class CanvasQueryTool:
             method_name = arguments.get("method")
             parameters = arguments.get("parameters", {})
             output_format = arguments.get("output_format", "json")
+            pandas_operations = arguments.get("pandas_operations", [])
             limit = arguments.get("limit")
             
             # Validate required arguments
@@ -150,7 +169,7 @@ class CanvasQueryTool:
             )
             
             # Format the response
-            formatted_result = self._format_result(result, output_format, limit)
+            formatted_result = self._format_result(result, output_format, pandas_operations, limit)
             
             return [TextContent(
                 type="text",
@@ -182,6 +201,15 @@ class CanvasQueryTool:
                 }, indent=2)
             )]
             
+        except PandasOperationError as e:
+            return [TextContent(
+                type="text",
+                text=json.dumps({
+                    "error": "pandas_operation_error",
+                    "message": str(e)
+                }, indent=2)
+            )]
+            
         except Exception as e:
             return [TextContent(
                 type="text",
@@ -192,22 +220,23 @@ class CanvasQueryTool:
                 }, indent=2)
             )]
     
-    def _format_result(self, result, output_format: str, limit: int | None = None) -> dict:
+    def _format_result(self, result, output_format: str, pandas_operations: list = None, limit: int | None = None) -> dict:
         """
         Format the Canvas API result for MCP response.
         
         Args:
             result: Canvas API result
             output_format: Desired output format
+            pandas_operations: List of pandas operations to apply
             limit: Optional result limit
             
         Returns:
             Formatted result dictionary
         """
         try:
-            # Handle DataFrame/CSV formats specially
-            if output_format in ["dataframe", "csv"]:
-                return self._format_dataframe_result(result, output_format, limit)
+            # Handle DataFrame/CSV formats specially (with pandas operations)
+            if output_format in ["dataframe", "csv"] or pandas_operations:
+                return self._format_dataframe_result(result, output_format, pandas_operations, limit)
             
             # Handle different result types
             if isinstance(result, PaginatedList):
@@ -232,13 +261,14 @@ class CanvasQueryTool:
                 "raw_result_type": type(result).__name__
             }
     
-    def _format_dataframe_result(self, result, output_format: str, limit: int | None = None) -> dict:
+    def _format_dataframe_result(self, result, output_format: str, pandas_operations: list = None, limit: int | None = None) -> dict:
         """
         Format result as DataFrame or CSV.
         
         Args:
             result: Canvas API result to convert
-            output_format: "dataframe" or "csv"
+            output_format: "dataframe", "csv", or other format
+            pandas_operations: List of pandas operations to apply
             limit: Optional limit for large datasets
             
         Returns:
@@ -247,8 +277,16 @@ class CanvasQueryTool:
         try:
             # Convert to DataFrame
             df = df_converter.convert_to_dataframe(result)
+            original_shape = df.shape
             
-            # Apply limit if specified
+            # Apply pandas operations if specified
+            if pandas_operations:
+                df = self.pandas_engine.apply_operations(df, pandas_operations)
+                operations_applied = True
+            else:
+                operations_applied = False
+            
+            # Apply limit if specified (after pandas operations)
             if limit and len(df) > limit:
                 df = df.head(limit)
                 limited = True
@@ -262,7 +300,10 @@ class CanvasQueryTool:
                     "format": "csv",
                     "csv_data": df.to_csv(index=False),
                     "shape": df.shape,
+                    "original_shape": original_shape,
                     "columns": list(df.columns),
+                    "operations_applied": operations_applied,
+                    "pandas_operations": pandas_operations if operations_applied else [],
                     "limited": limited,
                     "total_rows": len(df)
                 }
@@ -271,18 +312,24 @@ class CanvasQueryTool:
                 df_info = df_converter.get_dataframe_info(df)
                 export_formats = df_converter.export_to_formats(df)
                 
+                # Handle case where pandas operations resulted in a different format (like aggregation output)
+                result_format = "dataframe" if output_format in ["dataframe", "csv"] else "pandas_processed"
+                
                 return {
                     "success": True,
-                    "result_type": "dataframe",
-                    "format": "dataframe", 
+                    "result_type": result_format,
+                    "format": output_format if output_format in ["dataframe", "csv"] else "json", 
                     "dataframe_info": df_info,
                     "data": export_formats.get("json", []),
                     "csv_data": export_formats.get("csv", ""),
                     "summary_stats": export_formats.get("summary_stats", {}),
+                    "original_shape": original_shape,
+                    "final_shape": df.shape,
+                    "operations_applied": operations_applied,
+                    "pandas_operations": pandas_operations if operations_applied else [],
                     "limited": limited,
-                    "shape": df.shape,
                     "columns": list(df.columns),
-                    "dtypes": df.dtypes.to_dict()
+                    "dtypes": {k: str(v) for k, v in df.dtypes.to_dict().items()}
                 }
                 
         except Exception as e:

@@ -11,6 +11,7 @@ from mcp.types import Tool, TextContent
 from canvasapi_get.canvas import Canvas
 from canvasapi_get.canvas_object import CanvasObject
 from ..resolvers.method_resolver import MethodResolver, MethodResolutionError
+from ..utils.pandas_engine import PandasEngine
 
 
 class MethodDiscoveryTool:
@@ -31,6 +32,7 @@ class MethodDiscoveryTool:
         """
         self.canvas = canvas
         self.resolver = MethodResolver(canvas)
+        self.pandas_engine = PandasEngine()
     
     def get_tool_definition(self) -> Tool:
         """
@@ -125,6 +127,11 @@ class MethodDiscoveryTool:
                 "object_type": object_type,
                 "method_count": len(methods),
                 "methods": methods if include_details else [m["name"] for m in methods],
+                "pandas_operations": {
+                    "available": True,
+                    "operations_count": len(self.pandas_engine.get_available_operations()),
+                    "note": "Use 'get_pandas_operations' for detailed pandas operation info"
+                },
                 "discovery_info": {
                     "prefix_filter": method_prefix or "none",
                     "include_details": include_details,
@@ -381,3 +388,241 @@ class MethodInfoTool:
                 example["arguments"]["parameters"] = example_params
         
         return example
+
+
+class PandasOperationsTool:
+    """
+    Pandas operations information tool for MCP integration.
+    
+    This tool provides information about available pandas operations that can
+    be applied server-side to Canvas data through the canvas_query tool.
+    """
+    
+    def __init__(self, canvas: Canvas):
+        """
+        Initialize the pandas operations tool.
+        
+        Args:
+            canvas: Canvas API instance (for consistency with other tools)
+        """
+        self.canvas = canvas
+        self.pandas_engine = PandasEngine()
+    
+    def get_tool_definition(self) -> Tool:
+        """
+        Get the MCP tool definition for pandas operations info.
+        
+        Returns:
+            MCP Tool definition
+        """
+        return Tool(
+            name="get_pandas_operations",
+            description="""
+            Get information about available pandas operations for server-side Canvas data processing.
+            
+            This tool provides documentation about pandas operations that can be applied
+            to Canvas data through the canvas_query tool's pandas_operations parameter.
+            
+            Examples:
+            - List all operations: {"list_all": true}
+            - Get specific operation info: {"operation_name": "query"}
+            - Get operation examples: {"include_examples": true}
+            """,
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "operation_name": {
+                        "type": "string",
+                        "description": "Specific pandas operation to get info about"
+                    },
+                    "list_all": {
+                        "type": "boolean",
+                        "description": "List all available operations",
+                        "default": false
+                    },
+                    "include_examples": {
+                        "type": "boolean",
+                        "description": "Include usage examples for operations",
+                        "default": false
+                    },
+                    "category": {
+                        "type": "string",
+                        "description": "Filter by operation category",
+                        "enum": ["filtering", "sorting", "aggregation", "cleaning", "statistical"]
+                    }
+                },
+                "additionalProperties": false
+            }
+        )
+    
+    async def execute(self, arguments: dict) -> list[TextContent]:
+        """
+        Execute pandas operations info retrieval.
+        
+        Args:
+            arguments: Tool arguments from MCP request
+            
+        Returns:
+            List of TextContent responses
+        """
+        try:
+            operation_name = arguments.get("operation_name")
+            list_all = arguments.get("list_all", False)
+            include_examples = arguments.get("include_examples", False)
+            category = arguments.get("category")
+            
+            if operation_name:
+                # Get specific operation info
+                all_operations = self.pandas_engine.get_available_operations()
+                if operation_name not in all_operations:
+                    return [TextContent(
+                        type="text",
+                        text=json.dumps({
+                            "error": "operation_not_found",
+                            "message": f"Operation '{operation_name}' not found",
+                            "available_operations": list(all_operations.keys())
+                        }, indent=2)
+                    )]
+                
+                result = {
+                    "success": True,
+                    "operation_name": operation_name,
+                    "operation_info": all_operations[operation_name],
+                    "usage_example": self._generate_pandas_usage_example(operation_name, all_operations[operation_name])
+                }
+            
+            elif list_all:
+                # List all operations
+                all_operations = self.pandas_engine.get_available_operations()
+                
+                # Filter by category if specified
+                if category:
+                    filtered_ops = self._filter_operations_by_category(all_operations, category)
+                else:
+                    filtered_ops = all_operations
+                
+                result = {
+                    "success": True,
+                    "total_operations": len(all_operations),
+                    "displayed_operations": len(filtered_ops),
+                    "category_filter": category or "none",
+                    "operations": filtered_ops if include_examples else list(filtered_ops.keys()),
+                    "operation_categories": self._get_operation_categories()
+                }
+                
+                if include_examples:
+                    result["example_sequences"] = self.pandas_engine.get_operation_examples()
+            
+            else:
+                # Default: overview with categories
+                all_operations = self.pandas_engine.get_available_operations()
+                categories = self._get_operation_categories()
+                
+                result = {
+                    "success": True,
+                    "overview": "Pandas operations for server-side Canvas data processing",
+                    "total_operations": len(all_operations),
+                    "operation_categories": categories,
+                    "example_sequences": self.pandas_engine.get_operation_examples() if include_examples else {},
+                    "usage_info": {
+                        "how_to_use": "Add 'pandas_operations' parameter to canvas_query tool",
+                        "operations_format": "List of operation dictionaries with 'operation' key",
+                        "example": [
+                            {"operation": "query", "expr": "status == 'active'"},
+                            {"operation": "sort_values", "by": "created_at", "ascending": False},
+                            {"operation": "head", "n": 50}
+                        ]
+                    }
+                }
+            
+            return [TextContent(
+                type="text",
+                text=json.dumps(result, indent=2, default=str)
+            )]
+            
+        except Exception as e:
+            return [TextContent(
+                type="text",
+                text=json.dumps({
+                    "error": "pandas_operations_error",
+                    "message": str(e),
+                    "type": type(e).__name__
+                }, indent=2)
+            )]
+    
+    def _filter_operations_by_category(self, operations: dict, category: str) -> dict:
+        """Filter operations by category."""
+        category_mapping = {
+            "filtering": ["query", "head", "tail", "sample", "dropna"],
+            "sorting": ["sort_values", "sort_index"],
+            "aggregation": ["groupby", "agg", "describe", "value_counts"],
+            "cleaning": ["drop_duplicates", "fillna", "reset_index", "set_index"],
+            "statistical": ["describe", "value_counts"]
+        }
+        
+        if category not in category_mapping:
+            return operations
+        
+        category_ops = category_mapping[category]
+        return {k: v for k, v in operations.items() if k in category_ops}
+    
+    def _get_operation_categories(self) -> dict:
+        """Get operation categories with descriptions."""
+        return {
+            "filtering": {
+                "description": "Filter and select data",
+                "operations": ["query", "head", "tail", "sample", "dropna"]
+            },
+            "sorting": {
+                "description": "Sort data by columns or index",
+                "operations": ["sort_values", "sort_index"]
+            },
+            "aggregation": {
+                "description": "Group and aggregate data",
+                "operations": ["groupby", "agg", "describe", "value_counts"]
+            },
+            "cleaning": {
+                "description": "Clean and transform data structure",
+                "operations": ["drop_duplicates", "fillna", "reset_index", "set_index"]
+            },
+            "statistical": {
+                "description": "Statistical analysis and summaries",
+                "operations": ["describe", "value_counts"]
+            }
+        }
+    
+    def _generate_pandas_usage_example(self, operation_name: str, operation_info: dict) -> dict:
+        """Generate usage example for a pandas operation."""
+        base_example = {
+            "tool": "canvas_query",
+            "arguments": {
+                "object_type": "course",
+                "object_id": "YOUR_COURSE_ID",
+                "method": "get_enrollments",
+                "pandas_operations": [
+                    json.loads(operation_info["example"])
+                ],
+                "output_format": "dataframe"
+            }
+        }
+        
+        return {
+            "single_operation": base_example,
+            "in_sequence": {
+                "description": f"Using {operation_name} as part of a sequence",
+                "example": {
+                    "tool": "canvas_query",
+                    "arguments": {
+                        "object_type": "course",
+                        "object_id": "YOUR_COURSE_ID", 
+                        "method": "get_enrollments",
+                        "pandas_operations": [
+                            {"operation": "dropna", "subset": ["email"]},
+                            json.loads(operation_info["example"]),
+                            {"operation": "head", "n": 100}
+                        ],
+                        "output_format": "csv"
+                    }
+                }
+            }
+        }
