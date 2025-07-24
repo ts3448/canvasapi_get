@@ -107,36 +107,15 @@ The library is being expanded with MCP (Model Context Protocol) server functiona
 
 ### MCP Architecture Strategy
 
-**Generic Tool Design**: Instead of creating individual MCP tools for each Canvas method, the expansion implements a single universal `canvas_query` tool with method chaining:
-
-```python
-canvas_query(
-    method="get_courses",           # Canvas method name
-    from_object="account",          # Source object for method chaining
-    from_object_id=439,            # ID of source object
-    parameters={                    # Canvas API method parameters
-        "enrollment_term_id": 583
-    },
-    pandas_operations=[             # Flexible DataFrame operations
-        {
-            "operation": "query",
-            "params": {"expr": "name.str.contains('CHEM')"}
-        },
-        {
-            "operation": "sort_values", 
-            "params": {"by": "enrollment_count", "ascending": False}
-        }
-    ],
-    output_format="table"           # Response format
-)
-```
+**Generic Tool Design**: Instead of creating individual MCP tools for each Canvas method, implement a single universal tool that can call any Canvas method directly by specifying the target object type, method name, and parameters. This approach supports all 300+ Canvas methods automatically through dynamic resolution.
 
 ### Key MCP Features
 
-**1. Method Chaining Resolution**
-- Natural Canvas API flow: `canvas.get_account(439)` → `account.get_courses()` → DataFrame operations
-- Dynamic method resolution supports all 300+ Canvas methods automatically
+**1. Direct Method Invocation**
+- Call any Canvas method directly on the appropriate object type
+- Dynamic method resolution discovers and validates available methods
 - Preserves existing async performance and rate limiting
+- No complex chaining logic needed
 
 **2. Universal DataFrame Conversion**
 - Converts any Canvas object/response to pandas DataFrame
@@ -152,7 +131,7 @@ canvas_query(
 
 **4. Intelligent Troubleshooting**
 - Email-based user lookup and diagnostic data gathering
-- Cross-reference multiple Canvas data sources (enrollments, courses, assignments)
+- Cross-reference multiple Canvas data sources automatically
 - Pattern recognition for common Canvas issues
 - Actionable diagnostic reports
 
@@ -172,7 +151,7 @@ canvasapi_get/
 │   ├── tools/
 │   │   └── canvas_query.py    # Generic query tool
 │   ├── resolvers/
-│   │   └── method_resolver.py # Method chaining resolver
+│   │   └── method_resolver.py # Dynamic method resolution
 │   ├── utils/
 │   │   ├── dataframe_converter.py # Canvas object → DataFrame
 │   │   ├── pandas_engine.py   # Safe pandas operations
@@ -184,7 +163,7 @@ canvasapi_get/
 ### MCP Development Phases
 
 **Phase 1: Core Infrastructure**
-- Method chaining resolution system
+- Dynamic method resolution system  
 - Canvas object → MCP tool parameter mapping
 - Basic MCP server setup with error handling
 
