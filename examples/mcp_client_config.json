@@ -1,8 +1,13 @@
 {
   "mcpServers": {
     "canvas-api": {
-      "command": "python",
-      "args": ["-m", "canvasapi_mcp.server"],
+      "command": "uv",
+      "args": [
+        "--directory",
+        "/absolute/path/to/canvasapi_get",
+        "run",
+        "canvasapi-mcp"
+      ],
       "env": {
         "CANVAS_URL": "https://your-school.instructure.com",
         "CANVAS_TOKEN": "your-api-token-here"

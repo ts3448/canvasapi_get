@@ -2,6 +2,32 @@
 
 This directory contains example configurations for using the Canvas API MCP server with different MCP clients.
 
+## Prerequisites
+
+- **uv package manager** installed ([installation guide](https://docs.astral.sh/uv/))
+- **Canvas API MCP Server** installed with MCP dependencies
+- **Valid Canvas API token** with appropriate permissions
+
+## Installation
+
+1. **Install uv** (if not already installed):
+   ```bash
+   curl -LsSf https://astral.sh/uv/install.sh | sh
+   source $HOME/.local/bin/env
+   ```
+
+2. **Install Canvas API MCP Server**:
+   ```bash
+   cd /path/to/canvasapi_get
+   uv sync --extra mcp
+   ```
+
+3. **Test installation**:
+   ```bash
+   uv run canvasapi-mcp --version
+   # Should output: Canvas API MCP Server 0.1.0
+   ```
+
 ## Quick Setup
 
 ### 1. Get Your Canvas API Token
@@ -28,8 +54,13 @@ This directory contains example configurations for using the Canvas API MCP serv
 {
   "mcpServers": {
     "canvas-api": {
-      "command": "python",
-      "args": ["-m", "canvasapi_mcp.server"],
+      "command": "uv",
+      "args": [
+        "--directory",
+        "/absolute/path/to/canvasapi_get",
+        "run",
+        "canvasapi-mcp"
+      ],
       "env": {
         "CANVAS_URL": "https://your-school.instructure.com",
         "CANVAS_TOKEN": "your-api-token-here"
@@ -40,6 +71,7 @@ This directory contains example configurations for using the Canvas API MCP serv
 ```
 
 3. Replace:
+   - `/absolute/path/to/canvasapi_get` with your actual project path
    - `https://your-school.instructure.com` with your Canvas URL
    - `your-api-token-here` with your actual API token
 
