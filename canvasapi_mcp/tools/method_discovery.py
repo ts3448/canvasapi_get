@@ -80,11 +80,11 @@ class MethodDiscoveryTool:
                     "include_details": {
                         "type": "boolean",
                         "description": "Include detailed parameter information for each method",
-                        "default": false
+                        "default": False
                     }
                 },
                 "required": ["object_type"],
-                "additionalProperties": false
+                "additionalProperties": False
             }
         )
     
@@ -285,7 +285,7 @@ class MethodInfoTool:
                     }
                 },
                 "required": ["object_type", "method_name"],
-                "additionalProperties": false
+                "additionalProperties": False
             }
         )
     
@@ -438,12 +438,12 @@ class PandasOperationsTool:
                     "list_all": {
                         "type": "boolean",
                         "description": "List all available operations",
-                        "default": false
+                        "default": False
                     },
                     "include_examples": {
                         "type": "boolean",
                         "description": "Include usage examples for operations",
-                        "default": false
+                        "default": False
                     },
                     "category": {
                         "type": "string",
@@ -451,7 +451,7 @@ class PandasOperationsTool:
                         "enum": ["filtering", "sorting", "aggregation", "cleaning", "statistical"]
                     }
                 },
-                "additionalProperties": false
+                "additionalProperties": False
             }
         )
     

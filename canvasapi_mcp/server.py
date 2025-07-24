@@ -9,7 +9,7 @@ MCP protocol communication with comprehensive error handling.
 import asyncio
 import logging
 from mcp.server import Server
-from mcp.types import Resource, Tool, TextContent, ListResourcesResult, ListToolsResult, ReadResourceResult, CallToolResult
+from mcp.types import Tool, TextContent, TextResourceContents, ReadResourceResult
 from canvasapi_get.canvas import Canvas
 from canvasapi_get.exceptions import CanvasException
 from .tools.canvas_query import CanvasQueryTool
@@ -110,23 +110,33 @@ class CanvasAPIMCPServer:
         """Set up MCP protocol handlers."""
         
         @self.server.list_resources()
-        async def list_resources() -> ListResourcesResult:
+        async def list_resources():
             """List available resources."""
-            resources = [
-                Resource(
-                    uri="canvas://methods",
-                    name="Available Canvas Methods",
-                    description="List of all available Canvas API methods by object type",
-                    mimeType="application/json"
-                ),
-                Resource(
-                    uri="canvas://object-types", 
-                    name="Canvas Object Types",
-                    description="List of supported Canvas object types for queries",
-                    mimeType="application/json"
-                )
-            ]
-            return ListResourcesResult(resources=resources)
+            from mcp import types
+            
+            try:
+                logger.info("DEBUG: list_resources called - using proper MCP types")
+                
+                return [
+                    types.Resource(
+                        uri="canvas://methods",
+                        name="Available Canvas Methods",
+                        description="List of all available Canvas API methods by object type",
+                        mimeType="application/json"
+                    ),
+                    types.Resource(
+                        uri="canvas://object-types", 
+                        name="Canvas Object Types",
+                        description="List of supported Canvas object types for queries",
+                        mimeType="application/json"
+                    )
+                ]
+                
+            except Exception as e:
+                logger.error(f"DEBUG: list_resources failed: {e}")
+                import traceback
+                traceback.print_exc()
+                return []
         
         @self.server.read_resource()
         async def read_resource(uri: str) -> ReadResourceResult:
@@ -140,8 +150,9 @@ class CanvasAPIMCPServer:
                         "description": "Available methods on the main Canvas object"
                     }
                     return ReadResourceResult(
-                        contents=[TextContent(
-                            type="text",
+                        contents=[TextResourceContents(
+                            uri=uri,
+                            mimeType="application/json",
                             text=str(content)
                         )]
                     )
@@ -153,16 +164,18 @@ class CanvasAPIMCPServer:
                         "description": "Canvas object types that can be queried"
                     }
                     return ReadResourceResult(
-                        contents=[TextContent(
-                            type="text", 
+                        contents=[TextResourceContents(
+                            uri=uri,
+                            mimeType="application/json", 
                             text=str(content)
                         )]
                     )
                 
                 else:
                     return ReadResourceResult(
-                        contents=[TextContent(
-                            type="text",
+                        contents=[TextResourceContents(
+                            uri=uri,
+                            mimeType="text/plain",
                             text=f"Resource not found: {uri}"
                         )]
                     )
@@ -170,53 +183,114 @@ class CanvasAPIMCPServer:
             except Exception as e:
                 logger.error(f"Error reading resource {uri}: {str(e)}")
                 return ReadResourceResult(
-                    contents=[TextContent(
-                        type="text",
+                    contents=[TextResourceContents(
+                        uri=uri,
+                        mimeType="text/plain",
                         text=f"Error reading resource: {str(e)}"
                     )]
                 )
-        
+
         @self.server.list_tools()
-        async def list_tools() -> ListToolsResult:
-            """List available tools."""
-            tools = [
-                self.discovery_tool.get_tool_definition(),
-                self.method_info_tool.get_tool_definition(),
-                self.pandas_operations_tool.get_tool_definition(),
-                self.query_tool.get_tool_definition()
-            ]
-            return ListToolsResult(tools=tools)
+        async def list_tools():
+            """List available tools using proper MCP patterns."""
+            import sys
+            import traceback
+
+            try:
+                logger.info("DEBUG: list_tools handler called - using proper MCP types")
+
+                # Get each tool definition individually
+                tools = []
+
+                try:
+                    logger.info("DEBUG: Getting discovery_tool definition...")
+                    discovery_def = self.discovery_tool.get_tool_definition()
+                    logger.info(f"DEBUG: discovery_tool type: {type(discovery_def)}")
+                    logger.info(f"DEBUG: discovery_tool name: {discovery_def.name}")
+                    tools.append(discovery_def)
+                except Exception as e:
+                    logger.error(f"DEBUG: discovery_tool failed: {e}")
+                    traceback.print_exc(file=sys.stderr)
+
+                try:
+                    logger.info("DEBUG: Getting method_info_tool definition...")
+                    method_info_def = self.method_info_tool.get_tool_definition()
+                    logger.info(f"DEBUG: method_info_tool type: {type(method_info_def)}")
+                    logger.info(f"DEBUG: method_info_tool name: {method_info_def.name}")
+                    tools.append(method_info_def)
+                except Exception as e:
+                    logger.error(f"DEBUG: method_info_tool failed: {e}")
+                    traceback.print_exc(file=sys.stderr)
+
+                try:
+                    logger.info("DEBUG: Getting pandas_operations_tool definition...")
+                    pandas_def = self.pandas_operations_tool.get_tool_definition()
+                    logger.info(f"DEBUG: pandas_operations_tool type: {type(pandas_def)}")
+                    logger.info(f"DEBUG: pandas_operations_tool name: {pandas_def.name}")
+                    tools.append(pandas_def)
+                except Exception as e:
+                    logger.error(f"DEBUG: pandas_operations_tool failed: {e}")
+                    traceback.print_exc(file=sys.stderr)
+
+                try:
+                    logger.info("DEBUG: Getting query_tool definition...")
+                    query_def = self.query_tool.get_tool_definition()
+                    logger.info(f"DEBUG: query_tool type: {type(query_def)}")
+                    logger.info(f"DEBUG: query_tool name: {query_def.name}")
+                    tools.append(query_def)
+                except Exception as e:
+                    logger.error(f"DEBUG: query_tool failed: {e}")
+                    traceback.print_exc(file=sys.stderr)
+
+                logger.info(f"DEBUG: Total tools collected: {len(tools)}")
+                logger.info("DEBUG: Returning tools list")
+                return tools
+
+            except Exception as e:
+                logger.error(f"DEBUG: list_tools handler failed with error: {e}")
+                logger.error(f"DEBUG: Error type: {type(e)}")
+                traceback.print_exc(file=sys.stderr)
+
+                # Return empty result to avoid crashing
+                return []
         
         @self.server.call_tool()
-        async def call_tool(name: str, arguments: dict) -> CallToolResult:
-            """Handle tool calls."""
+        async def call_tool(name: str, arguments: dict):
+            """Handle tool calls using proper MCP patterns."""
             try:
+                logger.info(f"DEBUG: call_tool called with name: {name}")
+                
                 if name == "discover_canvas_methods":
                     result = await self.discovery_tool.execute(arguments)
-                    return CallToolResult(content=result)
+                    logger.info(f"DEBUG: discovery_tool returned: {type(result)}")
+                    return result
                 elif name == "get_canvas_method_info":
                     result = await self.method_info_tool.execute(arguments)
-                    return CallToolResult(content=result)
+                    logger.info(f"DEBUG: method_info_tool returned: {type(result)}")
+                    return result
                 elif name == "get_pandas_operations":
                     result = await self.pandas_operations_tool.execute(arguments)
-                    return CallToolResult(content=result)
+                    logger.info(f"DEBUG: pandas_operations_tool returned: {type(result)}")
+                    return result
                 elif name == "canvas_query":
                     result = await self.query_tool.execute(arguments)
-                    return CallToolResult(content=result)
+                    logger.info(f"DEBUG: canvas_query returned: {type(result)}")
+                    return result
                 else:
-                    error_content = [TextContent(
+                    logger.error(f"DEBUG: Unknown tool: {name}")
+                    return [TextContent(
                         type="text",
                         text=f"Unknown tool: {name}. Available tools: discover_canvas_methods, get_canvas_method_info, get_pandas_operations, canvas_query"
                     )]
-                    return CallToolResult(content=error_content)
                     
             except Exception as e:
-                logger.error(f"Error calling tool {name}: {str(e)}")
-                error_content = [TextContent(
+                logger.error(f"DEBUG: Tool {name} execution error: {str(e)}")
+                import traceback
+                traceback.print_exc()
+                return [TextContent(
                     type="text",
                     text=f"Tool execution error: {str(e)}"
                 )]
-                return CallToolResult(content=error_content)
     
     async def run(self, transport_type: str = "stdio", **transport_kwargs):
         """
