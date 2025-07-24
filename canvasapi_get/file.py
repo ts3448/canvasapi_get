@@ -1,4 +1,7 @@
+import asyncio
+import aiofiles
 from canvasapi_get.canvas_object import CanvasObject
+from canvasapi_get.background_loop import BackgroundLoop
 
 
 class File(CanvasObject):
@@ -14,8 +17,14 @@ class File(CanvasObject):
         """
         response = self._requester.request("GET", _url=self.url)
 
-        with open(location, "wb") as file_out:
-            file_out.write(response.content)
+        # Use async-safe file I/O to prevent blocking the event loop
+        async def _async_write_file(path, content):
+            """Write file using aiofiles to avoid blocking the event loop."""
+            async with aiofiles.open(path, "wb") as file_out:
+                await file_out.write(content)
+        
+        # Execute file I/O through background loop to avoid blocking
+        BackgroundLoop.run(_async_write_file(location, response.content))
 
     def get_contents(self, binary=False):
         """

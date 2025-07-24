@@ -192,7 +192,18 @@ class BackgroundLoop:
 
         # Schedule the coroutine and wait for completion
         future: Future = asyncio.run_coroutine_threadsafe(coro, self._loop)
-        return future.result()  # This blocks until the coroutine completes
+        
+        # Add timeout to prevent indefinite blocking
+        # Use a reasonable timeout that's longer than typical request timeouts
+        try:
+            return future.result(timeout=60.0)  # 60 second timeout
+        except asyncio.TimeoutError:
+            # Cancel the future to clean up resources
+            future.cancel()
+            raise RuntimeError(
+                "Coroutine execution timed out after 60 seconds. "
+                "This may indicate a deadlock or network connectivity issue."
+            )
 
 
 def get_background_loop() -> BackgroundLoop:

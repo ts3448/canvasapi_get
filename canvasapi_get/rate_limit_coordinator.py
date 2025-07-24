@@ -41,12 +41,11 @@ class RateLimitCoordinator:
         self.max_concurrency = max_concurrency
         self.min_concurrency = min_concurrency
         
-        # Core semaphore management
-        self._semaphore = asyncio.Semaphore(base_concurrency)
+        # Core semaphore management - lazily initialized
+        self._semaphore: asyncio.Semaphore | None = None
         self._current_limit = base_concurrency
-        self._adjustment_lock = asyncio.Lock()
-        self._circuit_breaker_event = asyncio.Event()
-        self._circuit_breaker_event.set()  # Start in "open" state (requests allowed)
+        self._adjustment_lock: asyncio.Lock | None = None
+        self._circuit_breaker_event: asyncio.Event | None = None
         
         # Thread safety for cross-context operations
         self._thread_lock = threading.RLock()
@@ -68,6 +67,17 @@ class RateLimitCoordinator:
         self._coordinator_health = 100.0
         self._last_health_update = time.time()
 
+    async def _ensure_async_primitives(self) -> tuple[asyncio.Semaphore, asyncio.Lock, asyncio.Event]:
+        """Ensure async primitives exist for current event loop."""
+        if self._semaphore is None:
+            self._semaphore = asyncio.Semaphore(self._current_limit)
+        if self._adjustment_lock is None:
+            self._adjustment_lock = asyncio.Lock()
+        if self._circuit_breaker_event is None:
+            self._circuit_breaker_event = asyncio.Event()
+            self._circuit_breaker_event.set()  # Start in "open" state (requests allowed)
+        return self._semaphore, self._adjustment_lock, self._circuit_breaker_event
+
     async def acquire(self) -> None:
         """
         Acquire permission to make a request with enhanced monitoring.
@@ -77,11 +87,22 @@ class RateLimitCoordinator:
         """
         acquire_start = time.time()
         
+        logger.debug("RateLimitCoordinator.acquire() called")
+        
+        # Ensure async primitives exist
+        logger.debug("About to call _ensure_async_primitives()")
+        semaphore, _, circuit_breaker_event = await self._ensure_async_primitives()
+        logger.debug(f"Async primitives ensured - semaphore has {semaphore._value} permits available")
+        
         # Wait for circuit breaker to be open
-        await self._circuit_breaker_event.wait()
+        logger.debug("About to wait for circuit breaker event")
+        await circuit_breaker_event.wait()
+        logger.debug("Circuit breaker event passed")
         
         # Acquire semaphore permit
-        await self._semaphore.acquire()
+        logger.debug("About to acquire semaphore permit")
+        await semaphore.acquire()
+        logger.debug("Semaphore permit acquired")
         
         # Track metrics
         acquire_end = time.time()
@@ -97,8 +118,9 @@ class RateLimitCoordinator:
         """Release the request permit with enhanced tracking."""
         release_time = time.time()
         
-        # Release semaphore permit
-        self._semaphore.release()
+        # Release semaphore permit - only if it exists
+        if self._semaphore is not None:
+            self._semaphore.release()
         
         # Track metrics
         with self._thread_lock:
@@ -116,7 +138,8 @@ class RateLimitCoordinator:
         This method uses sophisticated algorithms to dynamically adjust concurrency based on
         quota, health scores, and historical performance patterns.
         """
-        async with self._adjustment_lock:
+        _, adjustment_lock, _ = await self._ensure_async_primitives()
+        async with adjustment_lock:
             with self._thread_lock:
                 current_time = time.time()
                 remaining_quota = await self.rate_limit_state.get_remaining_quota()
@@ -234,15 +257,18 @@ class RateLimitCoordinator:
         
         await self.rate_limit_state.record_throttle()
         
+        # Ensure circuit breaker exists
+        _, _, circuit_breaker_event = await self._ensure_async_primitives()
+        
         # Clear the event to block all new requests
-        self._circuit_breaker_event.clear()
+        circuit_breaker_event.clear()
         
         try:
             # Wait for recovery period
             await asyncio.sleep(recovery_delay)
         finally:
             # Always re-enable requests
-            self._circuit_breaker_event.set()
+            circuit_breaker_event.set()
             logger.info("Circuit breaker recovered, resuming requests")
 
     async def get_current_concurrency(self) -> int:
@@ -252,7 +278,8 @@ class RateLimitCoordinator:
         Returns:
             Current maximum number of concurrent requests allowed.
         """
-        async with self._adjustment_lock:
+        _, adjustment_lock, _ = await self._ensure_async_primitives()
+        async with adjustment_lock:
             with self._thread_lock:
                 return self._current_limit
 
@@ -286,8 +313,8 @@ class RateLimitCoordinator:
                 "max_concurrency": self.max_concurrency,
                 "min_concurrency": self.min_concurrency,
                 "base_concurrency": self.base_concurrency,
-                "circuit_breaker_open": self._circuit_breaker_event.is_set(),
-                "available_permits": getattr(self._semaphore, '_value', 0),
+                "circuit_breaker_open": self._circuit_breaker_event.is_set() if self._circuit_breaker_event else True,
+                "available_permits": getattr(self._semaphore, '_value', 0) if self._semaphore else 0,
                 "total_acquires": self._total_acquires,
                 "total_releases": self._total_releases,
                 "circuit_breaker_trips": self._circuit_breaker_trips,
@@ -328,7 +355,7 @@ class RateLimitCoordinator:
                 "coordinator_health": self._coordinator_health,
                 "rate_limit_health": rate_limit_health,
                 "status": status,
-                "circuit_breaker_healthy": self._circuit_breaker_event.is_set(),
+                "circuit_breaker_healthy": self._circuit_breaker_event.is_set() if self._circuit_breaker_event else True,
                 "utilization_healthy": stats["utilization"] < 0.9,
                 "adjustment_frequency_healthy": stats["recent_adjustments"] < 10,
             }

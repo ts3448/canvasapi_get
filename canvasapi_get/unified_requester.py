@@ -231,7 +231,9 @@ class UnifiedRequester:
         """
         if method.upper() != "GET":
             raise CanvasException(
-                f"Unsupported HTTP method: {method}; only GET allowed"
+                f"Unsupported HTTP method: {method}. This library only supports GET "
+                f"requests for read-only Canvas API access. For full CRUD operations, "
+                f"use the complete 'canvasapi' library instead."
             )
 
         # Log request for compatibility with existing behavior

@@ -27,8 +27,8 @@ class AsyncRateLimitState:
         self.total_cost: float = 0.0
         self.throttle_events: int = 0
         
-        # Async lock for async contexts
-        self._async_lock: asyncio.Lock = asyncio.Lock()
+        # Async lock for async contexts - lazily initialized
+        self._async_lock: asyncio.Lock | None = None
         
         # Thread lock for cross-context safety
         self._thread_lock = threading.RLock()
@@ -42,6 +42,12 @@ class AsyncRateLimitState:
         self._last_throttle_time: float | None = None
         self._health_score = 100.0  # 0-100 scale
 
+    async def _ensure_async_lock(self) -> asyncio.Lock:
+        """Ensure async lock exists for current event loop."""
+        if self._async_lock is None:
+            self._async_lock = asyncio.Lock()
+        return self._async_lock
+
     async def update(self, cost: float | None, remaining: float | None) -> None:
         """
         Update rate limit state from response headers in thread-safe manner.
@@ -52,7 +58,8 @@ class AsyncRateLimitState:
         """
         current_time = time.time()
         
-        async with self._async_lock:
+        async_lock = await self._ensure_async_lock()
+        async with async_lock:
             with self._thread_lock:
                 # Update basic state
                 self.last_request_cost = cost
@@ -83,7 +90,8 @@ class AsyncRateLimitState:
         """Record a throttling event with enhanced tracking."""
         current_time = time.time()
         
-        async with self._async_lock:
+        async_lock = await self._ensure_async_lock()
+        async with async_lock:
             with self._thread_lock:
                 self.throttle_events += 1
                 self._consecutive_throttles += 1
@@ -115,7 +123,8 @@ class AsyncRateLimitState:
             - avg_request_cost: Average cost per request
             - request_rate: Recent request rate (requests per second)
         """
-        async with self._async_lock:
+        async_lock = await self._ensure_async_lock()
+        async with async_lock:
             with self._thread_lock:
                 avg_cost = (
                     self.total_cost / self.total_requests 
@@ -147,7 +156,8 @@ class AsyncRateLimitState:
         Returns:
             The remaining quota or None if not yet determined.
         """
-        async with self._async_lock:
+        async_lock = await self._ensure_async_lock()
+        async with async_lock:
             with self._thread_lock:
                 return self.remaining_quota
 
@@ -158,7 +168,8 @@ class AsyncRateLimitState:
         Returns:
             Health score from 0 (unhealthy) to 100 (excellent).
         """
-        async with self._async_lock:
+        async_lock = await self._ensure_async_lock()
+        async with async_lock:
             with self._thread_lock:
                 return self._health_score
 
@@ -177,7 +188,8 @@ class AsyncRateLimitState:
 
     async def reset(self) -> None:
         """Reset all rate limiting statistics to initial state in thread-safe manner."""
-        async with self._async_lock:
+        async_lock = await self._ensure_async_lock()
+        async with async_lock:
             with self._thread_lock:
                 self.remaining_quota = None
                 self.last_request_cost = None

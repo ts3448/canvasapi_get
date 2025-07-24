@@ -182,18 +182,44 @@ def file_or_path(file):
     """
     Open a file and return the handler if a path is given.
     If a file handler is given, return it directly.
+    
+    Note: File operations use aiofiles when in async context to prevent
+    blocking the event loop.
 
     :param file: A file handler or path to a file.
 
     :returns: A tuple with the open file handler and whether it was a path.
     :rtype: (file, bool)
     """
+    import asyncio
+    import aiofiles
+    from canvasapi_get.background_loop import BackgroundLoop
 
     is_path = False
     if isinstance(file, str):
         if not os.path.exists(file):
             raise IOError("File at path " + file + " does not exist.")
-        file = open(file, "rb")
+        
+        # Use async-safe file opening to prevent blocking the event loop
+        async def _async_open_file(path):
+            """Open file using aiofiles to avoid blocking the event loop."""
+            # Note: aiofiles.open() returns an async context manager
+            # For compatibility with existing code, we need to read the content
+            # and return a file-like object
+            import io
+            async with aiofiles.open(path, "rb") as f:
+                content = await f.read()
+            return io.BytesIO(content)
+        
+        try:
+            # Check if we're in an async context
+            asyncio.get_running_loop()
+            # We're in an async context - use background loop for file opening
+            file = BackgroundLoop.run(_async_open_file(file))
+        except RuntimeError:
+            # No event loop running - use synchronous I/O
+            file = open(file, "rb")
+        
         is_path = True
 
     return file, is_path

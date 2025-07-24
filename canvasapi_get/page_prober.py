@@ -145,7 +145,7 @@ class PageProber:
             params = {**base_params, "page": mid}
             try:
                 resp = (
-                    self._requester.request(
+                    await self._requester.request(
                         request_method,
                         base_url,
                         _url=url_override,
