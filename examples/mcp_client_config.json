@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "canvas-api": {
+      "command": "python",
+      "args": ["-m", "canvasapi_mcp.server"],
+      "env": {
+        "CANVAS_URL": "https://your-school.instructure.com",
+        "CANVAS_TOKEN": "your-api-token-here"
+      }
+    }
+  }
+}

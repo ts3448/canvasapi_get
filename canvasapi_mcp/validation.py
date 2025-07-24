@@ -7,7 +7,7 @@ and kwargs processing.
 """
 
 import inspect
-from typing import Any, Dict, List, Optional, Tuple, Union, Type, get_type_hints
+from collections.abc import Sequence
 from datetime import datetime, date
 from canvasapi_get.canvas_object import CanvasObject
 from canvasapi_get.exceptions import RequiredFieldMissing, BadRequest
@@ -17,7 +17,7 @@ from canvasapi_get.util import obj_or_id, combine_kwargs, normalize_bool, is_mul
 class ValidationError(Exception):
     """Raised when parameter validation fails."""
     
-    def __init__(self, parameter_name: str, message: str, expected_type: Optional[str] = None):
+    def __init__(self, parameter_name: str, message: str, expected_type: str | None = None):
         self.parameter_name = parameter_name
         self.expected_type = expected_type
         super().__init__(f"Parameter '{parameter_name}': {message}")
@@ -120,10 +120,10 @@ class ParameterValidator:
     
     def validate_id_parameter(
         self, 
-        parameter: Any, 
+        parameter, 
         param_name: str, 
-        object_types: Union[str, List[str], Tuple[Type, ...]]
-    ) -> Union[int, str]:
+        object_types: str | list[str] | tuple[type, ...]
+    ) -> int | str:
         """
         Validate and convert Canvas object ID parameter.
         
@@ -159,10 +159,10 @@ class ParameterValidator:
     
     def validate_parameter_type(
         self, 
-        value: Any, 
+        value, 
         param_name: str, 
-        expected_type: Union[str, type, List[Union[str, type]]]
-    ) -> Any:
+        expected_type: str | type | list[str | type]
+    ):
         """
         Validate parameter type and convert if necessary.
         
@@ -181,7 +181,7 @@ class ParameterValidator:
             return None
         
         # Handle list of acceptable types
-        if isinstance(expected_type, list):
+        if isinstance(expected_type, Sequence) and not isinstance(expected_type, str):
             for type_option in expected_type:
                 try:
                     return self.validate_parameter_type(value, param_name, type_option)
@@ -260,7 +260,7 @@ class ParameterValidator:
         
         return value
     
-    def validate_required_parameters(self, parameters: Dict[str, Any], required_params: List[str]):
+    def validate_required_parameters(self, parameters: dict, required_params: list[str]):
         """
         Validate that all required parameters are present and not None.
         
@@ -282,7 +282,7 @@ class ParameterValidator:
                 f"Required parameter(s) missing: {', '.join(missing_params)}"
             )
     
-    def process_kwargs(self, kwargs: Dict[str, Any]) -> List[Tuple[str, Any]]:
+    def process_kwargs(self, kwargs: dict) -> list[tuple]:
         """
         Process kwargs dictionary for Canvas API calls using combine_kwargs utility.
         
@@ -294,7 +294,7 @@ class ParameterValidator:
         """
         return combine_kwargs(**kwargs)
     
-    def convert_canvas_object_to_dict(self, obj: CanvasObject) -> Dict[str, Any]:
+    def convert_canvas_object_to_dict(self, obj: CanvasObject) -> dict:
         """
         Convert Canvas object to dictionary representation for MCP responses.
         
@@ -324,7 +324,7 @@ class ParameterValidator:
         
         return result
     
-    def extract_canvas_ids(self, obj: CanvasObject) -> Dict[str, Union[int, str]]:
+    def extract_canvas_ids(self, obj: CanvasObject) -> dict[str, int | str]:
         """
         Extract all available ID formats from a Canvas object.
         
@@ -358,8 +358,8 @@ class ParameterValidator:
         self, 
         method_name: str, 
         method_obj: callable, 
-        parameters: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        parameters: dict
+    ) -> dict:
         """
         Validate parameters for a specific Canvas method call.
         
@@ -380,10 +380,10 @@ class ParameterValidator:
             # Get method signature
             sig = inspect.signature(method_obj)
             
-            # Get type hints if available
+            # Get type hints if available  
             type_hints = {}
             try:
-                type_hints = get_type_hints(method_obj)
+                type_hints = getattr(method_obj, '__annotations__', {})
             except (NameError, AttributeError):
                 # Type hints might not be available or use forward references
                 pass
@@ -431,7 +431,7 @@ class ParameterValidator:
         
         return validated
     
-    def format_validation_error(self, error: Exception) -> Dict[str, Any]:
+    def format_validation_error(self, error: Exception) -> dict[str, str]:
         """
         Format validation error for MCP response.
         
@@ -464,7 +464,7 @@ class ParameterValidator:
 validator = ParameterValidator()
 
 
-def validate_id_parameter(parameter: Any, param_name: str, object_types: Union[str, List[str]]) -> Union[int, str]:
+def validate_id_parameter(parameter, param_name: str, object_types: str | list[str]) -> int | str:
     """
     Convenience function for ID parameter validation.
     
@@ -479,7 +479,7 @@ def validate_id_parameter(parameter: Any, param_name: str, object_types: Union[s
     return validator.validate_id_parameter(parameter, param_name, object_types)
 
 
-def validate_parameter_type(value: Any, param_name: str, expected_type: Union[str, type]) -> Any:
+def validate_parameter_type(value, param_name: str, expected_type: str | type):
     """
     Convenience function for parameter type validation.
     
@@ -494,7 +494,7 @@ def validate_parameter_type(value: Any, param_name: str, expected_type: Union[st
     return validator.validate_parameter_type(value, param_name, expected_type)
 
 
-def validate_required_parameters(parameters: Dict[str, Any], required_params: List[str]):
+def validate_required_parameters(parameters: dict, required_params: list[str]):
     """
     Convenience function for required parameter validation.
     
@@ -505,7 +505,7 @@ def validate_required_parameters(parameters: Dict[str, Any], required_params: Li
     return validator.validate_required_parameters(parameters, required_params)
 
 
-def process_kwargs(kwargs: Dict[str, Any]) -> List[Tuple[str, Any]]:
+def process_kwargs(kwargs: dict) -> list[tuple]:
     """
     Convenience function for kwargs processing.
     
@@ -518,7 +518,7 @@ def process_kwargs(kwargs: Dict[str, Any]) -> List[Tuple[str, Any]]:
     return validator.process_kwargs(kwargs)
 
 
-def convert_canvas_object_to_dict(obj: CanvasObject) -> Dict[str, Any]:
+def convert_canvas_object_to_dict(obj: CanvasObject) -> dict:
     """
     Convenience function for Canvas object to dict conversion.
     

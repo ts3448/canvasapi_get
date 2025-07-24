@@ -107,33 +107,40 @@ The library is being expanded with MCP (Model Context Protocol) server functiona
 
 ### MCP Architecture Strategy
 
-**Generic Tool Design**: Instead of creating individual MCP tools for each Canvas method, implement a single universal tool that can call any Canvas method directly by specifying the target object type, method name, and parameters. This approach supports all 300+ Canvas methods automatically through dynamic resolution.
+**Three-Tool Design**: The MCP server provides three complementary tools that work together to enable comprehensive Canvas API access:
+
+1. **discover_canvas_methods** - Dynamically explores available Canvas API methods by object type
+2. **get_canvas_method_info** - Provides detailed information about specific methods including parameters and documentation  
+3. **canvas_query** - Executes Canvas API calls with DataFrame/CSV output options
+
+This approach supports all 300+ Canvas methods automatically through dynamic discovery and resolution, eliminating the need for hardcoded method mappings while providing intelligent exploration capabilities.
 
 ### Key MCP Features
 
-**1. Direct Method Invocation**
-- Call any Canvas method directly on the appropriate object type
-- Dynamic method resolution discovers and validates available methods
+**1. Dynamic Method Discovery**
+- **discover_canvas_methods**: Explore available Canvas API methods by object type with filtering
+- **get_canvas_method_info**: Get detailed method documentation, parameters, and signatures
+- Dynamic resolution discovers and validates available methods without hardcoded mappings
 - Preserves existing async performance and rate limiting
-- No complex chaining logic needed
 
-**2. Universal DataFrame Conversion**
+**2. Universal Canvas Query Execution**
+- **canvas_query**: Execute any Canvas API method with parameter validation
+- Supports both direct Canvas methods and object-specific method calls
+- GET-only operations for safe, read-only Canvas interactions
+- Comprehensive error handling with actionable error messages
+
+**3. Universal DataFrame Conversion**
 - Converts any Canvas object/response to pandas DataFrame
 - Handles PaginatedList, single objects, and raw API responses
 - Maintains consistent column naming and data type conversion
 - Memory-efficient processing for large datasets (1000+ records)
+- Multiple output formats: table, JSON, CSV, summary statistics
 
-**3. Flexible Pandas Operations Engine**
-- Safe execution with allowlisted pandas methods
-- Sequential operation processing: query → sort → filter → aggregate
-- SQL-like operations on Canvas data without client-side complexity
-- Error handling for unsafe operations
-
-**4. Intelligent Troubleshooting**
-- Email-based user lookup and diagnostic data gathering
-- Cross-reference multiple Canvas data sources automatically
-- Pattern recognition for common Canvas issues
-- Actionable diagnostic reports
+**4. Environment-Based Security**
+- Secure configuration through environment variables (CANVAS_URL, CANVAS_TOKEN)
+- No hardcoded credentials in configuration files
+- Health check validation for Canvas connectivity
+- Comprehensive logging for debugging and monitoring
 
 ### MCP Module Structure
 
@@ -147,30 +154,95 @@ canvasapi_get/
 │   └── ...
 ├── canvasapi_mcp/             # MCP server (new sibling)
 │   ├── __init__.py
-│   ├── server.py              # Main MCP server
+│   ├── server.py              # Main MCP server with environment-based config
 │   ├── tools/
-│   │   └── canvas_query.py    # Generic query tool
+│   │   ├── canvas_query.py    # Universal Canvas query execution
+│   │   └── method_discovery.py # Dynamic method discovery tools
 │   ├── resolvers/
 │   │   └── method_resolver.py # Dynamic method resolution
 │   ├── utils/
 │   │   ├── dataframe_converter.py # Canvas object → DataFrame
-│   │   ├── pandas_engine.py   # Safe pandas operations
 │   │   └── attribute_discovery.py # Semantic attribute search
 │   └── validation.py          # Parameter validation
+├── examples/                  # Configuration examples
+│   ├── README.md              # Setup and configuration guide
+│   ├── claude_desktop_config.json # Example client configuration
+│   └── mcp_client_config.json # Generic MCP client config
 └── pyproject.toml             # Updated with optional [mcp] extra
 ```
 
 ### MCP Development Phases
 
-**Phase 1: Core Infrastructure**
-- Dynamic method resolution system  
-- Canvas object → MCP tool parameter mapping
-- Basic MCP server setup with error handling
+**Phase 1: Core Infrastructure** ✅ **COMPLETE**
+- ✅ Dynamic method resolution system (`resolvers/method_resolver.py`)
+- ✅ Canvas object → MCP tool parameter mapping (`validation.py`)
+- ✅ Basic MCP server setup with error handling (`server.py`)
+- ✅ Universal Canvas query tool (`tools/canvas_query.py`)
+- ✅ MCP dependencies configuration with optional `[mcp]` extra
 
-**Phase 2: DataFrame Conversion**
-- Universal Canvas object to DataFrame converter
-- Attribute flattening and data type normalization
-- Large dataset optimization and streaming
+**Phase 2: DataFrame Conversion** ✅ **COMPLETE**
+- ✅ Universal Canvas object to DataFrame converter (`utils/dataframe_converter.py`)
+- ✅ Attribute flattening and data type normalization for nested Canvas objects
+- ✅ Large dataset optimization and streaming for PaginatedList processing
+- ✅ Column naming standardization and data type inference
+- ✅ Memory-efficient batch processing for 1000+ record datasets
+- ✅ Support for all Canvas object types with consistent schema mapping
+- ✅ Semantic attribute discovery system (`utils/attribute_discovery.py`)
+- ✅ Extended canvas_query tool with DataFrame/CSV output formats
+
+**Phase 2.5: Dynamic Discovery** ✅ **COMPLETE**
+- ✅ Dynamic Canvas method discovery (`tools/method_discovery.py`)
+- ✅ **discover_canvas_methods** tool for exploring available Canvas API methods
+- ✅ **get_canvas_method_info** tool for detailed method documentation
+- ✅ Eliminated hardcoded Canvas method mappings in favor of dynamic resolution
+- ✅ Environment-based configuration for secure Canvas URL/token management
+- ✅ Comprehensive client configuration examples (`examples/` directory)
+- ✅ Health check validation for Canvas connectivity testing
+
+#### Phase 2 Implementation Details
+
+**Core Components:**
+1. **DataFrameConverter Class** (`utils/dataframe_converter.py`)
+   - Convert any Canvas object or PaginatedList to pandas DataFrame
+   - Handle nested object flattening with configurable depth limits
+   - Implement streaming conversion for large datasets
+   - Support batch processing with memory management
+
+2. **Schema Mapping System**
+   - Consistent column naming across all Canvas object types
+   - Data type inference and conversion (dates, IDs, booleans)
+   - Handle Canvas-specific data formats (ISO dates, SIS IDs)
+   - Maintain backward compatibility with existing Canvas object attributes
+
+3. **Memory Optimization**
+   - Streaming processor for PaginatedList with configurable batch sizes
+   - Memory-efficient iterator patterns for large datasets
+   - Lazy loading with on-demand DataFrame construction
+   - Garbage collection optimization for batch processing
+
+4. **Attribute Discovery Enhancement** (`utils/attribute_discovery.py`)
+   - Semantic attribute search across Canvas objects
+   - Relationship mapping between different Canvas object types
+   - Dynamic schema discovery for unknown Canvas object types
+   - Metadata extraction for DataFrame column information
+
+**Integration Points:**
+- Extend `canvas_query` tool with DataFrame output format option
+- Integrate with existing `validation.py` for parameter handling
+- Use `PaginatedList` async iteration for streaming conversion
+- Leverage `CanvasObject` dynamic attributes for schema discovery
+
+**Performance Requirements:**
+- Handle 1000+ record datasets efficiently
+- Batch processing with configurable memory limits
+- Concurrent conversion for multiple Canvas object types
+- Sub-second conversion for typical Canvas query results
+
+**Output Formats:**
+- Standard pandas DataFrame with optimized dtypes
+- JSON-serializable DataFrame representations for MCP responses  
+- CSV export capability for large datasets
+- Summary statistics and metadata for DataFrame inspection
 
 **Phase 3: Pandas Operations Engine**
 - Safe pandas query execution with allowlisted methods
@@ -302,17 +374,23 @@ numpy = "^1.24.0"          # pandas dependency
 
 ### MCP-Specific Troubleshooting
 
-**Method Resolution Issues**
-- **Unknown methods**: Verify Canvas method exists using dynamic discovery
-- **Parameter validation**: Check Canvas API documentation for required/optional parameters
-- **Object chaining**: Ensure `from_object` and `from_object_id` resolve to valid Canvas objects
+**Server Configuration Issues**
+- **"Canvas URL is required"**: Set `CANVAS_URL` or `CANVAS_BASE_URL` environment variable
+- **"Canvas API token is required"**: Set `CANVAS_TOKEN`, `CANVAS_API_TOKEN`, or `CANVAS_API_KEY` environment variable
+- **"Failed to resolve"**: Verify Canvas URL is correct and accessible from server environment
+- **"Authentication failed"**: Check API token validity and Canvas instance permissions
 
-**DataFrame Conversion Problems**
-- **Memory issues**: Use streaming conversion for large PaginatedLists
-- **Data type conflicts**: Verify attribute flattening handles nested Canvas objects
-- **Missing columns**: Check that DataFrame converter handles all Canvas object attributes
+**Method Discovery Issues**
+- **"No method found for object type"**: Use `discover_canvas_methods` to explore available methods
+- **"Method not found on object"**: Verify method exists using `get_canvas_method_info` tool
+- **"Method is not a GET operation"**: This library only supports GET operations for safety
 
-**Pandas Operations Failures**
-- **Unsafe operations**: Verify pandas method is in allowlisted operations
-- **Invalid expressions**: Validate query expressions against DataFrame columns  
-- **Operation sequencing**: Ensure pandas operations are applied in correct order
+**Query Execution Problems**
+- **Parameter validation errors**: Check required parameters using `get_canvas_method_info`
+- **Canvas API errors**: Verify Canvas API limits, permissions, and object IDs
+- **DataFrame conversion failures**: Use smaller batch sizes for large datasets
+
+**Client Configuration**
+- **MCP server not found**: Verify Python path and canvasapi_mcp module installation
+- **Environment variables not loaded**: Check MCP client configuration includes `env` section
+- **Connection timeouts**: Increase timeout settings or check network connectivity

@@ -7,7 +7,6 @@ and error handling.
 """
 
 import json
-from typing import Any, Dict, List, Optional, Union
 from mcp.types import Tool, TextContent
 from canvasapi_get.canvas import Canvas
 from canvasapi_get.canvas_object import CanvasObject
@@ -15,6 +14,7 @@ from canvasapi_get.paginated_list import PaginatedList
 from canvasapi_get.exceptions import CanvasException
 from ..resolvers.method_resolver import MethodResolver, MethodResolutionError
 from ..validation import validator, ValidationError
+from ..utils.dataframe_converter import converter as df_converter
 
 
 class CanvasQueryTool:
@@ -87,22 +87,10 @@ class CanvasQueryTool:
                         "description": "Parameters to pass to the Canvas method",
                         "additionalProperties": True
                     },
-                    "object_chain": {
-                        "type": "array",
-                        "description": "For chained calls, array of objects to traverse",
-                        "items": {
-                            "type": "object",
-                            "properties": {
-                                "object_type": {"type": "string"},
-                                "object_id": {"type": ["integer", "string"]}
-                            },
-                            "required": ["object_type", "object_id"]
-                        }
-                    },
                     "output_format": {
                         "type": "string",
                         "description": "Output format preference",
-                        "enum": ["json", "summary", "count"],
+                        "enum": ["json", "summary", "count", "dataframe", "csv"],
                         "default": "json"
                     },
                     "limit": {
@@ -117,7 +105,7 @@ class CanvasQueryTool:
             }
         )
     
-    async def execute(self, arguments: Dict[str, Any]) -> List[TextContent]:
+    async def execute(self, arguments: dict) -> list[TextContent]:
         """
         Execute a Canvas API query with the provided arguments.
         
@@ -133,7 +121,6 @@ class CanvasQueryTool:
             object_id = arguments.get("object_id")
             method_name = arguments.get("method")
             parameters = arguments.get("parameters", {})
-            object_chain = arguments.get("object_chain")
             output_format = arguments.get("output_format", "json")
             limit = arguments.get("limit")
             
@@ -148,7 +135,7 @@ class CanvasQueryTool:
                 )]
             
             # Validate object_id requirement
-            if object_type.lower() != "canvas" and not object_id and not object_chain:
+            if object_type.lower() != "canvas" and not object_id:
                 return [TextContent(
                     type="text", 
                     text=json.dumps({
@@ -158,14 +145,9 @@ class CanvasQueryTool:
                 )]
             
             # Execute the method call
-            if object_chain:
-                result = self.resolver.resolve_chained_method_call(
-                    object_chain, method_name, parameters
-                )
-            else:
-                result = self.resolver.resolve_method_call(
-                    object_type, object_id, method_name, parameters
-                )
+            result = self.resolver.resolve_method_call(
+                object_type, object_id, method_name, parameters
+            )
             
             # Format the response
             formatted_result = self._format_result(result, output_format, limit)
@@ -210,7 +192,7 @@ class CanvasQueryTool:
                 }, indent=2)
             )]
     
-    def _format_result(self, result: Any, output_format: str, limit: Optional[int] = None) -> Dict[str, Any]:
+    def _format_result(self, result, output_format: str, limit: int | None = None) -> dict:
         """
         Format the Canvas API result for MCP response.
         
@@ -223,6 +205,10 @@ class CanvasQueryTool:
             Formatted result dictionary
         """
         try:
+            # Handle DataFrame/CSV formats specially
+            if output_format in ["dataframe", "csv"]:
+                return self._format_dataframe_result(result, output_format, limit)
+            
             # Handle different result types
             if isinstance(result, PaginatedList):
                 return self._format_paginated_result(result, output_format, limit)
@@ -246,7 +232,68 @@ class CanvasQueryTool:
                 "raw_result_type": type(result).__name__
             }
     
-    def _format_paginated_result(self, paginated_list: PaginatedList, output_format: str, limit: Optional[int]) -> Dict[str, Any]:
+    def _format_dataframe_result(self, result, output_format: str, limit: int | None = None) -> dict:
+        """
+        Format result as DataFrame or CSV.
+        
+        Args:
+            result: Canvas API result to convert
+            output_format: "dataframe" or "csv"
+            limit: Optional limit for large datasets
+            
+        Returns:
+            Formatted DataFrame result
+        """
+        try:
+            # Convert to DataFrame
+            df = df_converter.convert_to_dataframe(result)
+            
+            # Apply limit if specified
+            if limit and len(df) > limit:
+                df = df.head(limit)
+                limited = True
+            else:
+                limited = False
+            
+            if output_format == "csv":
+                return {
+                    "success": True,
+                    "result_type": "csv",
+                    "format": "csv",
+                    "csv_data": df.to_csv(index=False),
+                    "shape": df.shape,
+                    "columns": list(df.columns),
+                    "limited": limited,
+                    "total_rows": len(df)
+                }
+            else:  # dataframe format
+                # Get comprehensive DataFrame information
+                df_info = df_converter.get_dataframe_info(df)
+                export_formats = df_converter.export_to_formats(df)
+                
+                return {
+                    "success": True,
+                    "result_type": "dataframe",
+                    "format": "dataframe", 
+                    "dataframe_info": df_info,
+                    "data": export_formats.get("json", []),
+                    "csv_data": export_formats.get("csv", ""),
+                    "summary_stats": export_formats.get("summary_stats", {}),
+                    "limited": limited,
+                    "shape": df.shape,
+                    "columns": list(df.columns),
+                    "dtypes": df.dtypes.to_dict()
+                }
+                
+        except Exception as e:
+            return {
+                "error": "dataframe_conversion_error",
+                "message": f"Failed to convert to DataFrame: {str(e)}",
+                "fallback_format": "json",
+                "raw_result_type": type(result).__name__
+            }
+    
+    def _format_paginated_result(self, paginated_list: PaginatedList, output_format: str, limit: int | None) -> dict:
         """Format PaginatedList results."""
         items = []
         count = 0
@@ -288,7 +335,7 @@ class CanvasQueryTool:
                 "data": [self._object_to_dict(item) for item in items]
             }
     
-    def _format_canvas_object(self, obj: CanvasObject, output_format: str) -> Dict[str, Any]:
+    def _format_canvas_object(self, obj: CanvasObject, output_format: str) -> dict:
         """Format single CanvasObject results."""
         if output_format == "count":
             return {
@@ -315,7 +362,7 @@ class CanvasQueryTool:
                 "data": self._object_to_dict(obj)
             }
     
-    def _format_list_result(self, result_list: List[Any], output_format: str, limit: Optional[int]) -> Dict[str, Any]:
+    def _format_list_result(self, result_list: list, output_format: str, limit: int | None) -> dict:
         """Format regular list results."""
         items = result_list[:limit] if limit else result_list
         
@@ -346,7 +393,7 @@ class CanvasQueryTool:
                 "data": [self._object_to_dict(item) for item in items]
             }
     
-    def _object_to_dict(self, obj: Any) -> Any:
+    def _object_to_dict(self, obj):
         """Convert Canvas object to dictionary representation."""
         if isinstance(obj, CanvasObject):
             return validator.convert_canvas_object_to_dict(obj)
@@ -357,7 +404,7 @@ class CanvasQueryTool:
             # Primitive value
             return obj
     
-    def get_available_methods(self, object_type: str, object_id: Optional[Union[int, str]] = None) -> List[Dict[str, Any]]:
+    def get_available_methods(self, object_type: str, object_id: int | str | None = None) -> list[dict]:
         """
         Get list of available methods for a Canvas object type.
         

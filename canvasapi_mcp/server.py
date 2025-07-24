@@ -8,12 +8,12 @@ MCP protocol communication with comprehensive error handling.
 
 import asyncio
 import logging
-from typing import Any, Dict, List, Optional
 from mcp.server import Server
 from mcp.types import Resource, Tool, TextContent, ListResourcesResult, ListToolsResult, ReadResourceResult, CallToolResult
 from canvasapi_get.canvas import Canvas
 from canvasapi_get.exceptions import CanvasException
 from .tools.canvas_query import CanvasQueryTool
+from .tools.method_discovery import MethodDiscoveryTool, MethodInfoTool
 from .resolvers.method_resolver import MethodResolver
 from .validation import ValidationError
 
@@ -30,23 +30,80 @@ class CanvasAPIMCPServer:
     the dynamic method resolution system.
     """
     
-    def __init__(self, canvas_url: str, canvas_token: str, server_name: str = "canvas-api"):
+    def __init__(self, canvas_url: str | None = None, canvas_token: str | None = None, server_name: str = "canvas-api"):
         """
         Initialize the Canvas API MCP server.
         
         Args:
-            canvas_url: Canvas instance URL
-            canvas_token: Canvas API token
+            canvas_url: Canvas instance URL (can be None to read from environment)
+            canvas_token: Canvas API token (can be None to read from environment)
             server_name: Name for the MCP server
         """
         self.server_name = server_name
-        self.canvas = Canvas(canvas_url, canvas_token)
+        
+        # Load configuration from environment if not provided
+        self.canvas_url, self.canvas_token = self._load_configuration(canvas_url, canvas_token)
+        
+        # Initialize Canvas API connection
+        self.canvas = Canvas(self.canvas_url, self.canvas_token)
+        
+        # Initialize tools
         self.query_tool = CanvasQueryTool(self.canvas)
+        self.discovery_tool = MethodDiscoveryTool(self.canvas)
+        self.method_info_tool = MethodInfoTool(self.canvas)
         self.method_resolver = MethodResolver(self.canvas)
         
         # Initialize MCP server
         self.server = Server(server_name)
         self._setup_handlers()
+    
+    def _load_configuration(self, canvas_url: str | None, canvas_token: str | None) -> tuple[str, str]:
+        """
+        Load Canvas configuration from parameters or environment variables.
+        
+        Args:
+            canvas_url: Provided Canvas URL (optional)
+            canvas_token: Provided Canvas token (optional)
+            
+        Returns:
+            Tuple of (canvas_url, canvas_token)
+            
+        Raises:
+            ValueError: If configuration cannot be loaded
+        """
+        import os
+        
+        # Try provided parameters first, then environment variables
+        final_url = canvas_url or os.getenv("CANVAS_URL") or os.getenv("CANVAS_BASE_URL")
+        final_token = canvas_token or os.getenv("CANVAS_TOKEN") or os.getenv("CANVAS_API_TOKEN") or os.getenv("CANVAS_API_KEY")
+        
+        # Validate required configuration
+        if not final_url:
+            raise ValueError(
+                "Canvas URL is required. Provide it via:\n"
+                "1. CANVAS_URL environment variable\n" 
+                "2. CANVAS_BASE_URL environment variable\n"
+                "3. canvas_url parameter\n"
+                "Example: CANVAS_URL=https://your-school.instructure.com"
+            )
+        
+        if not final_token:
+            raise ValueError(
+                "Canvas API token is required. Provide it via:\n"
+                "1. CANVAS_TOKEN environment variable\n"
+                "2. CANVAS_API_TOKEN environment variable\n" 
+                "3. CANVAS_API_KEY environment variable\n"
+                "4. canvas_token parameter\n"
+                "Get your token from Canvas: Account → Settings → Approved Integrations → New Access Token"
+            )
+        
+        # Normalize URL (ensure https and remove trailing slash)
+        if not final_url.startswith(('http://', 'https://')):
+            final_url = f"https://{final_url}"
+        final_url = final_url.rstrip('/')
+        
+        logger.info(f"Canvas MCP Server configured for: {final_url}")
+        return final_url, final_token
     
     def _setup_handlers(self):
         """Set up MCP protocol handlers."""
@@ -121,20 +178,30 @@ class CanvasAPIMCPServer:
         @self.server.list_tools()
         async def list_tools() -> ListToolsResult:
             """List available tools."""
-            tools = [self.query_tool.get_tool_definition()]
+            tools = [
+                self.discovery_tool.get_tool_definition(),
+                self.method_info_tool.get_tool_definition(),
+                self.query_tool.get_tool_definition()
+            ]
             return ListToolsResult(tools=tools)
         
         @self.server.call_tool()
-        async def call_tool(name: str, arguments: Dict[str, Any]) -> CallToolResult:
+        async def call_tool(name: str, arguments: dict) -> CallToolResult:
             """Handle tool calls."""
             try:
-                if name == "canvas_query":
+                if name == "discover_canvas_methods":
+                    result = await self.discovery_tool.execute(arguments)
+                    return CallToolResult(content=result)
+                elif name == "get_canvas_method_info":
+                    result = await self.method_info_tool.execute(arguments)
+                    return CallToolResult(content=result)
+                elif name == "canvas_query":
                     result = await self.query_tool.execute(arguments)
                     return CallToolResult(content=result)
                 else:
                     error_content = [TextContent(
                         type="text",
-                        text=f"Unknown tool: {name}"
+                        text=f"Unknown tool: {name}. Available tools: discover_canvas_methods, get_canvas_method_info, canvas_query"
                     )]
                     return CallToolResult(content=error_content)
                     
@@ -172,7 +239,7 @@ class CanvasAPIMCPServer:
             logger.error(f"Server error: {str(e)}")
             raise
     
-    def get_server_info(self) -> Dict[str, Any]:
+    def get_server_info(self) -> dict[str, str | list[str]]:
         """
         Get information about the server configuration.
         
@@ -181,13 +248,13 @@ class CanvasAPIMCPServer:
         """
         return {
             "server_name": self.server_name,
-            "canvas_url": self.canvas.base_url,
-            "available_tools": ["canvas_query"],
+            "canvas_url": self.canvas_url,
+            "available_tools": ["discover_canvas_methods", "get_canvas_method_info", "canvas_query"],
             "supported_object_types": self.method_resolver.get_available_object_types(),
             "version": "0.1.0"
         }
     
-    async def health_check(self) -> Dict[str, Any]:
+    async def health_check(self) -> dict:
         """
         Perform a health check on the server and Canvas connection.
         
@@ -229,13 +296,13 @@ class CanvasAPIMCPServer:
         logger.info("Server caches cleared")
 
 
-def create_server(canvas_url: str, canvas_token: str, server_name: str = "canvas-api") -> CanvasAPIMCPServer:
+def create_server(canvas_url: str | None = None, canvas_token: str | None = None, server_name: str = "canvas-api") -> CanvasAPIMCPServer:
     """
     Factory function to create a Canvas API MCP server.
     
     Args:
-        canvas_url: Canvas instance URL
-        canvas_token: Canvas API token  
+        canvas_url: Canvas instance URL (optional, reads from environment if not provided)
+        canvas_token: Canvas API token (optional, reads from environment if not provided)
         server_name: Name for the MCP server
         
     Returns:
@@ -248,9 +315,10 @@ async def main():
     """
     Main entry point for running the server as a standalone application.
     
-    This function expects environment variables:
-    - CANVAS_URL: Canvas instance URL
-    - CANVAS_TOKEN: Canvas API token
+    This function reads configuration from environment variables:
+    - CANVAS_URL or CANVAS_BASE_URL: Canvas instance URL
+    - CANVAS_TOKEN, CANVAS_API_TOKEN, or CANVAS_API_KEY: Canvas API token
+    - MCP_SERVER_NAME: Optional server name (defaults to "canvas-api")
     """
     import os
     from dotenv import load_dotenv
@@ -258,25 +326,28 @@ async def main():
     # Load environment variables
     load_dotenv()
     
-    canvas_url = os.getenv("CANVAS_URL")
-    canvas_token = os.getenv("CANVAS_TOKEN")
     server_name = os.getenv("MCP_SERVER_NAME", "canvas-api")
     
-    if not canvas_url or not canvas_token:
-        raise ValueError("CANVAS_URL and CANVAS_TOKEN environment variables are required")
-    
-    # Create and run server
-    server = create_server(canvas_url, canvas_token, server_name)
-    
-    # Perform health check
-    health = await server.health_check()
-    logger.info(f"Server health check: {health}")
-    
-    if health["status"] != "healthy":
-        logger.error("Server health check failed, but continuing...")
-    
-    # Run the server
-    await server.run()
+    try:
+        # Create server (will read config from environment automatically)
+        server = create_server(server_name=server_name)
+        
+        # Perform health check
+        health = await server.health_check()
+        logger.info(f"Server health check: {health}")
+        
+        if health["status"] != "healthy":
+            logger.error("Server health check failed, but continuing...")
+        
+        # Run the server
+        await server.run()
+        
+    except ValueError as e:
+        logger.error(f"Configuration error: {e}")
+        raise
+    except Exception as e:
+        logger.error(f"Server startup error: {e}")
+        raise
 
 
 if __name__ == "__main__":
