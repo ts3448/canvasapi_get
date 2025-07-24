@@ -148,7 +148,7 @@ class MethodResolver:
             # Use dynamic method resolution instead of hardcoded mappings
             # Try to find a get_* method on Canvas that matches the object type
             method_name = f"get_{object_type.lower()}"
-            
+
             if not hasattr(self.canvas, method_name):
                 raise MethodResolutionError(
                     f"No method found for object type '{object_type}'. "
@@ -170,7 +170,6 @@ class MethodResolver:
                 f"Failed to resolve {object_type} with ID {object_id}: {str(e)}. "
                 f"Use discover_canvas_methods tool to explore available object types."
             )
-
 
     def resolve_method_call(
         self,
@@ -240,7 +239,6 @@ class MethodResolver:
         except Exception as e:
             raise MethodResolutionError(f"Method execution failed: {str(e)}")
 
-
     def get_method_info(self, object_type: str, method_name: str) -> dict:
         """
         Get detailed information about a specific method.
@@ -300,7 +298,7 @@ class MethodResolver:
             List of object type names discovered from Canvas methods
         """
         object_types = ["canvas"]  # Canvas is always available
-        
+
         # Discover object types by looking for get_* methods on Canvas
         for attr_name in dir(self.canvas):
             if attr_name.startswith("get_") and not attr_name.startswith("get__"):
@@ -310,5 +308,5 @@ class MethodResolver:
                     method = getattr(self.canvas, attr_name)
                     if callable(method):
                         object_types.append(object_type)
-        
+
         return sorted(list(set(object_types)))
