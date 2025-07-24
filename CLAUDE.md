@@ -125,8 +125,9 @@ This approach supports all 300+ Canvas methods automatically through dynamic dis
 
 **2. Universal Canvas Query Execution**
 - **canvas_query**: Execute any Canvas API method with parameter validation
-- Supports both direct Canvas methods and object-specific method calls
+- Supports both direct Canvas methods and object-specific method calls  
 - GET-only operations for safe, read-only Canvas interactions
+- Server-side pandas operations on complete datasets with filtered results
 - Comprehensive error handling with actionable error messages
 
 **3. Universal DataFrame Conversion**
@@ -162,6 +163,7 @@ canvasapi_get/
 │   │   └── method_resolver.py # Dynamic method resolution
 │   ├── utils/
 │   │   ├── dataframe_converter.py # Canvas object → DataFrame
+│   │   ├── pandas_engine.py   # Server-side pandas operations (Phase 3)
 │   │   └── attribute_discovery.py # Semantic attribute search
 │   └── validation.py          # Parameter validation
 ├── examples/                  # Configuration examples
@@ -244,10 +246,12 @@ canvasapi_get/
 - CSV export capability for large datasets
 - Summary statistics and metadata for DataFrame inspection
 
-**Phase 3: Pandas Operations Engine**
-- Safe pandas query execution with allowlisted methods
-- Sequential operation processing pipeline
-- Advanced filtering and aggregation capabilities
+**Phase 3: Pandas Operations Engine** - NOT YET IMPLEMENTED
+- Server-side pandas operations on complete Canvas datasets
+- Safe execution with allowlisted pandas methods (`query`, `sort_values`, `head`, `groupby`, etc.)
+- Sequential operation processing: retrieve all Canvas data → apply pandas operations → return filtered results
+- Advanced filtering and aggregation without client-side data transfer
+- Operation transparency for client tool usage guidance
 
 **Phase 4: MCP Server Integration**
 - Complete MCP tool implementation
@@ -274,8 +278,9 @@ canvasapi_get/
 - Structured diagnostic reports with actionable recommendations
 
 **Client Experience**
-- No bulk data transfer - clients receive only filtered results
-- Pandas power without client-side complexity
+- No bulk data transfer - clients receive only filtered results after server-side processing
+- Full Canvas datasets retrieved via async pagination, then filtered server-side
+- Pandas power without client-side complexity or memory usage
 - Multiple output formats (table, JSON, CSV, summary)
 - Consistent interface pattern for all Canvas operations
 
