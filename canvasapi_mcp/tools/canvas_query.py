@@ -13,7 +13,7 @@ from canvasapi_get.canvas_object import CanvasObject
 from canvasapi_get.paginated_list import PaginatedList
 from canvasapi_get.exceptions import CanvasException
 from ..resolvers.method_resolver import MethodResolver, MethodResolutionError
-from ..validation import validator, ValidationError
+from ..validation import validator, ValidationError, ScopingRequiredError
 from ..utils.dataframe_converter import converter as df_converter
 from ..utils.pandas_engine import PandasEngine, PandasOperationError
 
@@ -59,10 +59,22 @@ class CanvasQueryTool:
             - Apply server-side pandas operations for filtering and processing
             - Get comprehensive error information
             
+            IMPORTANT - Canvas Data Hierarchy:
+            Large data endpoints require scoping to follow proper Canvas administrative workflows:
+            - get_courses: MUST include 'enrollment_term_id' (TESTED: 14K+ → hundreds)
+            - get_users: MUST include 'enrollment_type' (role-based scoping)
+            - get_groups: MUST include 'enrollment_term_id' (account-wide groups can be massive)
+            - get_sections: MUST include 'enrollment_term_id' (account-wide sections can be massive)
+            - get_external_tools: MUST include 'enrollment_term_id' (scope by active period)
+            - get_enrollments: MUST include 'enrollment_term_id' AND 'enrollment_type' (both required)
+            
+            This teaches efficient Canvas admin patterns: Account → Enrollment Term → Course/User → Content
+            
             Examples:
-            - Get course: {"object_type": "canvas", "method": "get_course", "parameters": {"course_id": 12345}}
-            - Get course assignments: {"object_type": "course", "object_id": 12345, "method": "get_assignments"}
-            - Get user with includes: {"object_type": "canvas", "method": "get_user", "parameters": {"user_id": 678, "include": ["enrollments"]}}
+            - Get courses by term: {"object_type": "account", "object_id": 439, "method": "get_courses", "parameters": {"enrollment_term_id": 583}}
+            - Get students: {"object_type": "account", "object_id": 439, "method": "get_users", "parameters": {"enrollment_type": "StudentEnrollment"}}
+            - Get groups by term: {"object_type": "account", "object_id": 439, "method": "get_groups", "parameters": {"enrollment_term_id": 583}}
+            - Get sections by term: {"object_type": "account", "object_id": 439, "method": "get_sections", "parameters": {"enrollment_term_id": 583}}
             """,
             inputSchema={
                 "type": "object",
@@ -102,7 +114,17 @@ class CanvasQueryTool:
                     },
                     "parameters": {
                         "type": "object",
-                        "description": "Parameters to pass to the Canvas method",
+                        "description": "Parameters to pass to the Canvas method. Scoping requirements: get_courses/get_groups/get_sections/get_external_tools need enrollment_term_id, get_users needs enrollment_type, get_enrollments needs both.",
+                        "properties": {
+                            "enrollment_term_id": {
+                                "type": ["integer", "string"],
+                                "description": "Required for get_courses, get_groups, get_sections, get_external_tools, get_enrollments - scope by academic term"
+                            },
+                            "enrollment_type": {
+                                "type": "string",
+                                "description": "Required for get_users and get_enrollments - scope by role (StudentEnrollment, TeacherEnrollment, TaEnrollment, etc.)"
+                            }
+                        },
                         "additionalProperties": True,
                     },
                     "output_format": {
@@ -175,16 +197,50 @@ class CanvasQueryTool:
 
             # Validate object_id requirement
             if object_type.lower() != "canvas" and not object_id:
+                # Check if this might be a search operation that should use canvas/account
+                common_search_methods = ["get_users", "get_courses", "get_accounts"]
+                if method_name in common_search_methods:
+                    return [
+                        TextContent(
+                            type="text",
+                            text=json.dumps(
+                                {
+                                    "error": "missing_object_id",
+                                    "message": f"For searching {object_type}, use object_type='account' with object_id instead",
+                                    "suggestion": {
+                                        "object_type": "account",
+                                        "object_id": 439,  # Barnard account
+                                        "method": method_name,
+                                        "parameters": parameters
+                                    },
+                                    "example": f'{{"object_type": "account", "object_id": 439, "method": "{method_name}", "parameters": {json.dumps(parameters)}}}'
+                                },
+                                indent=2,
+                            ),
+                        )
+                    ]
+                else:
+                    return [
+                        TextContent(
+                            type="text",
+                            text=json.dumps(
+                                {
+                                    "error": "missing_object_id",
+                                    "message": f"object_id is required for object_type '{object_type}'",
+                                },
+                                indent=2,
+                            ),
+                        )
+                    ]
+
+            # Validate scoping requirements for Canvas data hierarchy
+            try:
+                validator.validate_scoping_requirements(method_name, parameters)
+            except ScopingRequiredError as e:
                 return [
                     TextContent(
                         type="text",
-                        text=json.dumps(
-                            {
-                                "error": "missing_object_id",
-                                "message": f"object_id is required for object_type '{object_type}'",
-                            },
-                            indent=2,
-                        ),
+                        text=json.dumps(validator.format_validation_error(e), indent=2),
                     )
                 ]
 
@@ -216,7 +272,7 @@ class CanvasQueryTool:
                 )
             ]
 
-        except ValidationError as e:
+        except (ValidationError, ScopingRequiredError) as e:
             return [
                 TextContent(
                     type="text",

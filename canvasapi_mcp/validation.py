@@ -25,6 +25,20 @@ class ValidationError(Exception):
         super().__init__(f"Parameter '{parameter_name}': {message}")
 
 
+class ScopingRequiredError(ValidationError):
+    """Raised when a method requires scoping parameters to follow Canvas data hierarchy."""
+    
+    def __init__(self, method_name: str, required_params: list[str]):
+        self.method_name = method_name
+        self.required_params = required_params
+        super().__init__(
+            "scoping_parameters", 
+            f"Method {method_name} requires one of: {', '.join(required_params)} "
+            f"to follow proper Canvas data hierarchy and prevent large data dumps. "
+            f"This teaches efficient Canvas administrative workflows."
+        )
+
+
 class ParameterValidator:
     """
     Validates and converts parameters for Canvas API method calls.
@@ -32,6 +46,30 @@ class ParameterValidator:
     Handles conversion between MCP tool parameters and Canvas method parameters,
     including ID format validation, type checking, and kwargs processing.
     """
+
+    # Methods that require scoping parameters to follow Canvas data hierarchy
+    METHODS_REQUIRING_SCOPING = {
+        # Course queries - require academic term thinking (TESTED: 14K+ → hundreds)
+        "get_courses": ["enrollment_term_id"],
+        
+        # User queries - require role-based scoping (no search_term per instruction)
+        "get_users": ["enrollment_type"],
+        
+        # Group queries - account-level groups can be massive, scope by term
+        "get_groups": ["enrollment_term_id"],
+        
+        # Section queries - account-level sections can be massive, scope by term  
+        "get_sections": ["enrollment_term_id"],
+        
+        # Enrollment queries - require term and role scoping to prevent massive dumps
+        # Note: get_enrollments exists in Canvas API but not yet in Python wrapper
+        "get_enrollments": ["enrollment_term_id", "enrollment_type"],
+        
+        # External tools - may be many across entire account
+        "get_external_tools": ["enrollment_term_id"],
+        
+        # Additional endpoints identified from Canvas API documentation analysis
+    }
 
     # Canvas object types mapping for ID validation
     CANVAS_OBJECT_TYPES = {
@@ -465,6 +503,36 @@ class ParameterValidator:
 
         return validated
 
+    def validate_scoping_requirements(self, method_name: str, parameters: dict):
+        """
+        Validate that methods requiring scoping parameters follow Canvas data hierarchy.
+        
+        This enforces proper Canvas administrative workflows by requiring parameters
+        that scope queries appropriately and teach users the natural Canvas data flow.
+        
+        Args:
+            method_name: Name of the Canvas method
+            parameters: Dictionary of provided parameters
+            
+        Raises:
+            ScopingRequiredError: If method requires scoping parameters but none provided
+        """
+        if method_name in self.METHODS_REQUIRING_SCOPING:
+            required_params = self.METHODS_REQUIRING_SCOPING[method_name]
+            
+            # Skip validation if no scoping parameters are required (empty list)
+            if not required_params:
+                return
+                
+            # Check if any of the required scoping parameters are present and non-empty
+            has_scoping_param = any(
+                param in parameters and parameters[param] not in (None, "", [])
+                for param in required_params
+            )
+            
+            if not has_scoping_param:
+                raise ScopingRequiredError(method_name, required_params)
+
     def format_validation_error(self, error: Exception) -> dict[str, str]:
         """
         Format validation error for MCP response.
@@ -475,7 +543,58 @@ class ParameterValidator:
         Returns:
             Dictionary containing error information
         """
-        if isinstance(error, ValidationError):
+        if isinstance(error, ScopingRequiredError):
+            # Provide method-specific guidance based on Canvas hierarchy
+            suggestions = {
+                "get_courses": {
+                    "workflow": "Get enrollment terms first, then query courses by term",
+                    "example": '{"parameters": {"enrollment_term_id": 583}}',
+                    "reasoning": "Account-wide course queries can return 14,000+ courses (tested)"
+                },
+                "get_users": {
+                    "workflow": "Specify user role context for account-wide queries",
+                    "example": '{"parameters": {"enrollment_type": "StudentEnrollment"}}',
+                    "reasoning": "Users should be queried by role (StudentEnrollment, TeacherEnrollment, etc.)"
+                },
+                "get_groups": {
+                    "workflow": "Get enrollment terms first, then query groups by term",
+                    "example": '{"parameters": {"enrollment_term_id": 583}}',
+                    "reasoning": "Account-wide group queries can return thousands of groups across all courses"
+                },
+                "get_sections": {
+                    "workflow": "Get enrollment terms first, then query sections by term", 
+                    "example": '{"parameters": {"enrollment_term_id": 583}}',
+                    "reasoning": "Account-wide section queries can return massive numbers of sections"
+                },
+                "get_enrollments": {
+                    "workflow": "Specify both enrollment term and type for proper scoping",
+                    "example": '{"parameters": {"enrollment_term_id": 583, "enrollment_type": "StudentEnrollment"}}',
+                    "reasoning": "Enrollment queries can return millions of records without proper scoping"
+                },
+                "get_external_tools": {
+                    "workflow": "Get enrollment terms first to scope external tools by active period",
+                    "example": '{"parameters": {"enrollment_term_id": 583}}',
+                    "reasoning": "Account-wide external tool queries can return many tools across entire institution"
+                }
+            }
+            
+            method_guidance = suggestions.get(error.method_name, {
+                "workflow": f"Provide one of: {', '.join(error.required_params)}",
+                "example": f'{{\"parameters\": {{\"{error.required_params[0]}\": \"appropriate_value\"}}}}',
+                "reasoning": "This method requires scoping to prevent large data dumps"
+            })
+            
+            return {
+                "error": "scoping_required",
+                "method": error.method_name,
+                "message": str(error),
+                "required_parameters": error.required_params,
+                "workflow_guidance": method_guidance["workflow"],
+                "example": method_guidance["example"],
+                "reasoning": method_guidance["reasoning"],
+                "canvas_hierarchy": "Account → Enrollment Term → Course/User → Content"
+            }
+        elif isinstance(error, ValidationError):
             return {
                 "error": "validation_error",
                 "parameter": error.parameter_name,
