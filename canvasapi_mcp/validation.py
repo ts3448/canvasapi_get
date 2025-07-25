@@ -48,25 +48,26 @@ class ParameterValidator:
     """
 
     # Methods that require scoping parameters to follow Canvas data hierarchy
+    # Structure: "method_name": {"any": [...]} or {"all": [...]}
     METHODS_REQUIRING_SCOPING = {
         # Course queries - require academic term thinking (TESTED: 14K+ → hundreds)
-        "get_courses": ["enrollment_term_id"],
+        "get_courses": {"any": ["enrollment_term_id"]},
         
-        # User queries - require role-based scoping (no search_term per instruction)
-        "get_users": ["enrollment_type"],
+        # User queries - require BOTH term and role scoping (enrollment_type alone = 50K+ users)
+        "get_users": {"all": ["enrollment_term_id", "enrollment_type"]},
         
         # Group queries - account-level groups can be massive, scope by term
-        "get_groups": ["enrollment_term_id"],
+        "get_groups": {"any": ["enrollment_term_id"]},
         
         # Section queries - account-level sections can be massive, scope by term  
-        "get_sections": ["enrollment_term_id"],
+        "get_sections": {"any": ["enrollment_term_id"]},
         
         # Enrollment queries - require term and role scoping to prevent massive dumps
         # Note: get_enrollments exists in Canvas API but not yet in Python wrapper
-        "get_enrollments": ["enrollment_term_id", "enrollment_type"],
+        "get_enrollments": {"all": ["enrollment_term_id", "enrollment_type"]},
         
         # External tools - may be many across entire account
-        "get_external_tools": ["enrollment_term_id"],
+        "get_external_tools": {"any": ["enrollment_term_id"]},
         
         # Additional endpoints identified from Canvas API documentation analysis
     }
@@ -518,17 +519,35 @@ class ParameterValidator:
             ScopingRequiredError: If method requires scoping parameters but none provided
         """
         if method_name in self.METHODS_REQUIRING_SCOPING:
-            required_params = self.METHODS_REQUIRING_SCOPING[method_name]
+            scoping_config = self.METHODS_REQUIRING_SCOPING[method_name]
+            
+            # Handle both old format (list) and new format (dict)
+            if isinstance(scoping_config, list):
+                # Legacy format - treat as "any"
+                validation_type = "any"
+                required_params = scoping_config
+            else:
+                # New format - extract type and params
+                validation_type = list(scoping_config.keys())[0]  # "any" or "all"
+                required_params = scoping_config[validation_type]
             
             # Skip validation if no scoping parameters are required (empty list)
             if not required_params:
                 return
-                
-            # Check if any of the required scoping parameters are present and non-empty
-            has_scoping_param = any(
-                param in parameters and parameters[param] not in (None, "", [])
-                for param in required_params
-            )
+            
+            # Check parameters based on validation type
+            if validation_type == "any":
+                # Check if any of the required scoping parameters are present and non-empty
+                has_scoping_param = any(
+                    param in parameters and parameters[param] not in (None, "", [])
+                    for param in required_params
+                )
+            else:  # validation_type == "all"
+                # Check if all of the required scoping parameters are present and non-empty
+                has_scoping_param = all(
+                    param in parameters and parameters[param] not in (None, "", [])
+                    for param in required_params
+                )
             
             if not has_scoping_param:
                 raise ScopingRequiredError(method_name, required_params)
@@ -552,9 +571,9 @@ class ParameterValidator:
                     "reasoning": "Account-wide course queries can return 14,000+ courses (tested)"
                 },
                 "get_users": {
-                    "workflow": "Specify user role context for account-wide queries",
-                    "example": '{"parameters": {"enrollment_type": "StudentEnrollment"}}',
-                    "reasoning": "Users should be queried by role (StudentEnrollment, TeacherEnrollment, etc.)"
+                    "workflow": "Specify BOTH enrollment term and user role for account-wide queries",
+                    "example": '{"parameters": {"enrollment_term_id": 583, "enrollment_type": "StudentEnrollment"}}',
+                    "reasoning": "Account-wide user queries need both term and role scoping (enrollment_type alone can return 50,000+ users)"
                 },
                 "get_groups": {
                     "workflow": "Get enrollment terms first, then query groups by term",

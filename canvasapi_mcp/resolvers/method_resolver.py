@@ -204,7 +204,8 @@ class MethodResolver:
             # Check if method exists on the object
             if not hasattr(target_obj, method_name):
                 raise MethodResolutionError(
-                    f"Method {method_name} not found on {type(target_obj).__name__}"
+                    f"Method {method_name} not found on {type(target_obj).__name__}. "
+                    f"Use discover_canvas_methods to explore available methods for this object type."
                 )
 
             method = getattr(target_obj, method_name)
@@ -270,7 +271,8 @@ class MethodResolver:
                         return method_info
 
                 raise MethodResolutionError(
-                    f"Method {method_name} not found on {object_type}"
+                    f"Method {method_name} not found on {object_type}. "
+                    f"Use discover_canvas_methods to explore available methods."
                 )
 
             methods = self.discover_methods(obj)
@@ -279,7 +281,8 @@ class MethodResolver:
                     return method_info
 
             raise MethodResolutionError(
-                f"Method {method_name} not found on {object_type}"
+                f"Method {method_name} not found on {object_type}. "
+                f"Use discover_canvas_methods to explore available methods."
             )
 
         except Exception as e:

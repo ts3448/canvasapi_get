@@ -59,10 +59,13 @@ class CanvasQueryTool:
             - Apply server-side pandas operations for filtering and processing
             - Get comprehensive error information
             
+            Method Discovery: Use discover_canvas_methods if unsure about available methods.
+            This explores your specific Canvas instance's capabilities dynamically.
+            
             IMPORTANT - Canvas Data Hierarchy:
             Large data endpoints require scoping to follow proper Canvas administrative workflows:
             - get_courses: MUST include 'enrollment_term_id' (TESTED: 14K+ → hundreds)
-            - get_users: MUST include 'enrollment_type' (role-based scoping)
+            - get_users: MUST include BOTH 'enrollment_term_id' AND 'enrollment_type' (both required)
             - get_groups: MUST include 'enrollment_term_id' (account-wide groups can be massive)
             - get_sections: MUST include 'enrollment_term_id' (account-wide sections can be massive)
             - get_external_tools: MUST include 'enrollment_term_id' (scope by active period)
@@ -72,9 +75,25 @@ class CanvasQueryTool:
             
             Examples:
             - Get courses by term: {"object_type": "account", "object_id": 439, "method": "get_courses", "parameters": {"enrollment_term_id": 583}}
-            - Get students: {"object_type": "account", "object_id": 439, "method": "get_users", "parameters": {"enrollment_type": "StudentEnrollment"}}
+            - Get students: {"object_type": "account", "object_id": 439, "method": "get_users", "parameters": {"enrollment_term_id": 583, "enrollment_type": "StudentEnrollment"}}
             - Get groups by term: {"object_type": "account", "object_id": 439, "method": "get_groups", "parameters": {"enrollment_term_id": 583}}
             - Get sections by term: {"object_type": "account", "object_id": 439, "method": "get_sections", "parameters": {"enrollment_term_id": 583}}
+            
+            Canvas API Parameter Patterns:
+            - Scope by term: {"enrollment_term_id": 583}
+            - Scope by role: {"enrollment_type": "StudentEnrollment"}  
+            - Include related data: {"include": ["enrollments", "avatar_url"]}
+            - Pagination control: {"per_page": 100}
+            These are Canvas API parameters passed directly to endpoints.
+            
+            Server-Side Pandas Operations:
+            - Filter by text: {"operation": "query", "expr": "name.str.contains('2025')"}
+            - Sort data: {"operation": "sort_values", "by": "created_at", "ascending": false}
+            - Limit results: {"operation": "head", "n": 10}
+            - Remove duplicates: {"operation": "drop_duplicates"}
+            These process Canvas data after retrieval for targeted results.
+            
+            Large Dataset Strategy: Use pandas_operations when expecting >10 records.
             """,
             inputSchema={
                 "type": "object",
@@ -110,11 +129,11 @@ class CanvasQueryTool:
                     },
                     "method": {
                         "type": "string",
-                        "description": "Canvas method to call (e.g., 'get_courses', 'get_assignments', 'get_users')",
+                        "description": "Canvas method to call (e.g., 'get_courses', 'get_assignments', 'get_users'). Use discover_canvas_methods first if unsure about available methods.",
                     },
                     "parameters": {
                         "type": "object",
-                        "description": "Parameters to pass to the Canvas method. Scoping requirements: get_courses/get_groups/get_sections/get_external_tools need enrollment_term_id, get_users needs enrollment_type, get_enrollments needs both.",
+                        "description": "Parameters to pass to the Canvas method. Scoping requirements: get_courses/get_groups/get_sections/get_external_tools need enrollment_term_id, get_users needs BOTH enrollment_term_id AND enrollment_type, get_enrollments needs both.",
                         "properties": {
                             "enrollment_term_id": {
                                 "type": ["integer", "string"],
@@ -122,7 +141,7 @@ class CanvasQueryTool:
                             },
                             "enrollment_type": {
                                 "type": "string",
-                                "description": "Required for get_users and get_enrollments - scope by role (StudentEnrollment, TeacherEnrollment, TaEnrollment, etc.)"
+                                "description": "Required for get_users (with enrollment_term_id) and get_enrollments - scope by role (StudentEnrollment, TeacherEnrollment, TaEnrollment, etc.)"
                             }
                         },
                         "additionalProperties": True,
